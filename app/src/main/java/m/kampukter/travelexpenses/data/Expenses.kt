@@ -1,9 +1,6 @@
 package m.kampukter.travelexpenses.data
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity(
     tableName = "expenses",
@@ -15,7 +12,9 @@ import androidx.room.PrimaryKey
         entity = Currency::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("currency_Id")
-    )]
+    )],
+    indices = [(Index(value = ["expense_Id"], name = "idx_expense_id")),
+        (Index(value = ["currency_Id"], name = "idx_currency_id"))]
 )
 
 data class Expenses(

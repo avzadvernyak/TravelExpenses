@@ -1,5 +1,6 @@
 package m.kampukter.travelexpenses.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,7 @@ import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Currency
 import m.kampukter.travelexpenses.data.Expense
 import m.kampukter.travelexpenses.data.MyDatabase
+import m.kampukter.travelexpenses.data.TravelExpensesView
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -27,8 +29,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TravelExpensesFragment : Fragment() {
 
-    //private val viewModel by viewModel<MyViewModel>()
-    private val db = get<MyDatabase>().travelExpensesDao().getAll()
+    private val viewModel by viewModel<MyViewModel>()
     private var expensesAdapter: ExpensesAdapter? = null
 
     override fun onCreateView(
@@ -46,7 +47,18 @@ class TravelExpensesFragment : Fragment() {
             title = "Travel"
         }
 
-        expensesAdapter = ExpensesAdapter()
+        val clickEventDelegate: ClickEventDelegate<TravelExpensesView> = object : ClickEventDelegate<TravelExpensesView> {
+            override fun onClick(item: TravelExpensesView) {
+            }
+            override fun onLongClick(item: TravelExpensesView) {
+                fragmentManager?.let { fm ->
+                    val messageStr = "На сумму ${item.sum} \nЗа ${item.expenseName}\n Комментарий -${item.note}"
+                    ExpensesDelDialog.create(item.id, messageStr).show(fm, "delDialog")
+                }
+            }
+        }
+        expensesAdapter = ExpensesAdapter(clickEventDelegate)
+
 
         with(recyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -56,12 +68,12 @@ class TravelExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
-        /*
+
         viewModel.expenses.observe(this,
             Observer { list -> expensesAdapter?.setList(list) }
         )
-        */
 
-        //addCustomerButton.setOnClickListener { startActivity(Intent(activity, AddNewCustomerActivity::class.java)) }
+
+        addCustomerButton.setOnClickListener { startActivity(Intent(activity, NewExpensesActivity::class.java)) }
     }
 }

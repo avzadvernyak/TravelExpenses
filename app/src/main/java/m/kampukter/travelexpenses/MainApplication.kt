@@ -28,17 +28,17 @@ class MainApplication: Application() {
                         GlobalScope.launch(context = Dispatchers.IO) {
                             get<MyDatabase>().currencyDao().insertAll(
                                 listOf(
-                                    Currency(name = "UAH"),
-                                    Currency(name = "RUR"),
-                                    Currency(name = "USD"),
-                                    Currency(name = "EUR")
+                                    Currency(name = "UAH",defCurrency =0),
+                                    Currency(name = "RUR",defCurrency =0),
+                                    Currency(name = "USD",defCurrency =0),
+                                    Currency(name = "EUR",defCurrency =1)
                                 )
                             )
                         }
                         GlobalScope.launch(context = Dispatchers.IO) {
                             get<MyDatabase>().expenseDao().insertAll(
                                 listOf(
-                                    Expense(name = "Питание - ощественное"),
+                                    Expense(name = "Питание - общепит"),
                                     Expense(name = "Питание - продукты"),
                                     Expense(name = "Дорога - Топливо"),
                                     Expense(name = "Дорога - Оплата дорог"),
@@ -60,6 +60,7 @@ class MainApplication: Application() {
         single { ExpenseRepository(get<MyDatabase>().expenseDao()) }
         single { ExpensesRepository(get<MyDatabase>().expensesDao()) }
         single { TravelExpensesRepository(get<MyDatabase>().travelExpensesDao()) }
+
         viewModel { MyViewModel(get(),get(),get(),get()) }
     }
 

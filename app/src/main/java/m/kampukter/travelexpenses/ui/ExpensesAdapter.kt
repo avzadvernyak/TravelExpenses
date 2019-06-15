@@ -6,18 +6,28 @@ import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.TravelExpensesView
 
-typealias ExpensesClickListener<T> = (T) -> Unit
+class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<TravelExpensesView>) :
+    RecyclerView.Adapter<ExpensesViewHolder>() {
 
-class ExpensesAdapter(
-    private val expensesClickListener: ExpensesClickListener<TravelExpensesView>? = null
-) : RecyclerView.Adapter<ExpensesViewHolder>() {
-
+    /*
+    private val clickEventDelegate: ClickEventDelegate<TravelExpensesView> =
+        object : ClickEventDelegate<TravelExpensesView> {
+            override fun onClick(item: TravelExpensesView) {
+                Log.d("blablabla", "onClick --" + item.id + " ------")
+            }
+            override fun onLongClick(item: TravelExpensesView) {
+                Log.d("blablabla", "onLongClick --" + item.id + " ------")
+            }
+        }
+*/
     private var expenses: List<TravelExpensesView>? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpensesViewHolder {
         return ExpensesViewHolder(
             LayoutInflater
                 .from(parent.context)
-                .inflate(R.layout.expenses_item, parent, false)
+                .inflate(R.layout.expenses_item, parent, false),
+            clickEventDelegate
         )
     }
 
@@ -27,9 +37,10 @@ class ExpensesAdapter(
 
     override fun onBindViewHolder(holder: ExpensesViewHolder, position: Int) {
         expenses?.get(position)?.let { item ->
-            holder.bind(item, expensesClickListener)
+            holder.bind(item)
         }
     }
+
     fun setList(list: List<TravelExpensesView>) {
         this.expenses = list
         notifyDataSetChanged()

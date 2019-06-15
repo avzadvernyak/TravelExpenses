@@ -11,5 +11,6 @@ import androidx.room.PrimaryKey
 data class Currency (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val name: String
+    val name: String,
+    val defCurrency: Int = 0
 )

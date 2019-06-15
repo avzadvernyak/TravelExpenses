@@ -6,4 +6,5 @@ import m.kampukter.travelexpenses.data.dao.TravelExpensesDao
 
 class TravelExpensesRepository(private val travelExpensesDao: TravelExpensesDao) {
     fun getAll(): LiveData<List<TravelExpensesView>> = travelExpensesDao.getAll()
+    fun getRecordById(id: Long): LiveData<TravelExpensesView> = travelExpensesDao.getRecordById(id)
 }
