@@ -63,7 +63,9 @@ class EditExpenseFragment : Fragment() {
             }
         })
         expenseEditAdapter?.onLongClickCallback = { expense ->
-            viewModel.deleteExpense(expense.id, false)
+            fragmentManager?.let { ExpenseDeletionConfirmalDialog().setCallback {
+                viewModel.deleteExpense(expense.id, false)
+            }.show(it, "blablabla") }
             true
         }
 
