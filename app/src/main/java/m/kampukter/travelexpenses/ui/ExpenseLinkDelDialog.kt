@@ -8,7 +8,9 @@ import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ExpenseLinkDelDialog : DialogFragment() {
-    private val viewModel by viewModel<MyViewModel>()
+
+    private var callback: ((Long, Boolean) -> Unit)? = null
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val builder = AlertDialog.Builder(activity)
@@ -16,11 +18,16 @@ class ExpenseLinkDelDialog : DialogFragment() {
         builder.setTitle("Удалить запись")
             .setMessage(arguments?.getString(ARG_MESSAGE))
             .setPositiveButton(android.R.string.yes) { _, _ ->
-                expensesId?.let { viewModel.deleteExpense(expensesId, false) }
+                expensesId?.let { callback?.invoke(expensesId, true) }
             }
             .setNegativeButton(android.R.string.no) { _, _ -> }
 
         return builder.create()
+    }
+
+    fun setCallback(callback: (Long, Boolean) -> Unit): ExpenseLinkDelDialog {
+        this.callback = callback
+        return this
     }
 
     companion object {

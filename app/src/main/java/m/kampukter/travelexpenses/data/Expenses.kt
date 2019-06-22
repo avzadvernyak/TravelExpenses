@@ -7,7 +7,8 @@ import androidx.room.*
     foreignKeys = [ForeignKey(
         entity = Expense::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("expense_Id")
+        childColumns = arrayOf("expense_Id"),
+        onDelete = ForeignKey.CASCADE
     ), ForeignKey(
         entity = Currency::class,
         parentColumns = arrayOf("id"),

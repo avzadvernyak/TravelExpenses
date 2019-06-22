@@ -34,7 +34,7 @@ class ExpenseRepository(private val expenseDao: ExpenseDao , private val expense
                 expenseDao.deleteExpenseById(expenseId)
                 emit(ExpenseDeletionResult.Success)
             } else {
-                emit(ExpenseDeletionResult.Warning(countRecords))
+                emit(ExpenseDeletionResult.Warning(expenseId, countRecords))
             }
         }
 }

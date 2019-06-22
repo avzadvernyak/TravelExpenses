@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expense_edit_list_fragment.*
 import kotlinx.android.synthetic.main.expense_edit_list_fragment.toolbar
 import m.kampukter.travelexpenses.R
@@ -48,20 +49,21 @@ class EditExpenseFragment : Fragment() {
         viewModel.expenseList.observe(this, Observer { list ->
             expenseEditAdapter?.setItems(list)
         })
-        /*
-        viewModel.expenseDeletionResultLiveData.observe(this, Observer {
-
-            when(it){
-                is ExpenseDeletionResult.Warning -> Log.d("blablabla", "Warning ${it.countRecords}")
-                is ExpenseDeletionResult.Success -> Log.d("blablabla", "Success")
+        viewModel.expenseDeletionResultLiveData.observe(this, Observer { result ->
+            when(result){
+                is ExpenseDeletionResult.Warning -> {
+                    fragmentManager?.let { fm ->
+                        val messageStr = "Deleting this expense will impact ${result.countRecords} expenses"
+                        ExpenseLinkDelDialog.create(result.expenseId, messageStr)
+                            .setCallback { id, isForced -> viewModel.deleteExpense(id, isForced) }
+                            .show(fm, ExpenseLinkDelDialog.TAG)
+                    }
+                }
+                is ExpenseDeletionResult.Success -> Snackbar.make(expenseListRecyclerView, "Expense was deleted", Snackbar.LENGTH_SHORT).show()
             }
         })
-    */
-        expenseEditAdapter?.onLongClickCallback = {
-            fragmentManager?.let { fm ->
-                val messageStr = it.name
-                ExpenseDelDialog.create(it.id, messageStr).show(fm, ExpenseDelDialog.TAG)
-            }
+        expenseEditAdapter?.onLongClickCallback = { expense ->
+            viewModel.deleteExpense(expense.id, false)
             true
         }
 
