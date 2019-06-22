@@ -57,7 +57,7 @@ class MainApplication: Application() {
         }
 
         single { CurrencyRepository(get<MyDatabase>().currencyDao()) }
-        single { ExpenseRepository(get<MyDatabase>().expenseDao()) }
+        single { ExpenseRepository(get<MyDatabase>().expenseDao(), get<MyDatabase>().expensesDao()) }
         single { ExpensesRepository(get<MyDatabase>().expensesDao()) }
         single { TravelExpensesRepository(get<MyDatabase>().travelExpensesDao()) }
 

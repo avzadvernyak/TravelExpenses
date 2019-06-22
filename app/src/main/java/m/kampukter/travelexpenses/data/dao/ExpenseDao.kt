@@ -19,4 +19,10 @@ interface ExpenseDao {
 
     @Query("select * from expense where id like :query limit 1")
     fun search(query: String): LiveData<Expense>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addExpense( expense: Expense)
+
+    @Query("delete from expense WHERE expense.id = :selectedId")
+    suspend fun deleteExpenseById(selectedId: Long)
 }

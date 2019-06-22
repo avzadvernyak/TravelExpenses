@@ -2,5 +2,6 @@
     <string name="app_name">Travel Expenses</string>
 
     <string name="addNewRepairError">Есть не заполненные поля.</string>
+    <string name="edit_expense">Изменение статей расходов</string>
 
 </resources>

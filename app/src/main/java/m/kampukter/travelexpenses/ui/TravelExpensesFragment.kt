@@ -2,28 +2,15 @@ package m.kampukter.travelexpenses.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.android.synthetic.main.expenses_fragment.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.Currency
-import m.kampukter.travelexpenses.data.Expense
-import m.kampukter.travelexpenses.data.MyDatabase
 import m.kampukter.travelexpenses.data.TravelExpensesView
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
-import org.koin.android.ext.android.get
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -31,6 +18,11 @@ class TravelExpensesFragment : Fragment() {
 
     private val viewModel by viewModel<MyViewModel>()
     private var expensesAdapter: ExpensesAdapter? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,21 +36,32 @@ class TravelExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.apply {
-            title = "Travel"
+            title = "Расходы"
         }
 
-        val clickEventDelegate: ClickEventDelegate<TravelExpensesView> = object : ClickEventDelegate<TravelExpensesView> {
-            override fun onClick(item: TravelExpensesView) {
-            }
-            override fun onLongClick(item: TravelExpensesView) {
-                fragmentManager?.let { fm ->
-                    val messageStr = "На сумму ${item.sum} \nЗа ${item.expenseName}\n Комментарий -${item.note}"
-                    ExpensesDelDialog.create(item.id, messageStr).show(fm, "delDialog")
+        val clickEventDelegate: ClickEventDelegate<TravelExpensesView> =
+            object : ClickEventDelegate<TravelExpensesView> {
+                override fun onClick(item: TravelExpensesView) {
+                    (context as AppCompatActivity).startActivity(
+                        Intent(
+                            context,
+                            EditExpensesActivity::class.java
+                        ).apply {
+                            putExtra(
+                                EXTRA_MESSAGE,
+                                item.id.toString()
+                            )
+                        })
+                }
+
+                override fun onLongClick(item: TravelExpensesView) {
+                    fragmentManager?.let { fm ->
+                        val messageStr = "На сумму ${item.sum} \nЗа ${item.expenseName}\n Комментарий -${item.note}"
+                        ExpensesDelDialog.create(item.id, messageStr).show(fm, "delDialog")
+                    }
                 }
             }
-        }
         expensesAdapter = ExpensesAdapter(clickEventDelegate)
-
 
         with(recyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -75,5 +78,27 @@ class TravelExpensesFragment : Fragment() {
 
 
         addCustomerButton.setOnClickListener { startActivity(Intent(activity, NewExpensesActivity::class.java)) }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.travel_expense_toolbar_menu, menu)
+
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return (when(item.itemId) {
+            R.id.action_edit_expense -> {
+                Log.d("blablabla", "menu ")
+                startActivity(Intent(activity, EditExpenseActivity::class.java))
+                true
+            }
+            else ->
+                super.onOptionsItemSelected(item)
+        })
+    }
+
+    companion object {
+        const val EXTRA_MESSAGE = "EXTRA_MESSAGE"
     }
 }
