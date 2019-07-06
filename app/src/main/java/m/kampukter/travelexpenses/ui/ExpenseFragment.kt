@@ -29,7 +29,7 @@ class ExpenseFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.apply {
-            title = "Выберите статью расходов"
+            title = getString(R.string.expense_frag_title)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
@@ -40,7 +40,6 @@ class ExpenseFragment: Fragment() {
                 finish()
             }
         }
-
         with(recyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,
@@ -49,15 +48,9 @@ class ExpenseFragment: Fragment() {
             )
             adapter = expenseAdapter
         }
-
         viewModel.expenseList.observe(this, Observer { list ->
             expenseAdapter?.setList(list)
         })
-/*
-        viewModel.clearSearch()
-
-        addModelButton.setOnClickListener{startActivity(Intent(activity, AddNewModelActivity::class.java))}
-        */
     }
     companion object {
         const val EXTRA_EXPENSE_ID = "EXTRA_EXPENSE_ID"

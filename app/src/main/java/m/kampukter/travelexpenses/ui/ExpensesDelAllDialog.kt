@@ -8,16 +8,17 @@ import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ExpensesDelDialog : DialogFragment() {
+class ExpensesDelAllDialog : DialogFragment() {
     private val viewModel by viewModel<MyViewModel>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)
-        val expensesId = arguments?.getLong(ARG_EXPENSES_ID)
-        builder.setTitle(getString(R.string.expenses_del_title))
-            .setMessage(arguments?.getString(ARG_MESSAGE))
+        builder.setTitle(getString(R.string.expenses_del_all_title))
+            .setMessage(
+                getString(R.string.expenses_del_all_message)
+            )
             .setPositiveButton(android.R.string.yes) { _, _ ->
-                expensesId?.let { viewModel.expensesDelete(it) }
+                viewModel.deleteAllExpenses()
             }
             .setNegativeButton(android.R.string.no) { _, _ -> }
 
@@ -25,13 +26,7 @@ class ExpensesDelDialog : DialogFragment() {
     }
 
     companion object {
-        private const val ARG_EXPENSES_ID = "ARG_EXPENSES_ID"
-        private const val ARG_MESSAGE = "ARG_MESSAGE"
-        fun create(expensesId: Long, message: String): ExpensesDelDialog = ExpensesDelDialog().apply {
-            arguments = Bundle().apply {
-                putLong(ARG_EXPENSES_ID, expensesId)
-                putString(ARG_MESSAGE, message)
-            }
-        }
+        const val TAG = "ExpensesDelAllDialog"
+        fun create(): ExpensesDelAllDialog = ExpensesDelAllDialog()
     }
 }

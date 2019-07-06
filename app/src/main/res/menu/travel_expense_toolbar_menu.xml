@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+       >
 
     <item android:id="@+id/action_edit_expense"
-          android:title="Корзина"
-          app:showAsAction="always"
-          android:icon="@drawable/ic_settings"
-          android:orderInCategory="9"
+          android:title="@string/menu_expense"
+          android:orderInCategory="10"
+    />
+    <item android:id="@+id/action_export"
+          android:title="@string/menu_export"
+          android:orderInCategory="50"
+    />
+    <item android:id="@+id/action_delAllExpenses"
+          android:title="@string/menu_clear_expenses"
+          android:orderInCategory="70"
+    />
+    <item android:id="@+id/action_about"
+          android:title="@string/menu_about"
+          android:orderInCategory="90"
     />
 </menu>

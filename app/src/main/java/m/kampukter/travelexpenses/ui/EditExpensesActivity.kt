@@ -3,7 +3,6 @@ package m.kampukter.travelexpenses.ui
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -34,7 +33,7 @@ class EditExpensesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.edit_expenses_activity)
-        setSupportActionBar(editExpensesToolbar).apply { title = "Редактирование записи" }
+        setSupportActionBar(editExpensesToolbar).apply { title = getString(R.string.expenses_edit_title) }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
@@ -55,7 +54,6 @@ class EditExpensesActivity : AppCompatActivity() {
         }
 
         val idSelectedExpense = intent.getStringExtra(TravelExpensesFragment.EXTRA_MESSAGE)
-        Log.d("blablabla", "Edit record - $idSelectedExpense")
         viewModel.setQueryTravelExpensesId(idSelectedExpense.toLong())
         viewModel.expensesById.observe(this, Observer { expenses ->
             idRecord = expenses.id
@@ -88,7 +86,6 @@ class EditExpensesActivity : AppCompatActivity() {
         saveEditExpensesButton.setOnClickListener {
             summa = sumTextInputEdit.text.toString().toFloat()
             if (expenseId != 0L && summa != 0F) {
-                Log.d("blablabla", "Save summa= $summa - currencyId=$currencyId type =$expenseId")
                 val expensesSave = Expenses(
                     id = idRecord,
                     dateTime = dateTimeRecord,

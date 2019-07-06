@@ -29,4 +29,9 @@ class ExpensesRepository(private val expensesDao: ExpensesDao) {
             expensesDao.deleteExpensesById(selectedId)
         }
     }
+    fun deleteAll() {
+        GlobalScope.launch(context = Dispatchers.IO) {
+            expensesDao.deleteAll()
+        }
+    }
 }

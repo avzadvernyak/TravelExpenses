@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expense_edit_list_fragment.*
@@ -20,16 +19,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditExpenseFragment : Fragment() {
     private val viewModel by viewModel<MyViewModel>()
-
     private var expenseEditAdapter: ExpenseEditAdapter? = null
 
-/*
-    private lateinit var viewModel: MyViewModel
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(activity?).get(MyViewModel::class.java)
-    }
-*/
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.expense_edit_list_fragment, container, false)
 
@@ -50,20 +41,31 @@ class EditExpenseFragment : Fragment() {
             expenseEditAdapter?.setItems(list)
         })
         viewModel.expenseDeletionResultLiveData.observe(this, Observer { result ->
-            when(result){
+            when (result) {
                 is ExpenseDeletionResult.Warning -> {
                     fragmentManager?.let { fm ->
-                        val messageStr = "Deleting this expense will impact ${result.countRecords} expenses"
-                        ExpenseLinkDelDialog.create(result.expenseId, messageStr)
-                            .setCallback { id, isForced -> viewModel.deleteExpense(id, isForced) }
-                            .show(fm, ExpenseLinkDelDialog.TAG)
+                        if (fm.findFragmentByTag(ExpenseLinkDelDialog.TAG) == null) {
+                            val messageStr = getString(R.string.expense_del_warning, result.countRecords.toString())
+                            ExpenseLinkDelDialog.create(result.expenseId, messageStr)
+                                .setCallback { id, isForced -> viewModel.deleteExpense(id, isForced) }
+                                .show(fm, ExpenseLinkDelDialog.TAG)
+                        }
                     }
                 }
-                is ExpenseDeletionResult.Success -> Snackbar.make(expenseListRecyclerView, "Expense was deleted", Snackbar.LENGTH_SHORT).show()
+                is ExpenseDeletionResult.Success -> Snackbar.make(
+                    expenseListRecyclerView,
+                    getString(R.string.expense_del_message),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         })
         expenseEditAdapter?.onLongClickCallback = { expense ->
-            viewModel.deleteExpense(expense.id, false)
+            fragmentManager?.let { fm ->
+                val messageStr = expense.name
+                ExpenseDelDialog.create(expense.id, messageStr)
+                    .setCallback { id, isForced -> viewModel.deleteExpense(id, isForced) }
+                    .show(fm, ExpenseDelDialog.TAG)
+            }
             true
         }
 

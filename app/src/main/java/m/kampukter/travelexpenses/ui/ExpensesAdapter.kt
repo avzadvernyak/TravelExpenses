@@ -8,18 +8,6 @@ import m.kampukter.travelexpenses.data.TravelExpensesView
 
 class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<TravelExpensesView>) :
     RecyclerView.Adapter<ExpensesViewHolder>() {
-
-    /*
-    private val clickEventDelegate: ClickEventDelegate<TravelExpensesView> =
-        object : ClickEventDelegate<TravelExpensesView> {
-            override fun onClick(item: TravelExpensesView) {
-                Log.d("blablabla", "onClick --" + item.id + " ------")
-            }
-            override fun onLongClick(item: TravelExpensesView) {
-                Log.d("blablabla", "onLongClick --" + item.id + " ------")
-            }
-        }
-*/
     private var expenses: List<TravelExpensesView>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpensesViewHolder {

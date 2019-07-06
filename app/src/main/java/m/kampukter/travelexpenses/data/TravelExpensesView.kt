@@ -1,13 +1,7 @@
 package m.kampukter.travelexpenses.data
 
 import androidx.room.ColumnInfo
-import androidx.room.Entity
 
-/*
-@Entity(
-    tableName = "expensesview"
-)
-*/
 data class TravelExpensesView (
     @ColumnInfo(name = "id_records")
     val id: Long,

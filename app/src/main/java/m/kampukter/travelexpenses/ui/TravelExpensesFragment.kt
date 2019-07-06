@@ -7,7 +7,9 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
+import kotlinx.android.synthetic.main.expenses_fragment.toolbar
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.TravelExpensesView
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
@@ -36,7 +38,7 @@ class TravelExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.apply {
-            title = "Расходы"
+            title = getString(R.string.travel_expenses_title)
         }
 
         val clickEventDelegate: ClickEventDelegate<TravelExpensesView> =
@@ -73,8 +75,26 @@ class TravelExpensesFragment : Fragment() {
         }
 
         viewModel.expenses.observe(this,
-            Observer { list -> expensesAdapter?.setList(list) }
+            Observer { list ->
+                expensesAdapter?.setList(list)
+            }
         )
+        viewModel.expensesCSVForExport.observe(this, Observer {expensesCSV->
+            if (expensesCSV.isNullOrEmpty()) {
+                Snackbar.make(
+                    recyclerView,
+                    "Нет данных для экспорта",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, expensesCSV)
+                    type = "text/plain"
+                }
+                startActivity(Intent.createChooser(sendIntent, "My Send"))
+            }
+        })
 
 
         addCustomerButton.setOnClickListener { startActivity(Intent(activity, NewExpensesActivity::class.java)) }
@@ -87,10 +107,27 @@ class TravelExpensesFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return (when(item.itemId) {
+        return (when (item.itemId) {
             R.id.action_edit_expense -> {
                 Log.d("blablabla", "menu ")
                 startActivity(Intent(activity, EditExpenseActivity::class.java))
+                true
+            }
+            R.id.action_export -> {
+                viewModel.getExpensesCSV(true)
+                true
+            }
+            R.id.action_delAllExpenses -> {
+                fragmentManager?.let { fm ->
+                    ExpensesDelAllDialog.create().show(fm, ExpensesDelAllDialog.TAG)
+                }
+                true
+            }
+            R.id.action_about ->{
+                fragmentManager?.let { fm ->
+                    AboutDialog.create()
+                        .show(fm, AboutDialog.TAG)
+                }
                 true
             }
             else ->

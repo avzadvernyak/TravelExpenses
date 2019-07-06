@@ -4,8 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import m.kampukter.travelexpenses.viewmodel.MyViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import m.kampukter.travelexpenses.R
 
 class ExpenseLinkDelDialog : DialogFragment() {
 
@@ -15,7 +14,7 @@ class ExpenseLinkDelDialog : DialogFragment() {
 
         val builder = AlertDialog.Builder(activity)
         val expensesId = arguments?.getLong(ARG_EXPENSES_ID)
-        builder.setTitle("Удалить запись")
+        builder.setTitle(getString(R.string.expense_lin_del_title))
             .setMessage(arguments?.getString(ARG_MESSAGE))
             .setPositiveButton(android.R.string.yes) { _, _ ->
                 expensesId?.let { callback?.invoke(expensesId, true) }

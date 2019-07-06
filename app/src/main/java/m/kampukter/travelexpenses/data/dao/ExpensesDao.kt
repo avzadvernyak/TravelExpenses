@@ -6,6 +6,9 @@ import m.kampukter.travelexpenses.data.Expenses
 
 @Dao
 interface ExpensesDao {
+    @Query("delete from expenses")
+    suspend fun deleteAll()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(expanses: Expenses): Long
 

@@ -4,4 +4,38 @@
     <string name="addNewRepairError">Есть не заполненные поля.</string>
     <string name="edit_expense">Изменение статей расходов</string>
 
+    <string name="about_title">О программе</string>
+    <string name="about_message">"\n\nВерсия 1.00\n\n Особая благодарность Олегу за титанические усилия по вразумению автора"
+    " прораммы в процессе написания\n\n Для тех, кто хочет поддержать проект\n"
+    "WMZ Z463710705149\n"
+    "WMR R848491093338"</string>
+
+    <string name="expense_del_message">Статья была удалена</string>
+    <string name="expense_del_warning">"Найдены связанные с этой статьей записи в количестве %1$s шт.\n "
+    "Данные будут безвозвратно потеряны! \n"
+    " Удалить?"</string>
+    <!--"Deleting this expense will impact ${result.countRecords} expenses"-->
+
+    <string name="expenses_edit_title">Редактирование записи</string>
+    <string name="expense_del_title">Удалить запись</string>
+    <string name="expense_frag_title">Выберите статью расходов</string>
+    <string name="expense_lin_del_title">Удалить запись</string>
+    <string name="expenses_del_all_title">Удалить</string>
+    <string name="expenses_del_all_message">Все записи с расходами будут безвозвратно потеряны.Для их сохранения в другом месте воспользуйтесь Экспортом.
+    </string>
+    <string name="expenses_del_title">Удалить запись</string>
+    <string name="new_expense_title">Статья расходов</string>
+    <string name="travel_expenses_title">Расходы</string>
+    <string name="menu_expense">Статьи</string>
+    <string name="menu_export">Экспорт</string>
+    <string name="menu_clear_expenses">Очистить</string>
+    <string name="menu_about">О программе</string>
+    <string name="hint_datetime_created">Запись создана</string>
+    <string name="hint_choice_expense">Выберите статью</string>
+    <string name="hint_sum">Сумма</string>
+    <string name="hint_note">Примечание</string>
+    <string name="description_image">expenseImage</string>
+    <string name="add_expenses_title">Добавить запись</string>
+
+
 </resources>

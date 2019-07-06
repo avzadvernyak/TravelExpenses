@@ -4,9 +4,7 @@ import android.text.format.DateFormat
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expenses_item.view.*
-import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.TravelExpensesView
-import java.util.*
 
 class ExpensesViewHolder(
     itemView: View,

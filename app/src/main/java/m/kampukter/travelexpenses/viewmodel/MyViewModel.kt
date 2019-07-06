@@ -17,6 +17,20 @@ class MyViewModel(
     private val travelExpensesRepository: TravelExpensesRepository
 ) : ViewModel() {
     /*
+    * получение строки в CSV из коллекции Expenses для экспорта
+    */
+    private val expensesCSV = MutableLiveData<Boolean>()
+    fun getExpensesCSV(query: Boolean) {
+        expensesCSV.postValue(query)
+    }
+    val expensesCSVForExport: LiveData<String> =
+        Transformations.switchMap(expensesCSV) { travelExpensesRepository.getAllForSend() }
+    /*
+    * Удаление всех записей из Expenses
+    */
+    fun deleteAllExpenses() = expensesRepository.deleteAll()
+
+    /*
     *Получение коллекции Expenses по Expense_Id
     */
     private val expenseIdFind = MutableLiveData<Long>()

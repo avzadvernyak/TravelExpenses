@@ -27,7 +27,7 @@ class NewExpensesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.new_expenses_activity)
-        setSupportActionBar(newExpensesToolbar).apply { title = "Добавить запись" }
+        setSupportActionBar(newExpensesToolbar).apply { title = getString(R.string.add_expenses_title) }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
@@ -40,8 +40,6 @@ class NewExpensesActivity : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val pos = (position + 1).toLong()
-                //val nnn = parent?.getItemAtPosition(position).toString()
-                //Log.d("blablabla", "Spinner position = $pos - currencyId=$currencyId id =$id $nnn")
                 if (currencyId != pos) {
                     viewModel.resetDef()
                     viewModel.setDefCurrency(pos)
