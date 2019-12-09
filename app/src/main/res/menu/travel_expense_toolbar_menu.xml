@@ -11,10 +11,15 @@
           android:title="@string/menu_export"
           android:orderInCategory="50"
     />
+    <item android:id="@+id/action_sumAllExpenses"
+          android:title="@string/menu_sum_expenses"
+          android:orderInCategory="60"
+    />
     <item android:id="@+id/action_delAllExpenses"
           android:title="@string/menu_clear_expenses"
           android:orderInCategory="70"
     />
+
     <item android:id="@+id/action_about"
           android:title="@string/menu_about"
           android:orderInCategory="90"

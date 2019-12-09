@@ -3,10 +3,19 @@ package m.kampukter.travelexpenses.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
+import m.kampukter.travelexpenses.data.ExpensesSumView
 import m.kampukter.travelexpenses.data.TravelExpensesView
 
 @Dao
 interface TravelExpensesDao {
+    /*
+    select expense.id, (select sum(expenses.sum) from expenses where expenses.id_expense = expense.id)  from expense
+     */
+    @Query(
+        """select expense.name AS expense_name, (select sum(expenses.sum) from expenses where expenses.expense_Id = expense.id) AS expenses_sum  
+            from expense"""
+    )
+    fun getSumExpenses(): LiveData<List<ExpensesSumView>>
     @Query(
         """select expenses.id AS id_records, currency.name AS currency_name,
             expense.name AS expense_name,

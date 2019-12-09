@@ -117,6 +117,10 @@ class TravelExpensesFragment : Fragment() {
                 viewModel.getExpensesCSV(true)
                 true
             }
+            R.id.action_sumAllExpenses -> {
+                startActivity(Intent(activity, ExpensesSumActivity::class.java))
+                true
+            }
             R.id.action_delAllExpenses -> {
                 fragmentManager?.let { fm ->
                     ExpensesDelAllDialog.create().show(fm, ExpensesDelAllDialog.TAG)

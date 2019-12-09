@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="m.kampukter.travelexpenses">
 
     <application android:allowBackup="true"
@@ -7,7 +8,7 @@
                  android:roundIcon="@mipmap/ic_launcher_round"
                  android:supportsRtl="true"
                  android:theme="@style/AppTheme"
-                 android:name=".MainApplication">
+                 android:name=".MainApplication" tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -47,6 +48,14 @@
         <activity android:name=".ui.ExpenseActivity"
                   android:label="ExpenseActivity"
                   android:parentActivityName=".ui.NewExpensesActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.NewExpensesActivity">
+            </meta-data>
+        </activity>
+        <activity android:name=".ui.ExpensesSumActivity"
+                  android:label="ExpensesSumActivity"
+                  android:parentActivityName=".ui.MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".ui.NewExpensesActivity">

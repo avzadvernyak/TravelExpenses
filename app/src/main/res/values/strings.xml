@@ -28,6 +28,7 @@
     <string name="travel_expenses_title">Расходы</string>
     <string name="menu_expense">Статьи</string>
     <string name="menu_export">Экспорт</string>
+    <string name="menu_sum_expenses">Итоги</string>
     <string name="menu_clear_expenses">Очистить</string>
     <string name="menu_about">О программе</string>
     <string name="hint_datetime_created">Запись создана</string>
@@ -36,6 +37,7 @@
     <string name="hint_note">Примечание</string>
     <string name="description_image">expenseImage</string>
     <string name="add_expenses_title">Добавить запись</string>
+    <string name="expenses_sum_title">Итоги</string>
 
 
 </resources>

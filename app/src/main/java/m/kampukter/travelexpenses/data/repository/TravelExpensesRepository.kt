@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import m.kampukter.travelexpenses.data.ExpensesSumView
 import m.kampukter.travelexpenses.data.TravelExpensesView
 import m.kampukter.travelexpenses.data.dao.TravelExpensesDao
 
@@ -26,4 +27,5 @@ class TravelExpensesRepository(private val travelExpensesDao: TravelExpensesDao)
         return result
     }
     fun getRecordById(id: Long): LiveData<TravelExpensesView> = travelExpensesDao.getRecordById(id)
+    fun getExpensesSum():  LiveData<List<ExpensesSumView>> = travelExpensesDao.getSumExpenses()
 }

@@ -17,6 +17,10 @@ class MyViewModel(
     private val travelExpensesRepository: TravelExpensesRepository
 ) : ViewModel() {
     /*
+    * получение итогов по статьям и по валютам
+    */
+    fun getExpensesSun() = travelExpensesRepository.getExpensesSum()
+    /*
     * получение строки в CSV из коллекции Expenses для экспорта
     */
     private val expensesCSV = MutableLiveData<Boolean>()
