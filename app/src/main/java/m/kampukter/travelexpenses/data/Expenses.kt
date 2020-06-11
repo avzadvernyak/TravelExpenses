@@ -6,26 +6,25 @@ import androidx.room.*
     tableName = "expenses",
     foreignKeys = [ForeignKey(
         entity = Expense::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("expense_Id"),
+        parentColumns = arrayOf("name"),
+        childColumns = arrayOf("expense"),
         onDelete = ForeignKey.CASCADE
     ), ForeignKey(
         entity = Currency::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("currency_Id")
+        parentColumns = arrayOf("name"),
+        childColumns = arrayOf("currency_field")
     )],
-    indices = [(Index(value = ["expense_Id"], name = "idx_expense_id")),
-        (Index(value = ["currency_Id"], name = "idx_currency_id"))]
+    indices = [(Index(value = ["currency_field"], name = "idx_currency_field")),
+        (Index(value = ["expense"], name = "idx_expense"))]
 )
 
 data class Expenses(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val dateTime: Long,
-    @ColumnInfo(name = "expense_Id")
-    val expense: Long,
+    val expense: String,
     val sum: Float,
-    @ColumnInfo(name = "currency_Id")
-    val currency: Long,
+    @ColumnInfo(name = "currency_field")
+    val currency: String,
     val note: String
 )

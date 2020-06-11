@@ -12,29 +12,23 @@ import m.kampukter.travelexpenses.data.dao.ExpensesDao
 
 class ExpenseRepository(private val expenseDao: ExpenseDao , private val expensesDao: ExpensesDao) {
     fun getExpenseAll(): LiveData<List<Expense>> = expenseDao.getAll()
-    fun getExpenseById(foundId: String) = expenseDao.search(foundId)
+    fun getExpenseByName(expense: String) = expenseDao.search(expense)
     fun addExpense(expense: Expense) {
         GlobalScope.launch(context = Dispatchers.IO) {
             expenseDao.addExpense(expense)
         }
     }
-
-    fun deleteExpenseById(selectedId: Long) {
-        GlobalScope.launch(context = Dispatchers.IO) {
-            expenseDao.deleteExpenseById(selectedId)
-        }
-    }
     /*
     * Для удаления Expense. Код Олега
     */
-    fun deleteExpense(expenseId: Long, isForced: Boolean): LiveData<ExpenseDeletionResult> =
+    fun deleteExpense(expense: String, isForced: Boolean): LiveData<ExpenseDeletionResult> =
         liveData(context = Dispatchers.IO) {
-            val countRecords = expensesDao.getExpensesCount(expenseId)
+            val countRecords = expensesDao.getExpensesCount(expense)
             if (isForced || countRecords == 0L) {
-                expenseDao.deleteExpenseById(expenseId)
+                expenseDao.deleteExpenseByName(expense)
                 emit(ExpenseDeletionResult.Success)
             } else {
-                emit(ExpenseDeletionResult.Warning(expenseId, countRecords))
+                emit(ExpenseDeletionResult.Warning(expense, countRecords))
             }
         }
 }

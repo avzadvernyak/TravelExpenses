@@ -8,18 +8,20 @@ import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.repository.CurrencyRepository
 import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
-import m.kampukter.travelexpenses.data.repository.TravelExpensesRepository
+import m.kampukter.travelexpenses.data.repository.RateCurrencyRepository
 
 class MyViewModel(
     private val currencyRepository: CurrencyRepository,
     private val expenseRepository: ExpenseRepository,
     private val expensesRepository: ExpensesRepository,
-    private val travelExpensesRepository: TravelExpensesRepository
+    private val rateCurrencyRepository: RateCurrencyRepository
 ) : ViewModel() {
     /*
     * получение итогов по статьям и по валютам
     */
-    fun getExpensesSun() = travelExpensesRepository.getExpensesSum()
+    fun getExpensesSum() = expensesRepository.getExpensesSum()
+    fun getCurrencySum() = expensesRepository.getCurrencySum()
+
     /*
     * получение строки в CSV из коллекции Expenses для экспорта
     */
@@ -28,28 +30,12 @@ class MyViewModel(
         expensesCSV.postValue(query)
     }
     val expensesCSVForExport: LiveData<String> =
-        Transformations.switchMap(expensesCSV) { travelExpensesRepository.getAllForSend() }
+        Transformations.switchMap(expensesCSV) { expensesRepository.getAllForSend() }
     /*
     * Удаление всех записей из Expenses
     */
     fun deleteAllExpenses() = expensesRepository.deleteAll()
 
-    /*
-    *Получение коллекции Expenses по Expense_Id
-    */
-    private val expenseIdFind = MutableLiveData<Long>()
-
-    fun setQueryExpensesId(query: Long) {
-        expenseIdFind.postValue(query)
-    }
-
-    val expensesByExpenseId: LiveData<List<Expenses>> =
-        Transformations.switchMap(expenseIdFind) { query -> expensesRepository.getListByExpenseId(query) }
-
-    /*
-    *Получение типа валюты последней введенной суммы
-    */
-    val lastInputCurrency = expensesRepository.getLastInputCurrent()
 
     fun addExpenses(expenses: Expenses) {
         expensesRepository.addExpenses(expenses)
@@ -59,22 +45,22 @@ class MyViewModel(
         expensesRepository.updateExpenses(expenses)
     }
 
-    val expenses: LiveData<List<TravelExpensesView>> = travelExpensesRepository.getAll()
+    val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
 
     private val expensesFindId = MutableLiveData<Long>()
-    fun setQueryTravelExpensesId(query: Long) {
+    fun setQueryExpensesId(query: Long) {
         expensesFindId.postValue(query)
     }
 
-    val expensesById: LiveData<TravelExpensesView> =
-        Transformations.switchMap(expensesFindId) { query -> travelExpensesRepository.getRecordById(query) }
+    val expensesById: LiveData<Expenses> =
+        Transformations.switchMap(expensesFindId) { query -> expensesRepository.getRecordById(query) }
 
     fun expensesDelete(expensesId: Long) {
         expensesRepository.deleteExpensesById(expensesId)
     }
 
 
-    fun setDefCurrency(query: Long) {
+    fun setDefCurrency(query: String) {
         currencyRepository.setDefCurrency(query)
     }
 
@@ -82,25 +68,20 @@ class MyViewModel(
         currencyRepository.resetDef()
     }
 
-    val defCurrency: LiveData<Currency> = currencyRepository.getDefCurrency()
     val currencyList: LiveData<List<Currency>> = currencyRepository.getCurrencyAll()
 
 
-    private val queryExpenseId = MutableLiveData<String>()
-    fun setQueryExpenseId(query: String) {
-        queryExpenseId.postValue(query)
+    private val queryExpense = MutableLiveData<String>()
+    fun setQueryExpense(query: String) {
+        queryExpense.postValue(query)
     }
 
     val expenseById: LiveData<Expense> =
-        Transformations.switchMap(queryExpenseId) { query -> expenseRepository.getExpenseById(query) }
+        Transformations.switchMap(queryExpense) { query -> expenseRepository.getExpenseByName(query) }
 
     val expenseList: LiveData<List<Expense>> = expenseRepository.getExpenseAll()
     fun addExpense(expense: Expense) {
         expenseRepository.addExpense(expense)
-    }
-
-    fun delExpense(expenseId: Long) {
-        expenseRepository.deleteExpenseById(expenseId)
     }
 
     /*
@@ -110,16 +91,18 @@ class MyViewModel(
     private val expenseDeletionTrigger = MutableLiveData<ExpenseDeletionRequest>()
     val expenseDeletionResultLiveData: LiveData<ExpenseDeletionResult> =
         Transformations.switchMap(expenseDeletionTrigger) { request ->
-            expenseRepository.deleteExpense(request.id, request.isForced)
+            expenseRepository.deleteExpense(request.name, request.isForced)
         }
 
-    fun deleteExpense(expenseId: Long, isForced: Boolean) {
-        expenseDeletionTrigger.postValue(ExpenseDeletionRequest(expenseId, isForced))
+    fun deleteExpense(expenseName: String, isForced: Boolean) {
+        expenseDeletionTrigger.postValue(ExpenseDeletionRequest(expenseName, isForced))
     }
 
     data class ExpenseDeletionRequest(
-        val id: Long,
+        val name: String,
         val isForced: Boolean
     )
+
+    fun getRateCurrency() {rateCurrencyRepository.getRateCurrencyNBU()}
 
 }

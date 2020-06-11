@@ -36,7 +36,7 @@ class ExpenseFragment: Fragment() {
 
         expenseAdapter = ExpenseChoiceAdapter { item ->
             activity?.run {
-                setResult(AppCompatActivity.RESULT_OK, Intent().putExtra(EXTRA_EXPENSE_ID, item.id.toString()))
+                setResult(AppCompatActivity.RESULT_OK, Intent().putExtra(EXTRA_EXPENSE, item.name))
                 finish()
             }
         }
@@ -53,6 +53,6 @@ class ExpenseFragment: Fragment() {
         })
     }
     companion object {
-        const val EXTRA_EXPENSE_ID = "EXTRA_EXPENSE_ID"
+        const val EXTRA_EXPENSE = "EXTRA_EXPENSE"
     }
 }

@@ -8,15 +8,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
+import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
 import m.kampukter.travelexpenses.data.repository.CurrencyRepository
 import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
-import m.kampukter.travelexpenses.data.repository.TravelExpensesRepository
+import m.kampukter.travelexpenses.data.repository.RateCurrencyRepository
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainApplication: Application() {
     private val module = module {
@@ -59,7 +62,15 @@ class MainApplication: Application() {
         single { CurrencyRepository(get<MyDatabase>().currencyDao()) }
         single { ExpenseRepository(get<MyDatabase>().expenseDao(), get<MyDatabase>().expensesDao()) }
         single { ExpensesRepository(get<MyDatabase>().expensesDao()) }
-        single { TravelExpensesRepository(get<MyDatabase>().travelExpensesDao()) }
+
+        single { RateCurrencyRepository(get(), get<MyDatabase>().rateCurrencyDao()) }
+        // Start Retrofit injection
+        single { Retrofit.Builder()
+            .baseUrl("https://bank.gov.ua/NBUStatService/v1/statdirectory/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build() }
+        single { get<Retrofit>().create(RateCurrencyAPI::class.java) }
+        // End Retrofit injection
 
         viewModel { MyViewModel(get(),get(),get(),get()) }
     }

@@ -32,7 +32,7 @@ class ExpenseEditAdapter : RecyclerView.Adapter<ExpenseEditViewHolder>() {
     fun setItems(newItems: List<Expense>) {
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                items[oldItemPosition].id == newItems[newItemPosition].id
+                items[oldItemPosition].name == newItems[newItemPosition].name
 
             override fun getOldListSize(): Int = items.size
 

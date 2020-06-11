@@ -9,11 +9,9 @@ import m.kampukter.travelexpenses.data.dao.CurrencyDao
 
 class CurrencyRepository(private val currencyDao: CurrencyDao) {
     fun getCurrencyAll(): LiveData<List<Currency>> = currencyDao.getAll()
-    fun getDefCurrency(): LiveData<Currency> = currencyDao.searchDefault()
-    fun searchByName(query: String): LiveData<Currency> = currencyDao.searchByName(query)
-    fun setDefCurrency( currencyId: Long ) {
+    fun setDefCurrency(currencyName: String ) {
         GlobalScope.launch(context = Dispatchers.IO) {
-            currencyDao.setDefault(currencyId)
+            currencyDao.setDefault(currencyName)
         }
     }
     fun resetDef(  ) {

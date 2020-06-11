@@ -2,13 +2,14 @@ package m.kampukter.travelexpenses.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
+import java.util.*
 
 @Entity(
-    tableName = "currency"
+    tableName = "rateCurrency"
 )
 
-data class Currency (
+data class RateCurrency (
     @PrimaryKey val name: String,
-    val defCurrency: Int = 0
+    val exchangeDate: Date,
+    val rate: Float
 )

@@ -8,34 +8,34 @@ import m.kampukter.travelexpenses.R
 
 class ExpenseLinkDelDialog : DialogFragment() {
 
-    private var callback: ((Long, Boolean) -> Unit)? = null
+    private var callback: ((String, Boolean) -> Unit)? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val builder = AlertDialog.Builder(activity)
-        val expensesId = arguments?.getLong(ARG_EXPENSES_ID)
+        val expense = arguments?.getString(ARG_EXPENSE)
         builder.setTitle(getString(R.string.expense_lin_del_title))
             .setMessage(arguments?.getString(ARG_MESSAGE))
             .setPositiveButton(android.R.string.yes) { _, _ ->
-                expensesId?.let { callback?.invoke(expensesId, true) }
+                expense?.let { callback?.invoke(expense, true) }
             }
             .setNegativeButton(android.R.string.no) { _, _ -> }
 
         return builder.create()
     }
 
-    fun setCallback(callback: (Long, Boolean) -> Unit): ExpenseLinkDelDialog {
+    fun setCallback(callback: (String, Boolean) -> Unit): ExpenseLinkDelDialog {
         this.callback = callback
         return this
     }
 
     companion object {
-        private const val ARG_EXPENSES_ID = "ARG_EXPENSES_ID"
+        private const val ARG_EXPENSE = "ARG_EXPENSE"
         private const val ARG_MESSAGE = "ARG_MESSAGE"
         const val TAG = "ExpenseLinkDelDialog"
-        fun create(expensesId: Long, message: String): ExpenseLinkDelDialog = ExpenseLinkDelDialog().apply {
+        fun create(expense: String, message: String): ExpenseLinkDelDialog = ExpenseLinkDelDialog().apply {
             arguments = Bundle().apply {
-                putLong(ARG_EXPENSES_ID, expensesId)
+                putString(ARG_EXPENSE, expense)
                 putString(ARG_MESSAGE, message)
             }
         }

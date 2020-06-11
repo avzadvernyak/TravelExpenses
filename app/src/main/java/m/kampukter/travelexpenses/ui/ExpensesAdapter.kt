@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.TravelExpensesView
+import m.kampukter.travelexpenses.data.Expenses
 
-class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<TravelExpensesView>) :
+class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<Expenses>) :
     RecyclerView.Adapter<ExpensesViewHolder>() {
-    private var expenses: List<TravelExpensesView>? = null
+    private var expenses: List<Expenses>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpensesViewHolder {
         return ExpensesViewHolder(
@@ -29,7 +29,7 @@ class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<TravelE
         }
     }
 
-    fun setList(list: List<TravelExpensesView>) {
+    fun setList(list: List<Expenses>) {
         this.expenses = list
         notifyDataSetChanged()
     }

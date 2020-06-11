@@ -2,7 +2,6 @@ package m.kampukter.travelexpenses.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -12,37 +11,43 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.new_expenses_activity.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
-import m.kampukter.travelexpenses.ui.ExpenseFragment.Companion.EXTRA_EXPENSE_ID
+import m.kampukter.travelexpenses.ui.ExpenseFragment.Companion.EXTRA_EXPENSE
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class NewExpensesActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<MyViewModel>()
-    private var expenseId: Long = 0L
-    private var currencyId: Long = 0L
+    private var expense: String = ""
+    private var currency: String = ""
     private var summa: Float = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.new_expenses_activity)
-        setSupportActionBar(newExpensesToolbar).apply { title = getString(R.string.add_expenses_title) }
+        setSupportActionBar(newExpensesToolbar).apply {
+            title = getString(R.string.add_expenses_title)
+        }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         val currencySpinner = currencySpinner
         val currencyAdapter = ArrayAdapter<Any>(this, android.R.layout.simple_spinner_item)
         currencySpinner.adapter = currencyAdapter
+
         currencySpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val pos = (position + 1).toLong()
-                if (currencyId != pos) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (currency != currencySpinner.selectedItem.toString()) {
                     viewModel.resetDef()
-                    viewModel.setDefCurrency(pos)
+                    viewModel.setDefCurrency(currencySpinner.selectedItem.toString())
                 }
             }
         }
@@ -55,13 +60,13 @@ class NewExpensesActivity : AppCompatActivity() {
         }
         saveExpensesButton.setOnClickListener {
             summa = sumTextInputEdit.text.toString().toFloat()
-            if (expenseId != 0L && summa != 0F) {
-                Log.d("blablabla", "Save summa= $summa - currencyId=$currencyId type =$expenseId")
+            if (expense != "" && summa != 0F && !noteTextInputEdit.text.isNullOrBlank()) {
+                //Log.d("blablabla", "Save summa= $summa - currency=$currency type =$expense")
                 val expensesSave = Expenses(
                     dateTime = System.currentTimeMillis(),
                     sum = summa,
-                    currency = currencyId,
-                    expense = expenseId,
+                    currency = currency,
+                    expense = expense,
                     note = noteTextInputEdit.text.toString()
                 )
                 viewModel.addExpenses(expensesSave)
@@ -72,23 +77,22 @@ class NewExpensesActivity : AppCompatActivity() {
             ).show()
         }
 
-        viewModel.defCurrency.observe(
-            this,
-            Observer { defCurrency ->
-                currencyId = if (defCurrency != null) defCurrency.id else 1L
-                currencySpinner.setSelection(currencyId.toInt() - 1)
-            })
-
         viewModel.currencyList.observe(
             this,
-            Observer { currency ->
+            Observer { currencyList ->
                 currencyAdapter.clear()
-                currency?.forEach { currencyAdapter.add(it.name) }
+                currencyList?.forEachIndexed { count, value ->
+                    currencyAdapter.add(value.name)
+                    if (value.defCurrency == 1) {
+                        currency = value.name
+                        currencySpinner.setSelection(count)
+                    }
+                }
             }
         )
         viewModel.expenseById.observe(this, Observer {
             expenseTextView.text = it.name
-            expenseId = it.id
+            expense = it.name
         })
     }
 
@@ -99,9 +103,9 @@ class NewExpensesActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
-                PICK_EXPENSE_REQUEST -> data?.extras?.getString(EXTRA_EXPENSE_ID)?.let { _expenseId ->
-                    viewModel.setQueryExpenseId(_expenseId)
-                    expenseId = _expenseId.toLong()
+                PICK_EXPENSE_REQUEST -> data?.extras?.getString(EXTRA_EXPENSE)?.let { _expense ->
+                    viewModel.setQueryExpense(_expense)
+                    expense = _expense
                 }
             }
         }

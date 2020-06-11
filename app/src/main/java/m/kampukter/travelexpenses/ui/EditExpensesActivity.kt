@@ -12,19 +12,20 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.edit_expenses_activity.*
 import kotlinx.android.synthetic.main.edit_expenses_activity.currencySpinner
 import kotlinx.android.synthetic.main.edit_expenses_activity.expenseTextView
+import kotlinx.android.synthetic.main.edit_expenses_activity.newExpensesActivityLayout
 import kotlinx.android.synthetic.main.edit_expenses_activity.noteTextInputEdit
 import kotlinx.android.synthetic.main.edit_expenses_activity.sumTextInputEdit
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
-import m.kampukter.travelexpenses.ui.ExpenseFragment.Companion.EXTRA_EXPENSE_ID
+import m.kampukter.travelexpenses.ui.ExpenseFragment.Companion.EXTRA_EXPENSE
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditExpensesActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<MyViewModel>()
-    private var currencyId: Long = 0L
-    private var expenseId: Long = 0L
+    private var currency: String = ""
+    private var expense: String = ""
     private var summa: Float = 0F
     private var dateTimeRecord: Long = 0L
     private var idRecord: Long = 0L
@@ -45,37 +46,42 @@ class EditExpensesActivity : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val pos = (position + 1).toLong()
-                if (currencyId != pos) {
-                    currencyId = pos
-                    currencySpinner.setSelection(currencyId.toInt()-1)
+                if (currency != currencySpinner.selectedItem.toString()) {
+                    viewModel.resetDef()
+                    viewModel.setDefCurrency(currencySpinner.selectedItem.toString())
                 }
             }
         }
 
         val idSelectedExpense = intent.getStringExtra(TravelExpensesFragment.EXTRA_MESSAGE)
-        viewModel.setQueryTravelExpensesId(idSelectedExpense.toLong())
+        viewModel.setQueryExpensesId(idSelectedExpense.toLong())
         viewModel.expensesById.observe(this, Observer { expenses ->
             idRecord = expenses.id
             dateTimeRecord = expenses.dateTime
             dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", dateTimeRecord)
-            expenseTextView.text = expenses.expenseName
+            expenseTextView.text = expenses.expense
             sumTextInputEdit.setText(expenses.sum.toString())
             noteTextInputEdit.setText(expenses.note)
-            currencyId = expenses.currencyId
-            expenseId = expenses.expenseId
-            currencySpinner.setSelection(currencyId.toInt()-1)
+            currency = expenses.currency
+            expense = expenses.expense
+            //currencySpinner.setSelection(currencyId.toInt()-1)
         })
         viewModel.currencyList.observe(
             this,
-            Observer { currency ->
+            Observer { currencyList ->
                 currencyAdapter.clear()
-                currency?.forEach { currencyAdapter.add(it.name) }
+                currencyList?.forEachIndexed { count, value ->
+                    currencyAdapter.add(value.name)
+                    if (value.defCurrency == 1) {
+                        currency = value.name
+                        currencySpinner.setSelection(count)
+                    }
+                }
             }
         )
         viewModel.expenseById.observe(this, Observer {
             expenseTextView.text = it.name
-            expenseId = it.id
+            expense = it.name
         })
         expenseEditImageButton.setOnClickListener {
             startActivityForResult(
@@ -85,13 +91,13 @@ class EditExpensesActivity : AppCompatActivity() {
         }
         saveEditExpensesButton.setOnClickListener {
             summa = sumTextInputEdit.text.toString().toFloat()
-            if (expenseId != 0L && summa != 0F) {
+            if (expense != "" && summa != 0F && !noteTextInputEdit.text.isNullOrBlank()) {
                 val expensesSave = Expenses(
                     id = idRecord,
                     dateTime = dateTimeRecord,
                     sum = summa,
-                    currency = currencyId,
-                    expense = expenseId,
+                    currency = currency,
+                    expense = expense,
                     note = noteTextInputEdit.text.toString()
                 )
                 viewModel.updateExpenses(expensesSave)
@@ -109,9 +115,9 @@ class EditExpensesActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
-                PICK_EXPENSE_REQUEST_EDIT -> data?.extras?.getString(EXTRA_EXPENSE_ID)?.let { _expenseId ->
-                    viewModel.setQueryExpenseId(_expenseId)
-                    expenseId = _expenseId.toLong()
+                PICK_EXPENSE_REQUEST_EDIT -> data?.extras?.getString(EXTRA_EXPENSE)?.let { _expense ->
+                    viewModel.setQueryExpense(_expense)
+                    expense = _expense
                 }
             }
         }

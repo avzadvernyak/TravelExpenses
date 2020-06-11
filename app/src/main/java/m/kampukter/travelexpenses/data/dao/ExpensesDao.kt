@@ -3,6 +3,7 @@ package m.kampukter.travelexpenses.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import m.kampukter.travelexpenses.data.Expenses
+import m.kampukter.travelexpenses.data.ReportSumView
 
 @Dao
 interface ExpensesDao {
@@ -15,8 +16,8 @@ interface ExpensesDao {
     @Query("select * from expenses")
     fun getAll(): LiveData<List<Expenses>>
 
-    @Query("select dateTime from expenses order by dateTime desc limit 1")
-    fun getLastInputCurrent(): LiveData<Long>
+    @Query("select * from expenses")
+    fun getAllExpenses(): List<Expenses>
 
     @Query("delete from expenses WHERE expenses.id = :selectedId")
     suspend fun deleteExpensesById(selectedId: Long)
@@ -24,10 +25,25 @@ interface ExpensesDao {
     @Update
     suspend fun updateRecord(expanses: Expenses)
 
-    @Query("select * from expenses where expense_Id = :expenseId")
-    fun getListByExpenseId(expenseId: Long): LiveData<List<Expenses>>
+    @Query("select * from expenses where id = :id")
+    fun getExpensesById(id: Long): LiveData<Expenses>
 
-    @Query("select count(expense_Id) from expenses where expense_Id = :expenseId")
-    fun getExpensesCount(expenseId: Long): Long
+    @Query("select count(expense) from expenses where expense = :name")
+    fun getExpensesCount(name: String): Long
 
+    @Query(
+        """ select sum(sum) AS sum, expense AS name, currency_field AS note 
+            from expenses 
+            group by  expense,currency_field    
+            """
+    )
+    fun getSumExpenses(): LiveData<List<ReportSumView>>
+
+    @Query(
+        """ select sum(sum) AS sum, currency_field AS name, null AS note 
+            from expenses 
+            group by  currency_field    
+            """
+    )
+    fun getSumCurrency(): LiveData<List<ReportSumView>>
 }

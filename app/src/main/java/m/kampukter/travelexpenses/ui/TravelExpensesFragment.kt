@@ -11,7 +11,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import kotlinx.android.synthetic.main.expenses_fragment.toolbar
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.TravelExpensesView
+import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -41,9 +41,9 @@ class TravelExpensesFragment : Fragment() {
             title = getString(R.string.travel_expenses_title)
         }
 
-        val clickEventDelegate: ClickEventDelegate<TravelExpensesView> =
-            object : ClickEventDelegate<TravelExpensesView> {
-                override fun onClick(item: TravelExpensesView) {
+        val clickEventDelegate: ClickEventDelegate<Expenses> =
+            object : ClickEventDelegate<Expenses> {
+                override fun onClick(item: Expenses) {
                     (context as AppCompatActivity).startActivity(
                         Intent(
                             context,
@@ -56,9 +56,10 @@ class TravelExpensesFragment : Fragment() {
                         })
                 }
 
-                override fun onLongClick(item: TravelExpensesView) {
+                override fun onLongClick(item: Expenses) {
                     fragmentManager?.let { fm ->
-                        val messageStr = "На сумму ${item.sum} \nЗа ${item.expenseName}\n Комментарий -${item.note}"
+                        val messageStr =
+                            "На сумму ${item.sum} \nЗа ${item.expense}\n Комментарий -${item.note}"
                         ExpensesDelDialog.create(item.id, messageStr).show(fm, "delDialog")
                     }
                 }
@@ -79,7 +80,7 @@ class TravelExpensesFragment : Fragment() {
                 expensesAdapter?.setList(list)
             }
         )
-        viewModel.expensesCSVForExport.observe(this, Observer {expensesCSV->
+        viewModel.expensesCSVForExport.observe(this, Observer { expensesCSV ->
             if (expensesCSV.isNullOrEmpty()) {
                 Snackbar.make(
                     recyclerView,
@@ -97,7 +98,14 @@ class TravelExpensesFragment : Fragment() {
         })
 
 
-        addCustomerButton.setOnClickListener { startActivity(Intent(activity, NewExpensesActivity::class.java)) }
+        addCustomerButton.setOnClickListener {
+            startActivity(
+                Intent(
+                    activity,
+                    NewExpensesActivity::class.java
+                )
+            )
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -127,7 +135,8 @@ class TravelExpensesFragment : Fragment() {
                 }
                 true
             }
-            R.id.action_about ->{
+            R.id.action_about -> {
+                viewModel.getRateCurrency()
                 fragmentManager?.let { fm ->
                     AboutDialog.create()
                         .show(fm, AboutDialog.TAG)

@@ -20,7 +20,11 @@ class EditExpenseFragment : Fragment() {
     private val viewModel by viewModel<MyViewModel>()
     private var expenseEditAdapter: ExpenseEditAdapter? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.expense_edit_list_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,16 +40,16 @@ class EditExpenseFragment : Fragment() {
             adapter = expenseEditAdapter
             layoutManager = LinearLayoutManager(context)
         }
-        viewModel.expenseList.observe(this, Observer { list ->
+        viewModel.expenseList.observe(viewLifecycleOwner,  Observer { list ->
             expenseEditAdapter?.setItems(list)
         })
-        viewModel.expenseDeletionResultLiveData.observe(this, Observer { result ->
+        viewModel.expenseDeletionResultLiveData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is ExpenseDeletionResult.Warning -> {
                     fragmentManager?.let { fm ->
                         if (fm.findFragmentByTag(ExpenseLinkDelDialog.TAG) == null) {
                             val messageStr = getString(R.string.expense_del_warning, result.countRecords.toString())
-                            ExpenseLinkDelDialog.create(result.expenseId, messageStr)
+                            ExpenseLinkDelDialog.create(result.expenseName, messageStr)
                                 .setCallback { id, isForced -> viewModel.deleteExpense(id, isForced) }
                                 .show(fm, ExpenseLinkDelDialog.TAG)
                         }
@@ -61,8 +65,8 @@ class EditExpenseFragment : Fragment() {
         expenseEditAdapter?.onLongClickCallback = { expense ->
             fragmentManager?.let { fm ->
                 val messageStr = expense.name
-                ExpenseDelDialog.create(expense.id, messageStr)
-                    .setCallback { id, isForced -> viewModel.deleteExpense(id, isForced) }
+                ExpenseDelDialog.create(messageStr)
+                    .setCallback { expense, isForced -> viewModel.deleteExpense(expense, isForced) }
                     .show(fm, ExpenseDelDialog.TAG)
             }
             true

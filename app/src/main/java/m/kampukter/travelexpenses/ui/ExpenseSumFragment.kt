@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,36 +13,34 @@ import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ExpensesSumFragment: Fragment() {
+class ExpenseSumFragment: Fragment() {
     private val viewModel by viewModel<MyViewModel>()
-    private var expensesSumAdapter: ExpensesSumAdapter? = null
+    private var expensesSumAdapter: ExpenseSumAdapter? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.expenses_sum_fragment, container, false)
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            title = getString(R.string.expenses_sum_title)
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowHomeEnabled(true)
-        }
 
-        expensesSumAdapter = ExpensesSumAdapter()
+        expensesSumAdapter = ExpenseSumAdapter()
 
         with(expensesSumRecyclerView) {
             layoutManager = LinearLayoutManager(context)
             adapter = expensesSumAdapter
         }
 
-       viewModel.getExpensesSun().observe(this, Observer { list ->
+       viewModel.getExpensesSum().observe(this, Observer { list ->
            expensesSumAdapter?.setList(list)
        })
 
 
+    }
+    companion object {
+        fun newInstance(): ExpenseSumFragment {
+            return ExpenseSumFragment()
+        }
     }
 }
