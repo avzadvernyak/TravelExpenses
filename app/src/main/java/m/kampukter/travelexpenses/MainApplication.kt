@@ -9,10 +9,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
-import m.kampukter.travelexpenses.data.repository.CurrencyRepository
 import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
-import m.kampukter.travelexpenses.data.repository.RateCurrencyRepository
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -32,7 +30,7 @@ class MainApplication: Application() {
                             get<MyDatabase>().currencyDao().insertAll(
                                 listOf(
                                     Currency(name = "UAH",defCurrency =0),
-                                    Currency(name = "RUR",defCurrency =0),
+                                    Currency(name = "RUB",defCurrency =0),
                                     Currency(name = "USD",defCurrency =0),
                                     Currency(name = "EUR",defCurrency =1)
                                 )
@@ -59,11 +57,16 @@ class MainApplication: Application() {
                 }).build()
         }
 
-        single { CurrencyRepository(get<MyDatabase>().currencyDao()) }
         single { ExpenseRepository(get<MyDatabase>().expenseDao(), get<MyDatabase>().expensesDao()) }
-        single { ExpensesRepository(get<MyDatabase>().expensesDao()) }
+        single {
+            ExpensesRepository(
+                get<MyDatabase>().expensesDao(),
+                get<MyDatabase>().rateCurrencyDao(),
+                get<MyDatabase>().currencyDao(),
+                get()
 
-        single { RateCurrencyRepository(get(), get<MyDatabase>().rateCurrencyDao()) }
+            ) }
+
         // Start Retrofit injection
         single { Retrofit.Builder()
             .baseUrl("https://bank.gov.ua/NBUStatService/v1/statdirectory/")
@@ -72,7 +75,7 @@ class MainApplication: Application() {
         single { get<Retrofit>().create(RateCurrencyAPI::class.java) }
         // End Retrofit injection
 
-        viewModel { MyViewModel(get(),get(),get(),get()) }
+        viewModel { MyViewModel(get(),get()) }
     }
 
     override fun onCreate() {

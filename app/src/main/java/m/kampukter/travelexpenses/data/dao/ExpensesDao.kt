@@ -17,7 +17,7 @@ interface ExpensesDao {
     fun getAll(): LiveData<List<Expenses>>
 
     @Query("select * from expenses")
-    fun getAllExpenses(): List<Expenses>
+    suspend fun getAllExpenses(): List<Expenses>
 
     @Query("delete from expenses WHERE expenses.id = :selectedId")
     suspend fun deleteExpensesById(selectedId: Long)

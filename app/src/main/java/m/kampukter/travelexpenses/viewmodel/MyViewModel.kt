@@ -1,20 +1,15 @@
 package m.kampukter.travelexpenses.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
-import m.kampukter.travelexpenses.data.repository.CurrencyRepository
 import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
-import m.kampukter.travelexpenses.data.repository.RateCurrencyRepository
 
 class MyViewModel(
-    private val currencyRepository: CurrencyRepository,
     private val expenseRepository: ExpenseRepository,
-    private val expensesRepository: ExpensesRepository,
-    private val rateCurrencyRepository: RateCurrencyRepository
+    private val expensesRepository: ExpensesRepository
 ) : ViewModel() {
     /*
     * получение итогов по статьям и по валютам
@@ -29,20 +24,30 @@ class MyViewModel(
     fun getExpensesCSV(query: Boolean) {
         expensesCSV.postValue(query)
     }
-    val expensesCSVForExport: LiveData<String> =
-        Transformations.switchMap(expensesCSV) { expensesRepository.getAllForSend() }
+    val expensesCSVForExport = Transformations.switchMap(expensesCSV) {
+        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            emitSource(expensesRepository.getAllForSend())
+        }
+    }
+
     /*
     * Удаление всех записей из Expenses
     */
-    fun deleteAllExpenses() = expensesRepository.deleteAll()
 
+    fun deleteAllExpenses() {
+        viewModelScope.launch { expensesRepository.deleteAll() }
+    }
 
     fun addExpenses(expenses: Expenses) {
-        expensesRepository.addExpenses(expenses)
+        viewModelScope.launch { expensesRepository.addExpenses(expenses) }
     }
 
     fun updateExpenses(expenses: Expenses) {
-        expensesRepository.updateExpenses(expenses)
+        viewModelScope.launch { expensesRepository.updateExpenses(expenses) }
+    }
+
+    fun expensesDelete(expensesId: Long) {
+        viewModelScope.launch { expensesRepository.deleteExpensesById(expensesId) }
     }
 
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
@@ -55,20 +60,16 @@ class MyViewModel(
     val expensesById: LiveData<Expenses> =
         Transformations.switchMap(expensesFindId) { query -> expensesRepository.getRecordById(query) }
 
-    fun expensesDelete(expensesId: Long) {
-        expensesRepository.deleteExpensesById(expensesId)
-    }
-
 
     fun setDefCurrency(query: String) {
-        currencyRepository.setDefCurrency(query)
+        expensesRepository.setDefCurrency(query)
     }
 
     fun resetDef() {
-        currencyRepository.resetDef()
+        expensesRepository.resetDef()
     }
 
-    val currencyList: LiveData<List<Currency>> = currencyRepository.getCurrencyAll()
+    val currencyList: LiveData<List<Currency>> = expensesRepository.getCurrencyAllLiveData()
 
 
     private val queryExpense = MutableLiveData<String>()
@@ -103,6 +104,8 @@ class MyViewModel(
         val isForced: Boolean
     )
 
-    fun getRateCurrency() {rateCurrencyRepository.getRateCurrencyNBU()}
+    fun testRate() {
+        viewModelScope.launch { expensesRepository.rateSynchronizationNBU()}
+    }
 
 }

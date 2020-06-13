@@ -75,12 +75,12 @@ class TravelExpensesFragment : Fragment() {
             adapter = expensesAdapter
         }
 
-        viewModel.expenses.observe(this,
+        viewModel.expenses.observe(viewLifecycleOwner,
             Observer { list ->
                 expensesAdapter?.setList(list)
             }
         )
-        viewModel.expensesCSVForExport.observe(this, Observer { expensesCSV ->
+        viewModel.expensesCSVForExport.observe(viewLifecycleOwner, Observer { expensesCSV ->
             if (expensesCSV.isNullOrEmpty()) {
                 Snackbar.make(
                     recyclerView,
@@ -136,7 +136,7 @@ class TravelExpensesFragment : Fragment() {
                 true
             }
             R.id.action_about -> {
-                viewModel.getRateCurrency()
+                viewModel.testRate()
                 fragmentManager?.let { fm ->
                     AboutDialog.create()
                         .show(fm, AboutDialog.TAG)

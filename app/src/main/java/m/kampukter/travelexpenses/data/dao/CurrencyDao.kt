@@ -11,7 +11,10 @@ interface CurrencyDao {
     suspend fun insertAll(cities: List<Currency>)
 
     @Query("select * from currency")
-    fun getAll(): LiveData<List<Currency>>
+    fun getAllLiveData(): LiveData<List<Currency>>
+
+    @Query("select * from currency")
+    suspend fun getAll(): List<Currency>
 
     @Query(" update currency set defCurrency = 1 where currency.name = :defaultCurrency")
     suspend fun setDefault(defaultCurrency: String )
