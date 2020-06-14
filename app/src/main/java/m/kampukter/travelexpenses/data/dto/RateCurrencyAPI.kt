@@ -18,7 +18,7 @@ interface RateCurrencyAPI {
         @Query("valcode") currency: String,
         @Query("date") date: String,
         @QueryName str: String
-    ): List<RateCurrencyNbu>
+    ): Response<List<RateCurrencyNbu>>
 
 }
 data class RateCurrencyNbu(

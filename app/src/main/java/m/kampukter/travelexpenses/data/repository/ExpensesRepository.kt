@@ -16,8 +16,6 @@ import m.kampukter.travelexpenses.data.dao.ExpensesDao
 import m.kampukter.travelexpenses.data.dao.RateCurrencyDao
 import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
 import m.kampukter.travelexpenses.data.dto.RateCurrencyNbu
-import retrofit2.Call
-import retrofit2.Callback
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -86,19 +84,25 @@ class ExpensesRepository(
         currencyFound: String,
         dateFound: String
     ): RateCurrencyNbu? {
-        val rateCurrencyNBU =
-            rateCurrencyAPI.getRateCurrencyNbu(currencyFound, dateFound, "json")
+        val response = rateCurrencyAPI.getRateCurrencyNbu(currencyFound, dateFound, "json")
+        Log.d("blablabla", "Code HTTP- ${response.code()}")
+        if (response.code() != 200) return null
+
+        val rateCurrencyNBU = response.body()
         Log.d("blablabla", "From API- $rateCurrencyNBU")
+
         return if (rateCurrencyNBU.isNullOrEmpty()) null
         else rateCurrencyNBU.first()
     }
 
     suspend fun rateSynchronizationNBU() {
+        val infoForRate = expensesDao.getInfoForRate()
+        Log.d("blablabla", "infoForRate $infoForRate")
         val currentDate = System.currentTimeMillis()
         val currencyList = currencyDao.getAll()
         currencyList.forEach { currency ->
-            val resRate = rateCurrencyDao.searchByDate(currency.name, currentDate)
-            //Log.d("blablabla", "Rate for ${currency.name} $resRate")
+            val resRate = rateCurrencyDao.searchByDate(currency.name, currentDate*1000)
+            Log.d("blablabla", "Rate for ${currency.name} $resRate $currentDate")
             if (resRate.isEmpty()) {
                 Log.d("blablabla", "Go API find ${currency.name}")
                 getRateCurrencyNBU(

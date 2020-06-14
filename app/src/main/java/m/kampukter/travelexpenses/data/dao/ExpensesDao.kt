@@ -3,6 +3,7 @@ package m.kampukter.travelexpenses.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import m.kampukter.travelexpenses.data.Expenses
+import m.kampukter.travelexpenses.data.InfoForRate
 import m.kampukter.travelexpenses.data.ReportSumView
 
 @Dao
@@ -46,4 +47,9 @@ interface ExpensesDao {
             """
     )
     fun getSumCurrency(): LiveData<List<ReportSumView>>
+
+    // SELECT `sensor`, `date`, count(*) FROM `sensor_info` GROUP BY date(`date`),`sensor`
+    @Query("select currency_field, date(dateTime) as date from Expenses group by currency_field, date(dateTime)")
+    //@Query("select currency_field  from expenses")
+    suspend fun getInfoForRate(): List<InfoForRate>
 }
