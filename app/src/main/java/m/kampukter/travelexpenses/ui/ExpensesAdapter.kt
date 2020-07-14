@@ -2,13 +2,14 @@ package m.kampukter.travelexpenses.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.Expenses
+import m.kampukter.travelexpenses.data.ExpensesWithRate
 
-class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<Expenses>) :
+class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<ExpensesWithRate>) :
     RecyclerView.Adapter<ExpensesViewHolder>() {
-    private var expenses: List<Expenses>? = null
+    private var expenses = emptyList<ExpensesWithRate>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpensesViewHolder {
         return ExpensesViewHolder(
@@ -19,18 +20,29 @@ class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<Expense
         )
     }
 
-    override fun getItemCount(): Int {
-        return expenses?.size ?: 0
-    }
+    override fun getItemCount(): Int = expenses.size
+
 
     override fun onBindViewHolder(holder: ExpensesViewHolder, position: Int) {
-        expenses?.get(position)?.let { item ->
-            holder.bind(item)
-        }
+        expenses[position].let { item -> holder.bind(item) }
     }
 
-    fun setList(list: List<Expenses>) {
-        this.expenses = list
-        notifyDataSetChanged()
+    fun setList(newListExpenses: List<ExpensesWithRate>) {
+        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                expenses[oldItemPosition].rate == newListExpenses[newItemPosition].rate
+
+            override fun getOldListSize(): Int = expenses.size
+
+            override fun getNewListSize(): Int = newListExpenses.size
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                expenses[oldItemPosition] == newListExpenses[newItemPosition]
+
+        })
+        expenses = newListExpenses
+        diff.dispatchUpdatesTo(this)
+        /*this.expenses = list
+        notifyDataSetChanged()*/
     }
 }

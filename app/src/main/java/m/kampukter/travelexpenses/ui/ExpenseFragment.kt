@@ -48,7 +48,7 @@ class ExpenseFragment: Fragment() {
             )
             adapter = expenseAdapter
         }
-        viewModel.expenseList.observe(this, Observer { list ->
+        viewModel.expenseList.observe( viewLifecycleOwner, Observer { list ->
             expenseAdapter?.setList(list)
         })
     }

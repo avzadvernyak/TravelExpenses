@@ -10,16 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.edit_expenses_activity.*
-import kotlinx.android.synthetic.main.edit_expenses_activity.currencySpinner
-import kotlinx.android.synthetic.main.edit_expenses_activity.expenseTextView
-import kotlinx.android.synthetic.main.edit_expenses_activity.newExpensesActivityLayout
-import kotlinx.android.synthetic.main.edit_expenses_activity.noteTextInputEdit
-import kotlinx.android.synthetic.main.edit_expenses_activity.sumTextInputEdit
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.ui.ExpenseFragment.Companion.EXTRA_EXPENSE
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class EditExpensesActivity : AppCompatActivity() {
 
@@ -27,7 +23,7 @@ class EditExpensesActivity : AppCompatActivity() {
     private var currency: String = ""
     private var expense: String = ""
     private var summa: Float = 0F
-    private var dateTimeRecord: Long = 0L
+    private var dateTimeRecord = Date()
     private var idRecord: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {

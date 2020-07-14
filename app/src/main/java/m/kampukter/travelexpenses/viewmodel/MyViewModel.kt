@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
+import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 
 class MyViewModel(
     private val expenseRepository: ExpenseRepository,
@@ -51,6 +52,7 @@ class MyViewModel(
     }
 
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
+    val expensesWithRate= expensesRepository.getAllExpensesWithRate()
 
     private val expensesFindId = MutableLiveData<Long>()
     fun setQueryExpensesId(query: Long) {
@@ -104,8 +106,15 @@ class MyViewModel(
         val isForced: Boolean
     )
 
-    fun testRate() {
-        viewModelScope.launch { expensesRepository.rateSynchronizationNBU()}
+   /* fun testRate() {
+        viewModelScope.launch { apiRepository.rateSynchronization()}
+    }*/
+    fun deleteRate() {
+        viewModelScope.launch { expensesRepository.deleteRate()}
     }
+    val allRate: LiveData<List<RateCurrency>> = expensesRepository.getAllRate()
 
+    fun saveSettings(  settings: Settings) {
+        viewModelScope.launch {expensesRepository.insertSettings( settings)}
+    }
 }

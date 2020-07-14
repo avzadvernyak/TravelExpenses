@@ -11,7 +11,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import kotlinx.android.synthetic.main.expenses_fragment.toolbar
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.Expenses
+import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -41,9 +41,9 @@ class TravelExpensesFragment : Fragment() {
             title = getString(R.string.travel_expenses_title)
         }
 
-        val clickEventDelegate: ClickEventDelegate<Expenses> =
-            object : ClickEventDelegate<Expenses> {
-                override fun onClick(item: Expenses) {
+        val clickEventDelegate: ClickEventDelegate<ExpensesWithRate> =
+            object : ClickEventDelegate<ExpensesWithRate> {
+                override fun onClick(item: ExpensesWithRate) {
                     (context as AppCompatActivity).startActivity(
                         Intent(
                             context,
@@ -56,7 +56,7 @@ class TravelExpensesFragment : Fragment() {
                         })
                 }
 
-                override fun onLongClick(item: Expenses) {
+                override fun onLongClick(item: ExpensesWithRate) {
                     fragmentManager?.let { fm ->
                         val messageStr =
                             "На сумму ${item.sum} \nЗа ${item.expense}\n Комментарий -${item.note}"
@@ -74,12 +74,9 @@ class TravelExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
-
-        viewModel.expenses.observe(viewLifecycleOwner,
-            Observer { list ->
-                expensesAdapter?.setList(list)
-            }
-        )
+        viewModel.expensesWithRate.observe(viewLifecycleOwner, Observer {
+            expensesAdapter?.setList(it)
+        })
         viewModel.expensesCSVForExport.observe(viewLifecycleOwner, Observer { expensesCSV ->
             if (expensesCSV.isNullOrEmpty()) {
                 Snackbar.make(
@@ -117,7 +114,6 @@ class TravelExpensesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return (when (item.itemId) {
             R.id.action_edit_expense -> {
-                Log.d("blablabla", "menu ")
                 startActivity(Intent(activity, EditExpenseActivity::class.java))
                 true
             }
@@ -136,13 +132,23 @@ class TravelExpensesFragment : Fragment() {
                 true
             }
             R.id.action_about -> {
-                viewModel.testRate()
+
                 fragmentManager?.let { fm ->
                     AboutDialog.create()
                         .show(fm, AboutDialog.TAG)
                 }
                 true
             }
+            R.id.settings ->{
+                startActivity(Intent(activity, SettingsActivity::class.java))
+                //viewModel.deleteRate()
+                true
+            }
+            R.id.show_rate ->{
+                startActivity(Intent(activity, RateActivity::class.java))
+                true
+            }
+
             else ->
                 super.onOptionsItemSelected(item)
         })

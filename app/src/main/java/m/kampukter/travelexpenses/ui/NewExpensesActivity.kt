@@ -14,6 +14,7 @@ import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.ui.ExpenseFragment.Companion.EXTRA_EXPENSE
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 class NewExpensesActivity : AppCompatActivity() {
 
@@ -63,7 +64,11 @@ class NewExpensesActivity : AppCompatActivity() {
             if (expense != "" && summa != 0F && !noteTextInputEdit.text.isNullOrBlank()) {
                 //Log.d("blablabla", "Save summa= $summa - currency=$currency type =$expense")
                 val expensesSave = Expenses(
-                    dateTime = System.currentTimeMillis(),
+                    //dateTime = Date( System.currentTimeMillis() ),
+                    dateTime = Calendar.getInstance().time,
+                    /*dateTime =Calendar.getInstance().apply {
+                        add(Calendar.DAY_OF_YEAR, -2)
+                    }.time,*/
                     sum = summa,
                     currency = currency,
                     expense = expense,

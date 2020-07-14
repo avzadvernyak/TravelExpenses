@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ValCurs Date="23.06.2020" name="Foreign Currency Market">
+    <Valute ID="R01010">
+        <NumCode>036</NumCode>
+        <CharCode>AUD</CharCode>
+        <Nominal>1</Nominal>
+        <Name>Австралийский доллар</Name>
+        <Value>47,7769</Value>
+    </Valute>
+    <Valute ID="R01020A">
+        <NumCode>944</NumCode>
+        <CharCode>AZN</CharCode>
+        <Nominal>1</Nominal>
+        <Name>Азербайджанский манат</Name>
+        <Value>40,6146</Value>
+    </Valute>
+</ValCurs>

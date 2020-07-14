@@ -63,6 +63,14 @@
                     android:value=".ui.NewExpensesActivity">
             </meta-data>
         </activity>
+        <activity android:name=".ui.RateActivity"
+                android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.MainActivity">
+            </meta-data>
+        </activity>
+        <activity android:name=".ui.SettingsActivity" />
     </application>
 
 </manifest>

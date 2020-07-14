@@ -9,32 +9,27 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.Currency
 import m.kampukter.travelexpenses.data.Expenses
-import m.kampukter.travelexpenses.data.RateCurrency
 import m.kampukter.travelexpenses.data.ReportSumView
+import m.kampukter.travelexpenses.data.Settings
 import m.kampukter.travelexpenses.data.dao.CurrencyDao
 import m.kampukter.travelexpenses.data.dao.ExpensesDao
 import m.kampukter.travelexpenses.data.dao.RateCurrencyDao
-import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
-import m.kampukter.travelexpenses.data.dto.RateCurrencyNbu
-import java.text.SimpleDateFormat
-import java.util.*
+import m.kampukter.travelexpenses.data.dao.SettingsDao
 
 class ExpensesRepository(
     private val expensesDao: ExpensesDao,
     private val rateCurrencyDao: RateCurrencyDao,
     private val currencyDao: CurrencyDao,
-    private val rateCurrencyAPI: RateCurrencyAPI
+    private val settingsDao: SettingsDao
 ) {
 
     fun getAll(): LiveData<List<Expenses>> = expensesDao.getAll()
+    fun getAllExpensesWithRate() = expensesDao.getAllExpensesWithRate()
+
     fun getRecordById(id: Long): LiveData<Expenses> = expensesDao.getExpensesById(id)
 
     suspend fun addExpenses(expenses: Expenses) {
         expensesDao.insert(expenses)
-        getRateCurrencyNBU(
-            expenses.currency,
-            DateFormat.format("yyyyMMdd", expenses.dateTime).toString()
-        )
     }
 
     suspend fun updateExpenses(expenses: Expenses) {
@@ -79,49 +74,19 @@ class ExpensesRepository(
         }
     }
 
-    // API
-    private suspend fun getRateCurrencyNBU(
-        currencyFound: String,
-        dateFound: String
-    ): RateCurrencyNbu? {
-        val response = rateCurrencyAPI.getRateCurrencyNbu(currencyFound, dateFound, "json")
-        Log.d("blablabla", "Code HTTP- ${response.code()}")
-        if (response.code() != 200) return null
-
-        val rateCurrencyNBU = response.body()
-        Log.d("blablabla", "From API- $rateCurrencyNBU")
-
-        return if (rateCurrencyNBU.isNullOrEmpty()) null
-        else rateCurrencyNBU.first()
+    suspend fun deleteRate() {
+        rateCurrencyDao.deleteAll()
     }
 
-    suspend fun rateSynchronizationNBU() {
-        val infoForRate = expensesDao.getInfoForRate()
-        Log.d("blablabla", "infoForRate $infoForRate")
-        val currentDate = System.currentTimeMillis()
-        val currencyList = currencyDao.getAll()
-        currencyList.forEach { currency ->
-            val resRate = rateCurrencyDao.searchByDate(currency.name, currentDate*1000)
-            Log.d("blablabla", "Rate for ${currency.name} $resRate $currentDate")
-            if (resRate.isEmpty()) {
-                Log.d("blablabla", "Go API find ${currency.name}")
-                getRateCurrencyNBU(
-                    currency.name,
-                    DateFormat.format("yyyyMMdd", currentDate).toString()
-                )?.let { rateCurrencyNBU ->
-                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(
-                        rateCurrencyNBU.exchangedate
-                    )?.let {
-                        rateCurrencyDao.insert(
-                            RateCurrency(
-                                name = rateCurrencyNBU.cc,
-                                exchangeDate = it,
-                                rate = rateCurrencyNBU.rate
-                            )
-                        )
-                    }
-                }
-            } else Log.d("blablabla", "Есть в базе ${currency.name}")
+    fun getAllRate() = rateCurrencyDao.getAll()
+
+    /*fun getSettings() {
+        GlobalScope.launch(context = Dispatchers.IO) {
+            val mySettings = settingsDao.getSettings()
+            Log.d("blablabla", "settings $mySettings")
         }
-    }
+    }*/
+    suspend fun getSettings() = settingsDao.getSettings()
+    suspend fun insertSettings(settings: Settings) = settingsDao.insert(settings)
+
 }

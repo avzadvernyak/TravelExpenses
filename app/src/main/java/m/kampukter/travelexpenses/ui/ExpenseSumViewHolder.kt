@@ -9,8 +9,8 @@ class ExpenseSumViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(expensesSum: ReportSumView ) {
         with(itemView) {
-            expensesSumTextView.text = expensesSum.sum.toString()
-            expenseNameTextView.text = expensesSum.name
+            dateTextView.text = expensesSum.sum.toString()
+            rateTextView.text = expensesSum.name
             currencyTextView.text = expensesSum.note
         }
     }

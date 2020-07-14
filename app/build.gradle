@@ -28,14 +28,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-   /* compileOptions {
+    compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }*/
+    }
 }
 
 dependencies {
@@ -70,7 +70,19 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
-    def retrofit_version = "2.6.4"
+    def retrofit_version = "2.9.0"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    def work_version = "2.3.4"
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    implementation 'com.facebook.stetho:stetho:1.5.1'
+    // TikXML
+    def tikxml_version = "0.8.13"
+    implementation "com.tickaroo.tikxml:annotation:$tikxml_version"
+    implementation "com.tickaroo.tikxml:core:$tikxml_version"
+    kapt "com.tickaroo.tikxml:processor:$tikxml_version"
+    implementation "com.tickaroo.tikxml:retrofit-converter:$tikxml_version"
 }

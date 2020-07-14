@@ -38,6 +38,8 @@
     <string name="description_image">expenseImage</string>
     <string name="add_expenses_title">Добавить запись</string>
     <string name="expenses_sum_title">Итоги</string>
+    <string name="settings">Настройки</string>
+    <string name="showRate">Курс валют</string>
 
 
 </resources>
