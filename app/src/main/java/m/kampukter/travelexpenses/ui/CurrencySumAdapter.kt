@@ -8,7 +8,7 @@ import m.kampukter.travelexpenses.data.ReportSumView
 
 class CurrencySumAdapter: RecyclerView.Adapter<CurrencySumViewHolder>() {
 
-    private var currencySum: List<ReportSumView>? = null
+    private var currencySum = listOf<ReportSumView>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencySumViewHolder {
         return CurrencySumViewHolder(
@@ -19,13 +19,11 @@ class CurrencySumAdapter: RecyclerView.Adapter<CurrencySumViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return currencySum?.size ?: 0
+        return currencySum.size
     }
 
     override fun onBindViewHolder(holder: CurrencySumViewHolder, position: Int) {
-        currencySum?.get(position)?.let { item ->
-            holder.bind(item)
-        }
+            holder.bind(currencySum[position])
     }
 
     fun setList(list: List<ReportSumView>) {

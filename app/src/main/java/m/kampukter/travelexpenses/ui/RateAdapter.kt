@@ -8,7 +8,7 @@ import m.kampukter.travelexpenses.data.RateCurrency
 
 class RateAdapter: RecyclerView.Adapter<RateViewHolder>()  {
 
-    private var rateCurrencyList: List<RateCurrency>? = null
+    private var rateCurrencyList= listOf<RateCurrency>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RateViewHolder {
         return RateViewHolder(
@@ -18,14 +18,10 @@ class RateAdapter: RecyclerView.Adapter<RateViewHolder>()  {
         )
     }
 
-    override fun getItemCount(): Int {
-        return rateCurrencyList?.size ?: 0
-    }
+    override fun getItemCount(): Int = rateCurrencyList.size
 
     override fun onBindViewHolder(holder: RateViewHolder, position: Int) {
-        rateCurrencyList?.get(position)?.let { item ->
-            holder.bind(item)
-        }
+            holder.bind(rateCurrencyList[position])
     }
 
     fun setList(list: List<RateCurrency>) {

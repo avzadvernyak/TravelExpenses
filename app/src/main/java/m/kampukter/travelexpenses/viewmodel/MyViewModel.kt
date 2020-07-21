@@ -7,11 +7,19 @@ import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
+import m.kampukter.travelexpenses.mainApplication
 
 class MyViewModel(
     private val expenseRepository: ExpenseRepository,
     private val expensesRepository: ExpensesRepository
 ) : ViewModel() {
+
+    private val rateRepository = mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()
+
+    val currentExchangeRate: LiveData<List<CurrentExchangeRate>> = liveData {
+        rateRepository?.let { emitSource(it.getCurrentRate()) }
+    }
+
     /*
     * получение итогов по статьям и по валютам
     */
@@ -25,6 +33,7 @@ class MyViewModel(
     fun getExpensesCSV(query: Boolean) {
         expensesCSV.postValue(query)
     }
+
     val expensesCSVForExport = Transformations.switchMap(expensesCSV) {
         liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
             emitSource(expensesRepository.getAllForSend())
@@ -52,7 +61,7 @@ class MyViewModel(
     }
 
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
-    val expensesWithRate= expensesRepository.getAllExpensesWithRate()
+    val expensesWithRate = expensesRepository.getAllExpensesWithRate()
 
     private val expensesFindId = MutableLiveData<Long>()
     fun setQueryExpensesId(query: Long) {
@@ -106,15 +115,16 @@ class MyViewModel(
         val isForced: Boolean
     )
 
-   /* fun testRate() {
-        viewModelScope.launch { apiRepository.rateSynchronization()}
-    }*/
+    /* fun testRate() {
+         viewModelScope.launch { apiRepository.rateSynchronization()}
+     }*/
     fun deleteRate() {
-        viewModelScope.launch { expensesRepository.deleteRate()}
+        viewModelScope.launch { expensesRepository.deleteRate() }
     }
+
     val allRate: LiveData<List<RateCurrency>> = expensesRepository.getAllRate()
 
-    fun saveSettings(  settings: Settings) {
-        viewModelScope.launch {expensesRepository.insertSettings( settings)}
+    fun saveSettings(settings: Settings) {
+        viewModelScope.launch { expensesRepository.insertSettings(settings) }
     }
 }

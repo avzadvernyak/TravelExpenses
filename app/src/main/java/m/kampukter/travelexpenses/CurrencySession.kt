@@ -36,7 +36,7 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
         workerId?.let { WorkManager.getInstance(mainApplication).cancelWorkById(it) }
         currentAPIScope.close()
     }
-
+    fun getCurrentScope() = currentAPIScope
     fun getCurrencyId() = currencyId
     private fun getKoinScope(id: Int): Scope {
         with(getKoin()) {

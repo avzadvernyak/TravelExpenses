@@ -10,8 +10,10 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import kotlinx.android.synthetic.main.expenses_fragment.toolbar
+import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesWithRate
+import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -20,6 +22,10 @@ class TravelExpensesFragment : Fragment() {
 
     private val viewModel by viewModel<MyViewModel>()
     private var expensesAdapter: ExpensesAdapter? = null
+
+    private var myMenu: Menu? = null
+    private var defaultProgramCurrency: Int? = null
+    private var isNetwork = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +46,7 @@ class TravelExpensesFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.apply {
             title = getString(R.string.travel_expenses_title)
         }
+        defaultProgramCurrency = mainApplication.getActiveCurrencySession()
 
         val clickEventDelegate: ClickEventDelegate<ExpensesWithRate> =
             object : ClickEventDelegate<ExpensesWithRate> {
@@ -93,7 +100,10 @@ class TravelExpensesFragment : Fragment() {
                 startActivity(Intent.createChooser(sendIntent, "My Send"))
             }
         })
-
+        NetworkLiveData.observe(viewLifecycleOwner, Observer {
+            myMenu?.findItem(R.id.show_rate)?.isVisible = it and (defaultProgramCurrency != null)
+            isNetwork = it
+        })
 
         addCustomerButton.setOnClickListener {
             startActivity(
@@ -107,8 +117,9 @@ class TravelExpensesFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.travel_expense_toolbar_menu, menu)
-
         super.onCreateOptionsMenu(menu, inflater)
+        myMenu = menu
+        myMenu?.findItem(R.id.show_rate)?.isVisible = isNetwork and (defaultProgramCurrency != null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -139,16 +150,23 @@ class TravelExpensesFragment : Fragment() {
                 }
                 true
             }
-            R.id.settings ->{
+            R.id.settings -> {
                 startActivity(Intent(activity, SettingsActivity::class.java))
-                //viewModel.deleteRate()
                 true
             }
-            R.id.show_rate ->{
+            R.id.show_rate -> {
+                if (defaultProgramCurrency != null) startActivity(
+                    Intent(
+                        activity,
+                        CurrentExchangeRateActivity::class.java
+                    )
+                )
+                true
+            }
+            R.id.show_archive_rate -> {
                 startActivity(Intent(activity, RateActivity::class.java))
                 true
             }
-
             else ->
                 super.onOptionsItemSelected(item)
         })

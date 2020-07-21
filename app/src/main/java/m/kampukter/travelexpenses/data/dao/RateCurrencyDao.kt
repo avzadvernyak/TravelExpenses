@@ -19,7 +19,7 @@ interface RateCurrencyDao {
     @Query("select * from rateCurrency where name like :query limit 1")
     fun search(query: String): LiveData<RateCurrency>
 
-    @Query("select * from rateCurrency order by exchangeDate")
+    @Query("select * from rateCurrency order by exchangeDate DESC")
     fun getAll(): LiveData<List<RateCurrency>>
 
     //@Query("select * from rateCurrency where name = :name and date(exchangeDate) = date(:date)")

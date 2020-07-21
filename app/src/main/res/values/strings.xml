@@ -5,10 +5,9 @@
     <string name="edit_expense">Изменение статей расходов</string>
 
     <string name="about_title">О программе</string>
-    <string name="about_message">"\n\nВерсия 1.00\n\n Особая благодарность Олегу за титанические усилия по вразумению автора"
+    <string name="about_message">"\n\nВерсия 1.10\n\n Особая благодарность Олегу за титанические усилия по вразумению автора"
     " прораммы в процессе написания\n\n Для тех, кто хочет поддержать проект\n"
-    "WMZ Z463710705149\n"
-    "WMR R848491093338"</string>
+    "WMZ Z463710705149\n"</string>
 
     <string name="expense_del_message">Статья была удалена</string>
     <string name="expense_del_warning">"Найдены связанные с этой статьей записи в количестве %1$s шт.\n "
@@ -40,6 +39,11 @@
     <string name="expenses_sum_title">Итоги</string>
     <string name="settings">Настройки</string>
     <string name="showRate">Курс валют</string>
+    <string name="showArchiveRate">Архив курсов валют</string>
+    <string name="oneUah">1 UAH %1$s</string>
+    <string name="oneRub">1 RUB %1$s</string>
+    <string name="oneByn">1 BYN %1$s</string>
+    <string name="noCurrency">Не выбрана валюта по умолчанию</string>
 
 
 </resources>

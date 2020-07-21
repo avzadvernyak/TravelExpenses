@@ -30,4 +30,8 @@
             android:id="@+id/show_rate"
             android:orderInCategory="85"
             android:title="@string/showRate" />
+    <item
+            android:id="@+id/show_archive_rate"
+            android:orderInCategory="86"
+            android:title="@string/showArchiveRate" />
 </menu>

@@ -10,8 +10,6 @@ import java.util.*
 )
 
 data class RateCurrency (
-    /*@PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,*/
     val name: String,
     val exchangeDate: Date,
     val rate: Float

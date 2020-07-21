@@ -30,7 +30,9 @@ class EditExpensesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.edit_expenses_activity)
-        setSupportActionBar(editExpensesToolbar).apply { title = getString(R.string.expenses_edit_title) }
+        setSupportActionBar(editExpensesToolbar).apply {
+            title = getString(R.string.expenses_edit_title)
+        }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
@@ -41,7 +43,12 @@ class EditExpensesActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
 
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 if (currency != currencySpinner.selectedItem.toString()) {
                     viewModel.resetDef()
                     viewModel.setDefCurrency(currencySpinner.selectedItem.toString())
@@ -50,7 +57,7 @@ class EditExpensesActivity : AppCompatActivity() {
         }
 
         val idSelectedExpense = intent.getStringExtra(TravelExpensesFragment.EXTRA_MESSAGE)
-        viewModel.setQueryExpensesId(idSelectedExpense.toLong())
+        idSelectedExpense?.let { viewModel.setQueryExpensesId(it.toLong()) }
         viewModel.expensesById.observe(this, Observer { expenses ->
             idRecord = expenses.id
             dateTimeRecord = expenses.dateTime
@@ -104,6 +111,7 @@ class EditExpensesActivity : AppCompatActivity() {
             ).show()
         }
     }
+
     public override fun onActivityResult(
         requestCode: Int,
         resultCode: Int, data: Intent?
@@ -111,13 +119,15 @@ class EditExpensesActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             when (requestCode) {
-                PICK_EXPENSE_REQUEST_EDIT -> data?.extras?.getString(EXTRA_EXPENSE)?.let { _expense ->
-                    viewModel.setQueryExpense(_expense)
-                    expense = _expense
-                }
+                PICK_EXPENSE_REQUEST_EDIT -> data?.extras?.getString(EXTRA_EXPENSE)
+                    ?.let { _expense ->
+                        viewModel.setQueryExpense(_expense)
+                        expense = _expense
+                    }
             }
         }
     }
+
     companion object {
         const val PICK_EXPENSE_REQUEST_EDIT = 1
     }

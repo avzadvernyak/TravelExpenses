@@ -44,10 +44,14 @@ class MainApplication : Application() {
                         GlobalScope.launch(context = Dispatchers.IO) {
                             get<MyDatabase>().currencyDao().insertAll(
                                 listOf(
-                                    Currency(name = "UAH", defCurrency = 0),
                                     Currency(name = "RUB", defCurrency = 0),
+                                    Currency(name = "UAH", defCurrency = 0),
                                     Currency(name = "USD", defCurrency = 0),
-                                    Currency(name = "EUR", defCurrency = 1)
+                                    Currency(name = "EUR", defCurrency = 1),
+                                    Currency(name = "NOK", defCurrency = 0),
+                                    Currency(name = "BYN", defCurrency = 0),
+                                    Currency(name = "PLN", defCurrency = 0),
+                                    Currency(name = "CZK", defCurrency = 0)
                                 )
                             )
                         }
@@ -118,6 +122,8 @@ class MainApplication : Application() {
 
         Stetho.initializeWithDefaults(this)
         mainApplication = this@MainApplication
+        NetworkLiveData.init(this)
+
         startKoin {
             androidContext(this@MainApplication)
             modules(module)
@@ -130,6 +136,7 @@ class MainApplication : Application() {
     }
 
     fun getActiveCurrencySession() = currencySession?.getCurrencyId()
+    fun getCurrentScope() = currencySession?.getCurrentScope()
     fun changeActiveCurrency(currencyId: Int) {
         currencySession?.dispose()
         currencySession = CurrencySession(currencyId)

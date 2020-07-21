@@ -1,6 +1,6 @@
 package m.kampukter.travelexpenses.data.dto
 
-import com.google.gson.annotations.JsonAdapter
+import androidx.lifecycle.LiveData
 import com.google.gson.annotations.SerializedName
 import com.tickaroo.tikxml.annotation.Attribute
 import com.tickaroo.tikxml.annotation.Element
@@ -9,6 +9,7 @@ import com.tickaroo.tikxml.annotation.Xml
 import m.kampukter.travelexpenses.data.CBRDateConverter
 import m.kampukter.travelexpenses.data.CBRFloatConverter
 import m.kampukter.travelexpenses.data.CBRIntConverter
+import m.kampukter.travelexpenses.data.CurrentExchangeRate
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -24,6 +25,11 @@ interface RateCurrencyAPI {
         @QueryName str: String
     ): Response<List<RateCurrencyNbu>>
 
+    @GET("exchange?")
+    suspend fun getRateTodayNbu(
+        @QueryName str: String
+    ): Response<List<RateCurrencyNbu>>
+
     @GET("rates/{currency}")
     suspend fun getRateCurrencyNBRB(
         @Path("currency") currencyString: String,
@@ -31,9 +37,18 @@ interface RateCurrencyAPI {
         @Query("parammode") str: String
     ): Response<RateCurrencyNBRB>
 
+    @GET("rates")
+    suspend fun getRateTodayNBRB(
+        @Query("periodicity") str: String
+    ): Response<List<RateCurrencyNBRB>>
+
     @GET("XML_daily.asp")
     suspend fun getRateCurrencyCBR(
         @Query("date_req") date: String
+    ): Response<ValCurs>
+
+    @GET("XML_daily_eng.asp")
+    suspend fun getRateTodayCBR(
     ): Response<ValCurs>
 
 
@@ -48,11 +63,10 @@ data class RateCurrencyNbu(
     val exchangedate: String
 )
 
-// {"Cur_ID":290,"Date":"2020-07-07T00:00:00","Cur_Abbreviation":"UAH","Cur_Scale":100,"Cur_Name":"Гривен","Cur_OfficialRate":8.9844}
 
 data class RateCurrencyNBRB(
     @SerializedName("Cur_ID")
-    val сurID: Int,
+    val curID: Int,
     val Date: String,
     val Cur_Abbreviation: String,
     val Cur_Scale: Int,

@@ -2,6 +2,9 @@ package m.kampukter.travelexpenses.data.repository
 
 import android.text.format.DateFormat
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import m.kampukter.travelexpenses.data.CurrentExchangeRate
 import m.kampukter.travelexpenses.data.RateCurrency
 import m.kampukter.travelexpenses.data.dao.ExpensesDao
 import m.kampukter.travelexpenses.data.dao.RateCurrencyDao
@@ -23,12 +26,115 @@ class RateCurrencyAPIRepository(
 ) : KoinComponent {
     private val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
 
+    suspend fun getCurrentRate(): LiveData<List<CurrentExchangeRate>> {
+        return when (defaultProgramCurrency) {
+            1 -> getRateNBU()
+            2 -> getRateCBR()
+            3 -> getRateNBRB()
+            else -> MutableLiveData<List<CurrentExchangeRate>>()
+        }
+    }
+
+    private suspend fun getRateNBU(): LiveData<List<CurrentExchangeRate>> {
+        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        val retValue = MutableLiveData<List<CurrentExchangeRate>>()
+        try {
+            val response = rateCurrencyAPI.getRateTodayNbu("json")
+            if (response.code() == 200) {
+                response.body()?.forEach {
+                    resultListRate.add(
+                        CurrentExchangeRate(
+                            currencyCode = it.cc,
+                            currencyName = it.txt,
+                            rate = it.rate,
+                            exchangeDate = it.exchangedate
+                        )
+                    )
+                }
+            }
+            retValue.postValue(resultListRate)
+        } catch (e: IOException) {
+            Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
+        }
+
+        return retValue
+    }
+
+    private suspend fun getRateCBR(): LiveData<List<CurrentExchangeRate>> {
+        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        val retValue = MutableLiveData<List<CurrentExchangeRate>>()
+        try {
+            val response = rateCurrencyAPI.getRateTodayCBR()
+            if (response.code() == 200) {
+                val date = DateFormat.format("dd.MM.yyyy", response.body()?.date).toString()
+                response.body()?.valute?.forEach { _valute ->
+                    resultListRate.add(
+                        CurrentExchangeRate(
+                            currencyCode = _valute.charCode,
+                            currencyName = _valute.name,
+                            rate = _valute.value / _valute.nominal,
+                            exchangeDate = date
+                        )
+                    )
+                }
+            }
+            retValue.postValue(resultListRate)
+        } catch (e: IOException) {
+            Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
+        }
+        return retValue
+    }
+
+    private suspend fun getRateNBRB(): LiveData<List<CurrentExchangeRate>> {
+        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        val retValue = MutableLiveData<List<CurrentExchangeRate>>()
+        try {
+            val response = rateCurrencyAPI.getRateTodayNBRB("0")
+            if (response.code() == 200) {
+
+                val date = response.body()?.first()?.Date?.let { _date ->
+                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(
+                        _date
+                    )
+                }
+
+                val dateString = DateFormat.format("dd.MM.yyyy", date).toString()
+
+                response.body()?.forEach {
+                    resultListRate.add(
+                        CurrentExchangeRate(
+                            currencyCode = it.Cur_Abbreviation,
+                            currencyName = it.Cur_Name,
+                            rate = it.Cur_OfficialRate / it.Cur_Scale,
+                            exchangeDate = dateString
+                        )
+                    )
+                }
+            }
+            retValue.postValue(resultListRate)
+        } catch (e: IOException) {
+            Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
+        }
+        return retValue
+
+
+    }
+
     suspend fun rateSynchronization() {
-        Log.d("blablabla", "rateSynchronization $defaultProgramCurrency")
+
         when (defaultProgramCurrency) {
-            1 -> rateSynchronizationNBU()
-            2 -> rateSynchronizationCBR()
-            3 -> rateSynchronizationNBRB()
+            1 -> {
+                Log.d("Worker", "TravelExpenses -> SynchronizationNBU")
+                rateSynchronizationNBU()
+            }
+            2 -> {
+                Log.d("Worker", "TravelExpenses -> SynchronizationCBR")
+                rateSynchronizationCBR()
+            }
+            3 -> {
+                Log.d("Worker", "TravelExpenses -> SynchronizationNBRB")
+                rateSynchronizationNBRB()
+            }
         }
     }
 
@@ -44,11 +150,10 @@ class RateCurrencyAPIRepository(
             Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
         }
 
-        Log.d("blablabla", "Code HTTP- ${response?.code()}")
+        //Log.d("blablabla", "Code HTTP- ${response?.code()}")
         if (response?.code() != 200) return null
 
         val rateCurrencyNBU = response.body()
-        //Log.d("blablabla", "From API- $rateCurrencyNBU")
 
         return if (rateCurrencyNBU.isNullOrEmpty()) null
         else rateCurrencyNBU.first()
@@ -57,7 +162,7 @@ class RateCurrencyAPIRepository(
     // Работа с API НБУ
     private suspend fun rateSynchronizationNBU() {
         val infoRateList = expensesDao.getInfoForRate()
-        Log.d("blablabla", "infoForRate  NBU $infoRateList")
+        //Log.d("blablabla", "infoForRate  NBU $infoRateList")
         infoRateList.forEach { infoRateItem ->
             val currencySearchResult =
                 rateCurrencyDao.searchByDate(infoRateItem.currency_field, infoRateItem.dateRate)
@@ -82,31 +187,27 @@ class RateCurrencyAPIRepository(
                         )
                     }
                 }
-            } else Log.d(
-                "blablabla", "Есть в базе курс ${infoRateItem.currency_field} "
-            )
+            }
         }
     }
 
     // Работа с API ЦБР
     private suspend fun getRateCurrencyCBR(dateFound: String): ValCurs? {
-        var response: Response<ValCurs>? = null
         try {
-            response = rateCurrencyAPI.getRateCurrencyCBR(dateFound)
+            val response = rateCurrencyAPI.getRateCurrencyCBR(dateFound)
+            if (response.code() != 200) return null
+            return response.body()
         } catch (e: IOException) {
             Log.e("blablabla", " Error in API (getRateCurrencyCBR) $e ")
+            return null
         }
 
-        Log.d("blablabla", "Code HTTP- ${response?.code()}")
-        if (response?.code() != 200) return null
-
-        return response.body()
     }
 
     // Работа с API ЦБР
     private suspend fun rateSynchronizationCBR() {
         val infoRateList = expensesDao.getInfoForRate()
-        Log.d("blablabla", "infoForRates  CBR $infoRateList")
+        //Log.d("blablabla", "infoForRates  CBR $infoRateList")
         infoRateList.forEach { infoRateItem ->
             if (infoRateItem.currency_field != "RUB") {
 
@@ -149,26 +250,21 @@ class RateCurrencyAPIRepository(
         currencyFound: String,
         dateFound: String
     ): RateCurrencyNBRB? {
-        var response: Response<RateCurrencyNBRB>? = null
         try {
-            response = rateCurrencyAPI.getRateCurrencyNBRB(currencyFound, dateFound, "2")
+            val response = rateCurrencyAPI.getRateCurrencyNBRB(currencyFound, dateFound, "2")
+            return if (response.code() != 200) return null
+            else response.body()
         } catch (e: IOException) {
             Log.e("blablabla", " Error in API (getRateCurrencyNBRB) $e")
+            return null
         }
 
-        Log.d("blablabla", "Code HTTP- ${response?.code()}")
-        if (response?.code() != 200) return null
-
-        val rateCurrencyNBRB = response.body()
-        Log.d("blablabla", "From API- $rateCurrencyNBRB")
-
-        return rateCurrencyNBRB
     }
 
     // Работа с API НБPB
     private suspend fun rateSynchronizationNBRB() {
         val infoRateList = expensesDao.getInfoForRate()
-        Log.d("blablabla", "infoForRate  NBRB $infoRateList")
+        //Log.d("blablabla", "infoForRate  NBRB $infoRateList")
         infoRateList.forEach { infoRateItem ->
             val currencySearchResult =
                 rateCurrencyDao.searchByDate(infoRateItem.currency_field, infoRateItem.dateRate)
@@ -189,9 +285,7 @@ class RateCurrencyAPIRepository(
                         )
                     }
                 }
-            } else Log.d(
-                "blablabla", "Есть в базе курс ${infoRateItem.currency_field} "
-            )
+            }
         }
     }
 
