@@ -1,0 +1,114 @@
+{
+  "project_info": {
+    "project_number": "230666098877",
+    "firebase_url": "https://sublime-amp-262411.firebaseio.com",
+    "project_id": "sublime-amp-262411",
+    "storage_bucket": "sublime-amp-262411.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230666098877:android:251752db9e90db5fc2ffd4",
+        "android_client_info": {
+          "package_name": "m.kampukter.myfirebaseapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230666098877-pvsb8mqefvcqs7gmae2gese9af99cijt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "m.kampukter.myfirebaseapplication",
+            "certificate_hash": "9c86abe733c7765879971d92eebaa9d446aaf1f1"
+          }
+        },
+        {
+          "client_id": "230666098877-2ovs93qe7rnab1va6jdtpannbou0j8jk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDftS2lN7Ujd-h5ASdjGOLJ-QGtO7eVNtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230666098877-2ovs93qe7rnab1va6jdtpannbou0j8jk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230666098877:android:a88916b1d8db5e75c2ffd4",
+        "android_client_info": {
+          "package_name": "m.kampukter.mypeertopeer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230666098877-j2bshue3vqvvj1j8h80l7v8s8nbqoc4v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "m.kampukter.mypeertopeer",
+            "certificate_hash": "9c86abe733c7765879971d92eebaa9d446aaf1f1"
+          }
+        },
+        {
+          "client_id": "230666098877-2ovs93qe7rnab1va6jdtpannbou0j8jk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDftS2lN7Ujd-h5ASdjGOLJ-QGtO7eVNtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230666098877-2ovs93qe7rnab1va6jdtpannbou0j8jk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230666098877:android:f8e2bb64693719bdc2ffd4",
+        "android_client_info": {
+          "package_name": "m.kampukter.travelexpenses"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230666098877-2ovs93qe7rnab1va6jdtpannbou0j8jk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDftS2lN7Ujd-h5ASdjGOLJ-QGtO7eVNtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230666098877-2ovs93qe7rnab1va6jdtpannbou0j8jk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

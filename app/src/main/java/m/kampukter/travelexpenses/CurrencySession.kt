@@ -4,6 +4,7 @@ import androidx.work.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
+import m.kampukter.travelexpenses.workers.APISynchronizationWorker
 import org.koin.core.KoinComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -31,7 +32,9 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
     private val currentAPIScope: Scope = getKoinScope(currencyId).also {
         workerId = startPeriodicSynchronization()
     }
-
+    fun startSynch() {
+        scope.launch { currentAPIScope.get<RateCurrencyAPIRepository>().rateSynchronization() }
+    }
     fun dispose() {
         workerId?.let { WorkManager.getInstance(mainApplication).cancelWorkById(it) }
         currentAPIScope.close()
@@ -80,7 +83,5 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
         return myWorkRequest.id
     }
 
-    fun startSynch() {
-        scope.launch { currentAPIScope.get<RateCurrencyAPIRepository>().rateSynchronization() }
-    }
+
 }

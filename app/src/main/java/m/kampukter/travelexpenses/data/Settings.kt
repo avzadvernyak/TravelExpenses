@@ -8,5 +8,6 @@ import androidx.room.PrimaryKey
 )
 data class Settings(
     @PrimaryKey val userName: String,
-    val defCurrency: Int = 0
+    val defCurrency: Int = 0,
+    val backupPeriod: Int = 0
 )

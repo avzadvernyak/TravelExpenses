@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import m.kampukter.travelexpenses.data.CurrentExchangeRate
 import m.kampukter.travelexpenses.data.RateCurrency
+import m.kampukter.travelexpenses.data.ResultCurrentExchangeRate
 import m.kampukter.travelexpenses.data.dao.ExpensesDao
 import m.kampukter.travelexpenses.data.dao.RateCurrencyDao
 import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
@@ -26,18 +27,18 @@ class RateCurrencyAPIRepository(
 ) : KoinComponent {
     private val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
 
-    suspend fun getCurrentRate(): LiveData<List<CurrentExchangeRate>> {
+    suspend fun getCurrentRate(): LiveData<ResultCurrentExchangeRate> {
         return when (defaultProgramCurrency) {
             1 -> getRateNBU()
             2 -> getRateCBR()
             3 -> getRateNBRB()
-            else -> MutableLiveData<List<CurrentExchangeRate>>()
+            else -> MutableLiveData<ResultCurrentExchangeRate>()
         }
     }
 
-    private suspend fun getRateNBU(): LiveData<List<CurrentExchangeRate>> {
+    private suspend fun getRateNBU(): LiveData<ResultCurrentExchangeRate> {
         val resultListRate = mutableListOf<CurrentExchangeRate>()
-        val retValue = MutableLiveData<List<CurrentExchangeRate>>()
+        val retValue = MutableLiveData<ResultCurrentExchangeRate>()
         try {
             val response = rateCurrencyAPI.getRateTodayNbu("json")
             if (response.code() == 200) {
@@ -51,18 +52,23 @@ class RateCurrencyAPIRepository(
                         )
                     )
                 }
+                retValue.postValue(ResultCurrentExchangeRate.Success(resultListRate))
+            } else {
+                retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(response.code().toString()))
+                Log.e("blablabla", " Error in API (response.code) ${response.code()}")
             }
-            retValue.postValue(resultListRate)
+
         } catch (e: IOException) {
             Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
+            retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(e.toString()))
         }
 
         return retValue
     }
 
-    private suspend fun getRateCBR(): LiveData<List<CurrentExchangeRate>> {
+    private suspend fun getRateCBR(): LiveData<ResultCurrentExchangeRate> {
         val resultListRate = mutableListOf<CurrentExchangeRate>()
-        val retValue = MutableLiveData<List<CurrentExchangeRate>>()
+        val retValue = MutableLiveData<ResultCurrentExchangeRate>()
         try {
             val response = rateCurrencyAPI.getRateTodayCBR()
             if (response.code() == 200) {
@@ -77,17 +83,21 @@ class RateCurrencyAPIRepository(
                         )
                     )
                 }
+                retValue.postValue(ResultCurrentExchangeRate.Success(resultListRate))
+            } else {
+                retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(response.code().toString()))
+                Log.e("blablabla", " Error in API (response.code) ${response.code()}")
             }
-            retValue.postValue(resultListRate)
         } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
+            Log.e("blablabla", " Error in API (getRateCurrencyCbr) $e")
+            retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(e.toString()))
         }
         return retValue
     }
 
-    private suspend fun getRateNBRB(): LiveData<List<CurrentExchangeRate>> {
+    private suspend fun getRateNBRB(): LiveData<ResultCurrentExchangeRate> {
         val resultListRate = mutableListOf<CurrentExchangeRate>()
-        val retValue = MutableLiveData<List<CurrentExchangeRate>>()
+        val retValue = MutableLiveData<ResultCurrentExchangeRate>()
         try {
             val response = rateCurrencyAPI.getRateTodayNBRB("0")
             if (response.code() == 200) {
@@ -110,10 +120,15 @@ class RateCurrencyAPIRepository(
                         )
                     )
                 }
+                retValue.postValue(ResultCurrentExchangeRate.Success(resultListRate))
+            } else {
+                retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(response.code().toString()))
+                Log.e("blablabla", " Error in API (response.code) ${response.code()}")
             }
-            retValue.postValue(resultListRate)
+
         } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
+            Log.e("blablabla", " Error in API (getRateCurrencyNBRB) $e")
+            retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(e.toString()))
         }
         return retValue
 

@@ -69,7 +69,7 @@ class EditExpensesActivity : AppCompatActivity() {
             expense = expenses.expense
             //currencySpinner.setSelection(currencyId.toInt()-1)
         })
-        viewModel.currencyList.observe(
+        viewModel.currencyTableList.observe(
             this,
             Observer { currencyList ->
                 currencyAdapter.clear()

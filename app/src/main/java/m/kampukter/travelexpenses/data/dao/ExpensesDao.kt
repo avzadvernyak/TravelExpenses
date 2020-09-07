@@ -29,7 +29,7 @@ interface ExpensesDao {
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
             where date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null
             group by expenses.dateTime
-            order by expenses.dateTime  
+            order by expenses.dateTime desc  
            """
     )
     fun getAllExpensesWithRate(): LiveData<List<ExpensesWithRate>>

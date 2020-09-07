@@ -7,7 +7,7 @@ import m.kampukter.travelexpenses.data.dao.*
 
 @Database(
     version = 1,exportSchema = false, entities = [
-        Expenses::class, Expense::class, Currency::class, RateCurrency::class, Settings::class
+        Expenses::class, Expense::class, CurrencyTable::class, RateCurrency::class, Settings::class
     ]
 )
 

@@ -1,64 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:layout_height="match_parent">
+
     <androidx.appcompat.widget.Toolbar
             android:id="@+id/settingsToolbar"
             android:layout_width="match_parent"
-            android:background="?attr/colorPrimary"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:layout_height="?attr/actionBarSize"
-            app:layout_constraintTop_toTopOf="parent">
+            android:background="?attr/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
     </androidx.appcompat.widget.Toolbar>
 
     <RadioGroup
-            android:id="@+id/radio_group"
+            android:id="@+id/currencyRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settingsToolbar"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
-            >
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settingsToolbar">
 
         <TextView
                 android:id="@+id/title"
-                android:text="Выберите валюту"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                />
+                android:text="Автоматическая конвертация" />
+
+        <RadioButton
+                android:id="@+id/offRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="отключено" />
 
         <RadioButton
                 android:id="@+id/uahRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="UAH"
-                />
+                android:text="в UAH (по курсу НБУ)" />
 
         <RadioButton
                 android:id="@+id/rubRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="RUB"
-                />
+                android:text="в RUB (по курсу ЦРБ)" />
+
         <RadioButton
                 android:id="@+id/bynRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="BYN"
-                />
+                android:text="в BYN (по курсу НБРБ)" />
+    </RadioGroup>
 
+    <RadioGroup
+            android:id="@+id/controlBackupRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/currencyRadioGroup">
 
+        <TextView
+                android:id="@+id/titlePeriod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Автосохранение" />
+
+        <RadioButton
+                android:id="@+id/withoutBackupRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="отключено" />
+
+        <RadioButton
+                android:id="@+id/halfDayRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="каждые 12 часов" />
+
+        <RadioButton
+                android:id="@+id/dayRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ежедневно" />
+
+        <RadioButton
+                android:id="@+id/weekRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="еженедельно" />
     </RadioGroup>
 
     <Button
             android:id="@+id/saveSettingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="Save settings"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cancelButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/radio_group"
-            android:layout_margin="8dp"/>
+            app:layout_constraintTop_toBottomOf="@id/controlBackupRadioGroup" />
+
+    <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            app:layout_constraintBottom_toBottomOf="@id/saveSettingButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/saveSettingButton"
+            app:layout_constraintTop_toTopOf="@id/saveSettingButton" />
+    <TextView
+            android:id="@+id/lastBackupTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cancelButton"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

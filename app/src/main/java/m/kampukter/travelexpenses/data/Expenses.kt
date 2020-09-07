@@ -11,7 +11,7 @@ import java.util.*
         childColumns = arrayOf("expense"),
         onDelete = ForeignKey.CASCADE
     ), ForeignKey(
-        entity = Currency::class,
+        entity = CurrencyTable::class,
         parentColumns = arrayOf("name"),
         childColumns = arrayOf("currency_field")
     )

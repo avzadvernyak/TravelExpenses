@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
     tableName = "currency"
 )
 
-data class Currency (
+data class CurrencyTable (
     @PrimaryKey val name: String,
     val defCurrency: Int = 0
 )

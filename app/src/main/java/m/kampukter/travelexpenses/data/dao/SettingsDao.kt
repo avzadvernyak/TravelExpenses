@@ -1,5 +1,6 @@
 package m.kampukter.travelexpenses.data.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -15,4 +16,6 @@ interface SettingsDao {
     @Query("select * from settings LIMIT 1")
     suspend fun getSettings(): Settings?
 
+    @Query("select * from settings LIMIT 1")
+    fun getSettingsLiveData(): LiveData<Settings?>
 }

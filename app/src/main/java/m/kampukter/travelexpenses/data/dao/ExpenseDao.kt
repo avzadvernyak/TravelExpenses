@@ -14,7 +14,10 @@ interface ExpenseDao {
     suspend fun insertAll(cities: List<Expense>)
 
     @Query("select * from expense")
-    fun getAll(): LiveData<List<Expense>>
+    fun getAllLiveData(): LiveData<List<Expense>>
+
+    @Query("select * from expense")
+    suspend fun getAll(): List<Expense>
 
     @Query("select * from expense where name like :query limit 1")
     fun search(query: String): LiveData<Expense>

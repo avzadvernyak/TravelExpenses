@@ -1,6 +1,9 @@
 package m.kampukter.travelexpenses
 
 import android.app.Application
+import android.content.Intent
+import android.os.Build
+import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -9,13 +12,13 @@ import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import m.kampukter.travelexpenses.data.Currency
-import m.kampukter.travelexpenses.data.Expense
-import m.kampukter.travelexpenses.data.MyDatabase
+import m.kampukter.travelexpenses.data.*
+import m.kampukter.travelexpenses.data.dto.BackupServer
+import m.kampukter.travelexpenses.data.dto.FirebaseBackupServer
 import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
-import m.kampukter.travelexpenses.data.repository.ExpenseRepository
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
+import m.kampukter.travelexpenses.ui.SettingsActivity
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
@@ -26,6 +29,8 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
+import kotlin.math.absoluteValue
 
 lateinit var mainApplication: MainApplication
 
@@ -44,14 +49,14 @@ class MainApplication : Application() {
                         GlobalScope.launch(context = Dispatchers.IO) {
                             get<MyDatabase>().currencyDao().insertAll(
                                 listOf(
-                                    Currency(name = "RUB", defCurrency = 0),
-                                    Currency(name = "UAH", defCurrency = 0),
-                                    Currency(name = "USD", defCurrency = 0),
-                                    Currency(name = "EUR", defCurrency = 1),
-                                    Currency(name = "NOK", defCurrency = 0),
-                                    Currency(name = "BYN", defCurrency = 0),
-                                    Currency(name = "PLN", defCurrency = 0),
-                                    Currency(name = "CZK", defCurrency = 0)
+                                    CurrencyTable(name = "RUB", defCurrency = 0),
+                                    CurrencyTable(name = "UAH", defCurrency = 0),
+                                    CurrencyTable(name = "USD", defCurrency = 0),
+                                    CurrencyTable(name = "EUR", defCurrency = 1),
+                                    CurrencyTable(name = "NOK", defCurrency = 0),
+                                    CurrencyTable(name = "BYN", defCurrency = 0),
+                                    CurrencyTable(name = "PLN", defCurrency = 0),
+                                    CurrencyTable(name = "CZK", defCurrency = 0)
                                 )
                             )
                         }
@@ -75,18 +80,16 @@ class MainApplication : Application() {
                     }
                 }).build()
         }
-        single {
-            ExpenseRepository(
-                get<MyDatabase>().expenseDao(),
-                get<MyDatabase>().expensesDao()
-            )
-        }
+
+        single<BackupServer> { FirebaseBackupServer() }
         single {
             ExpensesRepository(
                 get<MyDatabase>().expensesDao(),
                 get<MyDatabase>().rateCurrencyDao(),
                 get<MyDatabase>().currencyDao(),
-                get<MyDatabase>().settingsDao()
+                get<MyDatabase>().settingsDao(),
+                get<MyDatabase>().expenseDao(),
+                get()
             )
         }
 
@@ -103,7 +106,7 @@ class MainApplication : Application() {
             }
         }
         // End Retrofit injection*/
-        viewModel { MyViewModel(get(), get()) }
+        viewModel { MyViewModel(get()) }
     }
 
     private fun retrofitBuild(apiUrl: String): Retrofit =
@@ -130,8 +133,36 @@ class MainApplication : Application() {
         }
 
         GlobalScope.launch(context = Dispatchers.IO) {
+
             val mySettings = getKoin().get<ExpensesRepository>().getSettings()
-            mySettings?.let { currencySession = CurrencySession(it.defCurrency) }
+            if (mySettings != null) {
+                val myHesh = mySettings.userName.hashCode().absoluteValue
+                val  testString = "${mySettings.userName}-${myHesh.toString(16)}"
+                val res = testString.split("-").last()
+                Log.d("blablabla", "hashCode $res")
+                currencySession =
+                    if (mySettings.defCurrency != 0) CurrencySession(mySettings.defCurrency)
+                    else null
+                when (mySettings.backupPeriod) {
+                    1 -> getKoin().get<MyViewModel>().startBackup(Periodic.HalfDayBackup)
+                    2 -> getKoin().get<MyViewModel>().startBackup(Periodic.DayBackup)
+                    3 -> getKoin().get<MyViewModel>().startBackup(Periodic.WeekBackup)
+                    else -> getKoin().get<MyViewModel>().stopBackup()
+                }
+            } else {
+                getKoin().get<ExpensesRepository>().insertSettings(
+                    Settings(
+                        userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
+                        defCurrency = 0,
+                        backupPeriod = 0
+                    )
+                )
+                startActivity(
+                    Intent(baseContext, SettingsActivity::class.java).addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK
+                    )
+                )
+            }
         }
     }
 
@@ -139,10 +170,16 @@ class MainApplication : Application() {
     fun getCurrentScope() = currencySession?.getCurrentScope()
     fun changeActiveCurrency(currencyId: Int) {
         currencySession?.dispose()
-        currencySession = CurrencySession(currencyId)
+
+        currencySession = if (currencyId != 0) CurrencySession(currencyId)
+        else null
     }
 
     fun startAPISynch() {
         currencySession?.startSynch()
+    }
+
+    fun saveBackup() {
+        getKoin().get<ExpensesRepository>().saveBackup()
     }
 }

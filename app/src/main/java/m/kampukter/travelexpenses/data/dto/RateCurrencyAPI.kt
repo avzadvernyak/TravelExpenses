@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses.data.dto
 
-import androidx.lifecycle.LiveData
 import com.google.gson.annotations.SerializedName
 import com.tickaroo.tikxml.annotation.Attribute
 import com.tickaroo.tikxml.annotation.Element
@@ -9,7 +8,6 @@ import com.tickaroo.tikxml.annotation.Xml
 import m.kampukter.travelexpenses.data.CBRDateConverter
 import m.kampukter.travelexpenses.data.CBRFloatConverter
 import m.kampukter.travelexpenses.data.CBRIntConverter
-import m.kampukter.travelexpenses.data.CurrentExchangeRate
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

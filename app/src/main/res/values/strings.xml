@@ -44,6 +44,8 @@
     <string name="oneRub">1 RUB %1$s</string>
     <string name="oneByn">1 BYN %1$s</string>
     <string name="noCurrency">Не выбрана валюта по умолчанию</string>
+    <string name="errorAPI">Ошибка связи с банком. \nПопробуйте позже.</string>
+    <string name="reload">Повторить</string>
 
 
 </resources>

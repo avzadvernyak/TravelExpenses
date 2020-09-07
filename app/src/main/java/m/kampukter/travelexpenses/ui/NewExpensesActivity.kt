@@ -82,7 +82,7 @@ class NewExpensesActivity : AppCompatActivity() {
             ).show()
         }
 
-        viewModel.currencyList.observe(
+        viewModel.currencyTableList.observe(
             this,
             Observer { currencyList ->
                 currencyAdapter.clear()

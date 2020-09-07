@@ -4,20 +4,26 @@ import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
-import m.kampukter.travelexpenses.data.repository.ExpenseRepository
+import m.kampukter.travelexpenses.data.dto.BackupServer
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.mainApplication
 
 class MyViewModel(
-    private val expenseRepository: ExpenseRepository,
     private val expensesRepository: ExpensesRepository
 ) : ViewModel() {
 
     private val rateRepository = mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()
 
-    val currentExchangeRate: LiveData<List<CurrentExchangeRate>> = liveData {
-        rateRepository?.let { emitSource(it.getCurrentRate()) }
+    private val reloadCurrentRate = MutableLiveData<Boolean>()
+    fun startReloadCurrentRate() {
+        reloadCurrentRate.postValue(true)
+    }
+
+    val currentExchangeRate: LiveData<ResultCurrentExchangeRate> = reloadCurrentRate.switchMap {
+        liveData(context = viewModelScope.coroutineContext) {
+            rateRepository?.let { emitSource(it.getCurrentRate()) }
+        }
     }
 
     /*
@@ -80,7 +86,8 @@ class MyViewModel(
         expensesRepository.resetDef()
     }
 
-    val currencyList: LiveData<List<Currency>> = expensesRepository.getCurrencyAllLiveData()
+    val currencyTableList: LiveData<List<CurrencyTable>> =
+        expensesRepository.getCurrencyAllLiveData()
 
 
     private val queryExpense = MutableLiveData<String>()
@@ -89,11 +96,11 @@ class MyViewModel(
     }
 
     val expenseById: LiveData<Expense> =
-        Transformations.switchMap(queryExpense) { query -> expenseRepository.getExpenseByName(query) }
+        Transformations.switchMap(queryExpense) { query -> expensesRepository.getExpenseByName(query) }
 
-    val expenseList: LiveData<List<Expense>> = expenseRepository.getExpenseAll()
+    val expenseList: LiveData<List<Expense>> = expensesRepository.getExpenseAllLiveData()
     fun addExpense(expense: Expense) {
-        expenseRepository.addExpense(expense)
+        expensesRepository.addExpense(expense)
     }
 
     /*
@@ -103,7 +110,7 @@ class MyViewModel(
     private val expenseDeletionTrigger = MutableLiveData<ExpenseDeletionRequest>()
     val expenseDeletionResultLiveData: LiveData<ExpenseDeletionResult> =
         Transformations.switchMap(expenseDeletionTrigger) { request ->
-            expenseRepository.deleteExpense(request.name, request.isForced)
+            expensesRepository.deleteExpense(request.name, request.isForced)
         }
 
     fun deleteExpense(expenseName: String, isForced: Boolean) {
@@ -114,10 +121,6 @@ class MyViewModel(
         val name: String,
         val isForced: Boolean
     )
-
-    /* fun testRate() {
-         viewModelScope.launch { apiRepository.rateSynchronization()}
-     }*/
     fun deleteRate() {
         viewModelScope.launch { expensesRepository.deleteRate() }
     }
@@ -127,4 +130,19 @@ class MyViewModel(
     fun saveSettings(settings: Settings) {
         viewModelScope.launch { expensesRepository.insertSettings(settings) }
     }
+
+    val savedSettings = expensesRepository.getSettingsLiveData()
+
+    fun startBackup(periodic: Periodic) {expensesRepository.startBackupWorker(periodic)}
+    fun stopBackup() {expensesRepository.stopBackupWorker()}
+
+    private val idProgram = MutableLiveData<String>()
+    fun setIdProgram(id: String) {
+        idProgram.postValue(id)
+    }
+    val restoreBackupLiveData: LiveData<BackupServer.Backup> =
+        Transformations.switchMap(idProgram) { name ->
+            expensesRepository.restoreBackupLiveData(name)
+        }
+
 }
