@@ -40,15 +40,15 @@ class SettingsActivity : AppCompatActivity() {
                     1 -> {
                         halfDayRadioButton.isChecked = true
                         viewModel.setIdProgram(programId)
-                        viewModel.restoreBackupLiveData .observe(
+                        viewModel.restoreBackupLiveData.observe(
                             this,
                             Observer { restoreBackup ->
                                 if (restoreBackup != null) {
-                                    lastBackupTextView.text =
-                                        DateFormat.format(
-                                            "dd/MM/yyyy HH:mm",
-                                            restoreBackup.backupTime
-                                        )
+                                    val dateStr = DateFormat.format(
+                                        "dd/MM/yyyy HH:mm",
+                                        restoreBackup.backupTime
+                                    ).toString()
+                                    lastBackupTextView.text = "Last backup in " + dateStr
                                 }
                             })
                     }

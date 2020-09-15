@@ -94,7 +94,13 @@
                 android:layout_height="wrap_content"
                 android:text="еженедельно" />
     </RadioGroup>
-
+    <TextView
+            android:id="@+id/lastBackupTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/controlBackupRadioGroup"/>
     <Button
             android:id="@+id/saveSettingButton"
             android:layout_width="wrap_content"
@@ -103,7 +109,7 @@
             android:text="Save settings"
             app:layout_constraintEnd_toStartOf="@id/cancelButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/controlBackupRadioGroup" />
+            app:layout_constraintTop_toBottomOf="@id/lastBackupTextView" />
 
     <Button
             android:id="@+id/cancelButton"
@@ -114,12 +120,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/saveSettingButton"
             app:layout_constraintTop_toTopOf="@id/saveSettingButton" />
-    <TextView
-            android:id="@+id/lastBackupTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cancelButton"/>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

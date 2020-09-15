@@ -136,8 +136,8 @@ class MainApplication : Application() {
 
             val mySettings = getKoin().get<ExpensesRepository>().getSettings()
             if (mySettings != null) {
-                val myHesh = mySettings.userName.hashCode().absoluteValue
-                val  testString = "${mySettings.userName}-${myHesh.toString(16)}"
+                val myHash = mySettings.userName.hashCode().absoluteValue
+                val  testString = "${mySettings.userName}-${myHash.toString(16)}"
                 val res = testString.split("-").last()
                 Log.d("blablabla", "hashCode $res")
                 currencySession =
