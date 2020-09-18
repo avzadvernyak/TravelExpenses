@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav_graph"
+        app:startDestination="@+id/homeExpensesFragment">
+    <fragment
+            android:id="@+id/homeExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.HomeExpensesFragment"
+            android:label="Расходы"
+            app:startDestination="@id/toAddExpensesFragment"
+            tools:layout="@layout/home_expenses_fragment">
+        <action
+                android:id="@+id/toAddExpensesFragment"
+                app:destination="@+id/addExpensesFragment" />
+        <action
+                android:id="@+id/toEditExpensesFragment"
+                app:destination="@+id/editExpensesFragment" />
+        <action
+                android:id="@+id/toDelExpensesDialogFragment"
+                app:destination="@+id/delExpensesDialogFragment" />
+        <action
+                android:id="@+id/toDelAllExpensesDialogFragment"
+                app:destination="@+id/delAllExpensesDialogFragment" />
+        <action
+                android:id="@+id/toSettingsFragment"
+                app:destination="@+id/settingsFragment" />
+        <action
+                android:id="@+id/toExpenseFragment"
+                app:destination="@+id/expenseFragment" />
+        <action
+                android:id="@+id/toSumExpenseFragment"
+                app:destination="@+id/sumExpenseFragment" />
+        <action
+                android:id="@+id/toCurrentExchangeFragment"
+                app:destination="@+id/currentExchangeFragment" />
+
+    </fragment>
+
+    <fragment
+            android:id="@+id/addExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.AddExpensesFragment"
+            android:label="Добавить запись"
+            tools:layout="@layout/add_expenses_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/editExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.EditExpensesFragment"
+            android:label="Редактировать запись"
+            tools:layout="@layout/edit_expenses_fragment">
+        <action
+                android:id="@+id/toChoiceExpenseFragment"
+                app:destination="@id/choiceExpenseFragment" />
+        <action
+                android:id="@+id/toChoiceCurrencyFragment"
+                app:destination="@id/choiceCurrencyFragment" />
+    </fragment>
+    <dialog
+            android:id="@+id/delExpensesDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.DelExpensesDialogFragment"
+            android:label="Dialog Fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </dialog>
+    <dialog
+            android:id="@+id/delAllExpensesDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.DelAllExpensesDialogFragment"
+            android:label="Dialog Fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </dialog>
+    <fragment
+            android:id="@+id/settingsFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.SettingsFragment"
+            android:label="Настройки"
+            tools:layout="@layout/settings_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/expenseFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ExpenseFragment"
+            android:label="Статьи"
+            tools:layout="@layout/expense_fragment">
+        <action
+                android:id="@+id/toDelExpenseDialogFragment"
+                app:destination="@id/delExpenseDialogFragment" />
+        <action
+                android:id="@+id/toAddExpenseDialogFragment"
+                app:destination="@id/addExpenseDialogFragment" />
+
+    </fragment>
+    <dialog
+            android:id="@+id/delExpenseDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.DelExpenseDialogFragment"
+            android:label="Dialog Fragment">
+        <action
+                android:id="@+id/toExpenseFragment"
+                app:popUpTo="@id/expenseFragment" />
+    </dialog>
+    <dialog
+            android:id="@+id/addExpenseDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.AddExpenseDialogFragment"
+            android:label="Dialog Fragment">
+        <action
+                android:id="@+id/toExpenseFragment"
+                app:popUpTo="@id/expenseFragment" />
+    </dialog>
+    <fragment
+            android:id="@+id/sumExpenseFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.SumExpenseFragment"
+            android:label="Суммы по статьям"
+            tools:layout="@layout/sum_expense_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+
+    <fragment
+            android:id="@+id/archiveExchangeFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ArchiveExchangeFragment"
+            android:label="Архив курсов"
+            tools:layout="@layout/archive_exchange_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+        <action
+                android:id="@+id/toCurrentExchangeFragment"
+                app:destination="@id/currentExchangeFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/currentExchangeFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.CurrentExchangeFragment"
+            android:label="Курс валют"
+            tools:layout="@layout/current_exchange_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+        <action
+                android:id="@+id/toArchiveExchangeFragment"
+                app:destination="@id/archiveExchangeFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/choiceExpenseFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ChoiceExpenseFragment"
+            android:label="@string/expense_frag_title"
+            tools:layout="@layout/choice_expense_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/editExpensesFragment" />
+
+    </fragment>
+    <fragment
+            android:id="@+id/choiceCurrencyFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ChoiceCurrencyFragment"
+            android:label="@string/currency_frag_title"
+            tools:layout="@layout/choice_currency_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/editExpensesFragment" />
+
+    </fragment>
+
+    <fragment
+            android:id="@+id/deeplink_export"
+
+            android:label="Export" />
+
+</navigation>

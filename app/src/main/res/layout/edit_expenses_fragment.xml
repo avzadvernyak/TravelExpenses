@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+            android:id="@+id/dateTimeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:hint="@string/hint_datetime_created"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/expenseTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:hint="@string/hint_expense"
+            android:inputType="none"
+            app:endIconDrawable="@drawable/ic_drop_down_24"
+            app:endIconMode="custom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateTimeTextView">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/expenseTextInputEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="false" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/sumTextInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/hint_sum"
+            app:layout_constraintEnd_toStartOf="@+id/currencyTextInputLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/expenseTextInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/sumTextInputEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/currencyTextInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/hint_currency"
+            app:endIconDrawable="@drawable/ic_drop_down_24"
+            app:endIconMode="custom"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            app:layout_constraintBottom_toBottomOf="@+id/sumTextInputLayout"
+            app:layout_constraintStart_toEndOf="@+id/sumTextInputLayout"
+            app:layout_constraintTop_toTopOf="@+id/sumTextInputLayout"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <AutoCompleteTextView
+                    android:id="@+id/currencyTextInputEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+
+                    tools:ignore="LabelFor" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <!-- <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/currencyTextInputEdit"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="false" />-->
+
+
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/noteTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:hint="@string/hint_note"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sumTextInputLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/noteTextInputEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

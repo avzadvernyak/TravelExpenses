@@ -139,7 +139,7 @@ class MainApplication : Application() {
                 val myHash = mySettings.userName.hashCode().absoluteValue
                 val  testString = "${mySettings.userName}-${myHash.toString(16)}"
                 val res = testString.split("-").last()
-                Log.d("blablabla", "hashCode $res")
+                //Log.d("blablabla", "hashCode $res")
                 currencySession =
                     if (mySettings.defCurrency != 0) CurrencySession(mySettings.defCurrency)
                     else null

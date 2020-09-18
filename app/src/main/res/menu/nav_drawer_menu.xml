@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/primary">
+        <item
+                android:id="@id/homeExpensesFragment"
+                android:icon="@drawable/ic_balance_wallet_black"
+                android:title="Расходы" />
+        <item
+                android:id="@id/archiveExchangeFragment"
+                android:icon="@drawable/ic_expenses"
+                android:title="Курсы валют" />
+        <item
+                android:id="@id/deeplink_export"
+                android:icon="@drawable/ic_archive_black"
+                android:title="Экспорт" />
+        <item
+                android:id="@id/delAllExpensesDialogFragment"
+                android:icon="@drawable/ic_delete_forever_black"
+                android:title="Очистить" />
+        <item
+                android:id="@id/settingsFragment"
+                android:icon="@drawable/ic_settings_black"
+                android:title="Настройки" />
+
+    </group>
+</menu>

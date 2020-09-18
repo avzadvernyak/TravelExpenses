@@ -46,6 +46,9 @@
     <string name="noCurrency">Не выбрана валюта по умолчанию</string>
     <string name="errorAPI">Ошибка связи с банком. \nПопробуйте позже.</string>
     <string name="reload">Повторить</string>
+    <string name="hint_expense">Статья расходов</string>
+    <string name="hint_currency">Валюта</string>
+    <string name="currency_frag_title">Выберите валюту</string>
 
 
 </resources>
