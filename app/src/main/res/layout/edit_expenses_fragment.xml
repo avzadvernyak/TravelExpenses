@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -66,7 +67,7 @@
             android:hint="@string/hint_currency"
             app:endIconDrawable="@drawable/ic_drop_down_24"
             app:endIconMode="custom"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+
             app:layout_constraintBottom_toBottomOf="@+id/sumTextInputLayout"
             app:layout_constraintStart_toEndOf="@+id/sumTextInputLayout"
             app:layout_constraintTop_toTopOf="@+id/sumTextInputLayout"
@@ -74,7 +75,7 @@
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/currencyTextInputEdit"
-                android:layout_width="120dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="false" />
 
@@ -85,7 +86,7 @@
             android:id="@+id/textField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:hint="@string/hint_currency"
             app:endIconDrawable="@drawable/ic_drop_down_24"
             app:endIconMode="custom"

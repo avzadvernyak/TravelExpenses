@@ -83,7 +83,7 @@ class EditExpensesFragment : Fragment() {
                 val navController = findNavController()
                 navController.navigate(R.id.toChoiceCurrencyFragment)
             }
-            val adapter = context?.let { ArrayAdapter(it,R.layout.list_item , listOf("1 USD","1 RUB")) }
+            val adapter = context?.let { ArrayAdapter(it,android.R.layout.simple_list_item_1 , listOf("одын", "джва", "трэ")) }
             (textField.editText as? AutoCompleteTextView)?.setAdapter(adapter)
 //            currencyTextInputLayout.setEndIconOnClickListener { Log.d("blablabla", "setEndIconOnClickListener") }
 
