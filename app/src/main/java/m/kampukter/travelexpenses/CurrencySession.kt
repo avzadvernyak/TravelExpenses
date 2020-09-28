@@ -1,5 +1,6 @@
 package m.kampukter.travelexpenses
 
+import android.util.Log
 import androidx.work.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit
 попалась ссылка - https://devcolibri.com/kotlin-coroutines-patterns-anti-patterns/
 
  */
+
 class CurrencySession(private val currencyId: Int) : KoinComponent {
 
     private var workerId: UUID? = null
@@ -33,7 +35,7 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
         workerId = startPeriodicSynchronization()
     }
     fun startSynch() {
-        scope.launch { currentAPIScope.get<RateCurrencyAPIRepository>().rateSynchronization() }
+        scope.launch { currentAPIScope.get<RateCurrencyAPIRepository>().rateSynchronization(currencyId) }
     }
     fun dispose() {
         workerId?.let { WorkManager.getInstance(mainApplication).cancelWorkById(it) }
@@ -45,14 +47,14 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
         with(getKoin()) {
             when (id) {
                 // Гривна по умолчанию
-                1 -> setProperty(
+                DEFAULT_CURRENCY_CONST_UAH -> setProperty(
                     "currentAPIUrl",
                     "https://bank.gov.ua/NBUStatService/v1/statdirectory/"
                 )
                 // Рубль по умолчению
-                2 -> setProperty("currentAPIUrl", "http://www.cbr.ru/scripts/")
+                DEFAULT_CURRENCY_CONST_RUB -> setProperty("currentAPIUrl", "http://www.cbr.ru/scripts/")
                 // Белорусский рубль по умолчению
-                3 -> setProperty("currentAPIUrl", "https://www.nbrb.by/api/exrates/")
+                DEFAULT_CURRENCY_CONST_BYN -> setProperty("currentAPIUrl", "https://www.nbrb.by/api/exrates/")
                 // для отладки
                 else -> setProperty("currentAPIUrl", "http://www.orbis.in.ua/")
             }

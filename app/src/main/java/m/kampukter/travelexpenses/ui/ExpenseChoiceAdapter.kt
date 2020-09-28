@@ -9,7 +9,7 @@ import m.kampukter.travelexpenses.data.Expense
 typealias ExpenseClickListener<T> = (T) -> Unit
 
 class ExpenseChoiceAdapter(
-    private val expenseClickListener: ExpenseClickListener<Expense>? = null
+    private var expenseClickListener: ExpenseClickListener<Expense>? = null
 ) : RecyclerView.Adapter<ExpenseViewHolder>() {
 
     private var expense: List<Expense>? = null
@@ -33,5 +33,9 @@ class ExpenseChoiceAdapter(
     fun setList(list: List<Expense>) {
         this.expense = list
         notifyDataSetChanged()
+    }
+    fun setCallback(callback: ExpenseClickListener<Expense>? ) {
+        this.expenseClickListener = callback
+
     }
 }

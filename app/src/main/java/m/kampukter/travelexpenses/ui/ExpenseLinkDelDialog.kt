@@ -14,7 +14,7 @@ class ExpenseLinkDelDialog : DialogFragment() {
 
         val builder = AlertDialog.Builder(activity)
         val expense = arguments?.getString(ARG_EXPENSE)
-        builder.setTitle(getString(R.string.expense_lin_del_title))
+        builder.setTitle(getString(R.string.delete_record_title))
             .setMessage(arguments?.getString(ARG_MESSAGE))
             .setPositiveButton(android.R.string.yes) { _, _ ->
                 expense?.let { callback?.invoke(expense, true) }

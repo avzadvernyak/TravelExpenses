@@ -116,7 +116,7 @@ class SettingsActivity : AppCompatActivity() {
                 )
             }
 
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, MainActivityWithNavigation::class.java))
         }
         cancelButton.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))

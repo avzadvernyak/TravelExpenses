@@ -21,14 +21,14 @@ class NewExpensesActivity : AppCompatActivity() {
     private val viewModel by viewModel<MyViewModel>()
     private var expense: String = ""
     private var currency: String = ""
-    private var summa: Float = 0F
+    private var summa: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.new_expenses_activity)
         setSupportActionBar(newExpensesToolbar).apply {
-            title = getString(R.string.add_expenses_title)
+            title = getString(R.string.add_record_title)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -60,8 +60,8 @@ class NewExpensesActivity : AppCompatActivity() {
             )
         }
         saveExpensesButton.setOnClickListener {
-            summa = sumTextInputEdit.text.toString().toFloat()
-            if (expense != "" && summa != 0F && !noteTextInputEdit.text.isNullOrBlank()) {
+            summa = sumTextInputEdit.text.toString().toDouble()
+            if (expense != "" && summa != 0.0 && !noteTextInputEdit.text.isNullOrBlank()) {
                 //Log.d("blablabla", "Save summa= $summa - currency=$currency type =$expense")
                 val expensesSave = Expenses(
                     //dateTime = Date( System.currentTimeMillis() ),

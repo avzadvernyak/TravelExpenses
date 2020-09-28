@@ -4,6 +4,10 @@ import android.text.format.DateFormat
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expenses_item.view.*
+import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
 import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.mainApplication
 import java.text.DecimalFormat
@@ -31,11 +35,11 @@ class ExpensesViewHolder(
             dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", result.dateTime)
             val pattern = when (defaultProgramCurrency ){
                 // Гривна по умолчанию
-                1 -> "######.## UAH"
+                DEFAULT_CURRENCY_CONST_UAH -> "######.## UAH"
                 // Рубль по умолчению
-                2 -> "######.## RUB"
+                DEFAULT_CURRENCY_CONST_RUB -> "######.## RUB"
                 // Белорусский Рубль по умолчению
-                3 -> "####.#### BYN"
+                DEFAULT_CURRENCY_CONST_BYN -> "####.#### BYN"
                 else -> "######.##"
             }
             result.rate?.let { rateTextView.text = DecimalFormat( pattern ).format(result.sum * it) }

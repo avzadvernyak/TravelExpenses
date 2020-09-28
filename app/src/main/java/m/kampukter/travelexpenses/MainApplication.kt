@@ -34,6 +34,10 @@ import kotlin.math.absoluteValue
 
 lateinit var mainApplication: MainApplication
 
+const val DEFAULT_CURRENCY_CONST_RUB = 1
+const val DEFAULT_CURRENCY_CONST_UAH = 2
+const val DEFAULT_CURRENCY_CONST_BYN = 6
+
 @Suppress("unused")
 class MainApplication : Application() {
 
@@ -109,15 +113,17 @@ class MainApplication : Application() {
         viewModel { MyViewModel(get()) }
     }
 
-    private fun retrofitBuild(apiUrl: String): Retrofit =
-        Retrofit.Builder()
+    private fun retrofitBuild(apiUrl: String): Retrofit {
+        return Retrofit.Builder()
             .baseUrl(apiUrl)
             .addConverterFactory(
                 when (getActiveCurrencySession()) {
-                    2 -> TikXmlConverterFactory.create()
+                    DEFAULT_CURRENCY_CONST_RUB -> TikXmlConverterFactory.create()
+                    DEFAULT_CURRENCY_CONST_UAH -> TikXmlConverterFactory.create()
                     else -> GsonConverterFactory.create()
                 }
             ).build()
+    }
 
 
     override fun onCreate() {
@@ -136,10 +142,10 @@ class MainApplication : Application() {
 
             val mySettings = getKoin().get<ExpensesRepository>().getSettings()
             if (mySettings != null) {
-                val myHash = mySettings.userName.hashCode().absoluteValue
+                /*val myHash = mySettings.userName.hashCode().absoluteValue
                 val  testString = "${mySettings.userName}-${myHash.toString(16)}"
                 val res = testString.split("-").last()
-                //Log.d("blablabla", "hashCode $res")
+                //Log.d("blablabla", "hashCode $res")*/
                 currencySession =
                     if (mySettings.defCurrency != 0) CurrencySession(mySettings.defCurrency)
                     else null

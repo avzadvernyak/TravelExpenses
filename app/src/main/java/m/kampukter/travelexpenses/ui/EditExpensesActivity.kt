@@ -22,7 +22,7 @@ class EditExpensesActivity : AppCompatActivity() {
     private val viewModel by viewModel<MyViewModel>()
     private var currency: String = ""
     private var expense: String = ""
-    private var summa: Float = 0F
+    private var summa: Double = 0.0
     private var dateTimeRecord = Date()
     private var idRecord: Long = 0L
 
@@ -31,7 +31,7 @@ class EditExpensesActivity : AppCompatActivity() {
 
         setContentView(R.layout.edit_expenses_activity)
         setSupportActionBar(editExpensesToolbar).apply {
-            title = getString(R.string.expenses_edit_title)
+            title = getString(R.string.edit_record_title)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -93,8 +93,8 @@ class EditExpensesActivity : AppCompatActivity() {
             )
         }
         saveEditExpensesButton.setOnClickListener {
-            summa = sumTextInputEdit.text.toString().toFloat()
-            if (expense != "" && summa != 0F && !noteTextInputEdit.text.isNullOrBlank()) {
+            summa = sumTextInputEdit.text.toString().toDouble()
+            if (expense != "" && summa != 0.0 && !noteTextInputEdit.text.isNullOrBlank()) {
                 val expensesSave = Expenses(
                     id = idRecord,
                     dateTime = dateTimeRecord,

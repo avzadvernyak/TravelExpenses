@@ -32,6 +32,9 @@
                 android:id="@+id/toSumExpenseFragment"
                 app:destination="@+id/sumExpenseFragment" />
         <action
+                android:id="@+id/toSumCurrencyFragment"
+                app:destination="@+id/sumCurrencyFragment" />
+        <action
                 android:id="@+id/toCurrentExchangeFragment"
                 app:destination="@+id/currentExchangeFragment" />
 
@@ -43,6 +46,9 @@
             android:label="Добавить запись"
             tools:layout="@layout/add_expenses_fragment">
         <action
+                android:id="@+id/toChoiceExpenseForAddFragment"
+                app:destination="@id/choiceExpenseForAddFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
@@ -52,8 +58,8 @@
             android:label="Редактировать запись"
             tools:layout="@layout/edit_expenses_fragment">
         <action
-                android:id="@+id/toChoiceExpenseFragment"
-                app:destination="@id/choiceExpenseFragment" />
+                android:id="@+id/toChoiceExpenseForEditFragment"
+                app:destination="@id/choiceExpenseForEditFragment" />
         <action
                 android:id="@+id/toChoiceCurrencyFragment"
                 app:destination="@id/choiceCurrencyFragment" />
@@ -92,6 +98,14 @@
                 android:id="@+id/toDelExpenseDialogFragment"
                 app:destination="@id/delExpenseDialogFragment" />
         <action
+                android:id="@+id/toEditExpenseDialogFragment"
+                app:destination="@id/editExpenseDialogFragment">
+            <argument
+                    android:name="expenseArg"
+                    android:defaultValue=""
+                    app:argType="string" />
+        </action>
+        <action
                 android:id="@+id/toAddExpenseDialogFragment"
                 app:destination="@id/addExpenseDialogFragment" />
 
@@ -112,16 +126,45 @@
                 android:id="@+id/toExpenseFragment"
                 app:popUpTo="@id/expenseFragment" />
     </dialog>
+    <dialog
+            android:id="@+id/editExpenseDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.EditExpenseDialogFragment"
+            android:label="Edit Expense">
+        <argument
+                android:name="expenseArg"
+                android:defaultValue=""
+                app:argType="string" />
+        <action
+                android:id="@+id/toExpenseFragment"
+                app:popUpTo="@id/expenseFragment" />
+    </dialog>
+    <dialog
+            android:id="@+id/datePickerDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.DatePickerDialogFragment"
+            android:label="DatePicker">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/currentExchangeFragment" />
+    </dialog>
+
     <fragment
             android:id="@+id/sumExpenseFragment"
             android:name="m.kampukter.travelexpenses.ui.fragments.SumExpenseFragment"
-            android:label="Суммы по статьям"
-            tools:layout="@layout/sum_expense_fragment">
+            android:label="Итоги"
+            tools:layout="@layout/sum_viewing_fragment">
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
-
+    <fragment
+            android:id="@+id/sumCurrencyFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.SumCurrencyFragment"
+            android:label="Итоги"
+            tools:layout="@layout/sum_viewing_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
     <fragment
             android:id="@+id/archiveExchangeFragment"
             android:name="m.kampukter.travelexpenses.ui.fragments.ArchiveExchangeFragment"
@@ -143,12 +186,25 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
         <action
+                android:id="@+id/toDatePickerDialogFragment"
+                app:destination="@id/datePickerDialogFragment" />
+        <action
                 android:id="@+id/toArchiveExchangeFragment"
                 app:destination="@id/archiveExchangeFragment" />
     </fragment>
     <fragment
-            android:id="@+id/choiceExpenseFragment"
-            android:name="m.kampukter.travelexpenses.ui.fragments.ChoiceExpenseFragment"
+            android:id="@+id/choiceExpenseForAddFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ChoiceExpenseForAddFragment"
+            android:label="@string/expense_frag_title"
+            tools:layout="@layout/choice_expense_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/addExpensesFragment" />
+
+    </fragment>
+    <fragment
+            android:id="@+id/choiceExpenseForEditFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ChoiceExpenseForEditFragment"
             android:label="@string/expense_frag_title"
             tools:layout="@layout/choice_expense_fragment">
         <action

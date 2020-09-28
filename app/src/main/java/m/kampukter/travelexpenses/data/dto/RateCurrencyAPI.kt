@@ -25,8 +25,14 @@ interface RateCurrencyAPI {
 
     @GET("exchange?")
     suspend fun getRateTodayNbu(
+        @Query("date") date: String,
         @QueryName str: String
     ): Response<List<RateCurrencyNbu>>
+
+    @GET("exchange?")
+    suspend fun getRateNbu_XML(
+        @Query("date") date: String
+    ): Response<Exchange>
 
     @GET("rates/{currency}")
     suspend fun getRateCurrencyNBRB(
@@ -37,6 +43,7 @@ interface RateCurrencyAPI {
 
     @GET("rates")
     suspend fun getRateTodayNBRB(
+        @Query("ondate") date: String,
         @Query("periodicity") str: String
     ): Response<List<RateCurrencyNBRB>>
 
@@ -47,6 +54,7 @@ interface RateCurrencyAPI {
 
     @GET("XML_daily_eng.asp")
     suspend fun getRateTodayCBR(
+        @Query("date_req") date: String
     ): Response<ValCurs>
 
 
@@ -65,10 +73,15 @@ data class RateCurrencyNbu(
 data class RateCurrencyNBRB(
     @SerializedName("Cur_ID")
     val curID: Int,
+    @SerializedName("Date")
     val Date: String,
+    @SerializedName("Cur_Abbreviation")
     val Cur_Abbreviation: String,
+    @SerializedName("Cur_Scale")
     val Cur_Scale: Int,
+    @SerializedName("Cur_Name")
     val Cur_Name: String,
+    @SerializedName("Cur_OfficialRate")
     val Cur_OfficialRate: Float
 )
 
@@ -103,4 +116,29 @@ data class Valute(
 
     @PropertyElement(name = "Value", converter = CBRFloatConverter::class)
     var value: Float = 0F
+)
+
+// CBR
+@Xml(name = "exchange")
+data class Exchange(
+    @Element(name = "currency")
+    var currency: List<Currency>
+)
+
+@Xml(name = "currency")
+data class Currency(
+    @PropertyElement(name = "r030")
+    var r030: String = "",
+
+    @PropertyElement(name = "txt")
+    var txt: String = "",
+
+    @PropertyElement(name = "rate", converter = CBRFloatConverter::class)
+    var rate: Float = 0F,
+
+    @PropertyElement(name = "cc")
+    var cc: String = "",
+
+    @PropertyElement(name = "exchangedate")
+    var exchangedate: String = ""
 )

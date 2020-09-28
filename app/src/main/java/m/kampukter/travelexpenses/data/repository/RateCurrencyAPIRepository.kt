@@ -4,6 +4,9 @@ import android.text.format.DateFormat
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
 import m.kampukter.travelexpenses.data.CurrentExchangeRate
 import m.kampukter.travelexpenses.data.RateCurrency
 import m.kampukter.travelexpenses.data.ResultCurrentExchangeRate
@@ -25,22 +28,24 @@ class RateCurrencyAPIRepository(
     private val rateCurrencyDao: RateCurrencyDao,
     private val rateCurrencyAPI: RateCurrencyAPI
 ) : KoinComponent {
-    private val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
 
-    suspend fun getCurrentRate(): LiveData<ResultCurrentExchangeRate> {
-        return when (defaultProgramCurrency) {
-            1 -> getRateNBU()
-            2 -> getRateCBR()
-            3 -> getRateNBRB()
-            else -> MutableLiveData<ResultCurrentExchangeRate>()
+    suspend fun getCurrentRate(date: Date): ResultCurrentExchangeRate {
+        return when (mainApplication.getActiveCurrencySession()) {
+            //DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(date)
+            DEFAULT_CURRENCY_CONST_UAH -> getRateNBUXML(date)
+            DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(date)
+            DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(date)
+            else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
         }
     }
 
-    private suspend fun getRateNBU(): LiveData<ResultCurrentExchangeRate> {
+    private suspend fun getRateNBU(date: Date): ResultCurrentExchangeRate {
         val resultListRate = mutableListOf<CurrentExchangeRate>()
-        val retValue = MutableLiveData<ResultCurrentExchangeRate>()
         try {
-            val response = rateCurrencyAPI.getRateTodayNbu("json")
+            val response = rateCurrencyAPI.getRateTodayNbu(
+                DateFormat.format("yyyyMMdd", date).toString(),
+                "json"
+            )
             if (response.code() == 200) {
                 response.body()?.forEach {
                     resultListRate.add(
@@ -52,63 +57,93 @@ class RateCurrencyAPIRepository(
                         )
                     )
                 }
-                retValue.postValue(ResultCurrentExchangeRate.Success(resultListRate))
+                return ResultCurrentExchangeRate.Success(resultListRate)
             } else {
-                retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(response.code().toString()))
-                Log.e("blablabla", " Error in API (response.code) ${response.code()}")
+                Log.e("blablabla", " Error in API (response.code NBU) ${response.code()}")
+                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
             }
 
         } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
-            retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(e.toString()))
+            Log.e("blablabla", " Error in API (getRateCurrency NBU) $e")
+            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
         }
 
-        return retValue
     }
+    private suspend fun getRateNBUXML(date: Date): ResultCurrentExchangeRate {
+        val foundDateString = DateFormat.format("yyyyMMdd", date).toString()
 
-    private suspend fun getRateCBR(): LiveData<ResultCurrentExchangeRate> {
         val resultListRate = mutableListOf<CurrentExchangeRate>()
-        val retValue = MutableLiveData<ResultCurrentExchangeRate>()
         try {
-            val response = rateCurrencyAPI.getRateTodayCBR()
+            val response = rateCurrencyAPI.getRateNbu_XML(foundDateString)
             if (response.code() == 200) {
-                val date = DateFormat.format("dd.MM.yyyy", response.body()?.date).toString()
+                response.body()?.currency?.forEach { _valute ->
+                    resultListRate.add(
+                        CurrentExchangeRate(
+                            currencyCode = _valute.cc,
+                            currencyName = _valute.txt,
+                            rate = _valute.rate,
+                            exchangeDate = _valute.exchangedate
+                        )
+                    )
+                }
+                return ResultCurrentExchangeRate.Success(resultListRate)
+            } else {
+
+                Log.e("blablabla", " Error in API (response.code CBR) ${response.code()}")
+                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
+            }
+        } catch (e: IOException) {
+            Log.e("blablabla", " Error in API (IOException) $e")
+            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
+        }
+    }
+    private suspend fun getRateCBR(date: Date): ResultCurrentExchangeRate {
+
+        val foundDateString = DateFormat.format("dd/MM/yyyy", date).toString()
+
+        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        try {
+            val response = rateCurrencyAPI.getRateTodayCBR(foundDateString)
+            if (response.code() == 200) {
+                val resDate = DateFormat.format("dd.MM.yyyy", response.body()?.date).toString()
                 response.body()?.valute?.forEach { _valute ->
                     resultListRate.add(
                         CurrentExchangeRate(
                             currencyCode = _valute.charCode,
                             currencyName = _valute.name,
                             rate = _valute.value / _valute.nominal,
-                            exchangeDate = date
+                            exchangeDate = resDate
                         )
                     )
                 }
-                retValue.postValue(ResultCurrentExchangeRate.Success(resultListRate))
+                return ResultCurrentExchangeRate.Success(resultListRate)
             } else {
-                retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(response.code().toString()))
-                Log.e("blablabla", " Error in API (response.code) ${response.code()}")
+
+                Log.e("blablabla", " Error in API (response.code CBR) ${response.code()}")
+                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
             }
         } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (getRateCurrencyCbr) $e")
-            retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(e.toString()))
+            Log.e("blablabla", " Error in API (IOException) $e")
+            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
         }
-        return retValue
     }
 
-    private suspend fun getRateNBRB(): LiveData<ResultCurrentExchangeRate> {
+    private suspend fun getRateNBRB(date: Date): ResultCurrentExchangeRate {
         val resultListRate = mutableListOf<CurrentExchangeRate>()
-        val retValue = MutableLiveData<ResultCurrentExchangeRate>()
         try {
-            val response = rateCurrencyAPI.getRateTodayNBRB("0")
+            val response = rateCurrencyAPI.getRateTodayNBRB(
+                DateFormat.format("yyyy-MM-dd", date).toString(),
+                "0"
+            )
             if (response.code() == 200) {
 
-                val date = response.body()?.first()?.Date?.let { _date ->
+                val resDate = response.body()?.first()?.Date?.let { _date ->
                     SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(
                         _date
                     )
                 }
 
-                val dateString = DateFormat.format("dd.MM.yyyy", date).toString()
+                val dateString = DateFormat.format("dd.MM.yyyy", resDate).toString()
 
                 response.body()?.forEach {
                     resultListRate.add(
@@ -120,35 +155,34 @@ class RateCurrencyAPIRepository(
                         )
                     )
                 }
-                retValue.postValue(ResultCurrentExchangeRate.Success(resultListRate))
+                return ResultCurrentExchangeRate.Success(resultListRate)
             } else {
-                retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(response.code().toString()))
-                Log.e("blablabla", " Error in API (response.code) ${response.code()}")
+
+                Log.e("blablabla", " Error in API (response.code NBRB) ${response.code()}")
+                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
             }
 
         } catch (e: IOException) {
             Log.e("blablabla", " Error in API (getRateCurrencyNBRB) $e")
-            retValue.postValue(ResultCurrentExchangeRate.ErrorAPI(e.toString()))
+            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
         }
-        return retValue
-
 
     }
 
-    suspend fun rateSynchronization() {
+    suspend fun rateSynchronization(currencyId: Int) {
 
-        when (defaultProgramCurrency) {
-            1 -> {
+        when (currencyId) {
+            DEFAULT_CURRENCY_CONST_UAH -> {
                 Log.d("Worker", "TravelExpenses -> SynchronizationNBU")
-                rateSynchronizationNBU()
+                //rateSynchronizationNBU()
             }
-            2 -> {
+            DEFAULT_CURRENCY_CONST_RUB -> {
                 Log.d("Worker", "TravelExpenses -> SynchronizationCBR")
                 rateSynchronizationCBR()
             }
-            3 -> {
+            DEFAULT_CURRENCY_CONST_BYN -> {
                 Log.d("Worker", "TravelExpenses -> SynchronizationNBRB")
-                rateSynchronizationNBRB()
+                //rateSynchronizationNBRB()
             }
         }
     }

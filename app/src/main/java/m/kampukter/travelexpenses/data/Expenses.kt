@@ -9,7 +9,8 @@ import java.util.*
         entity = Expense::class,
         parentColumns = arrayOf("name"),
         childColumns = arrayOf("expense"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE
     ), ForeignKey(
         entity = CurrencyTable::class,
         parentColumns = arrayOf("name"),
@@ -26,7 +27,7 @@ data class Expenses(
     @ColumnInfo(name = "dateTime")
     val dateTime: Date,
     val expense: String,
-    val sum: Float,
+    val sum: Double,
     @ColumnInfo(name = "currency_field")
     val currency: String,
     val note: String

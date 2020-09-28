@@ -1,14 +1,13 @@
 package m.kampukter.travelexpenses.ui.fragments
 
+import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -20,6 +19,9 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 class EditExpensesFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
+
+    private var myDropdownAdapter: MyArrayAdapter? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,64 +31,65 @@ class EditExpensesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.expensesById.observe(viewLifecycleOwner, Observer { expenses ->
 
-            currencyTextInputEdit.setText( expenses.currency)
-            dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
-            expenseTextInputEdit.setText(expenses.expense)
+        // (currencyTextInputLayout.editText as? AutoCompleteTextView)?.
 
-            var isNoteEdited = false
-            var isSumEdited = false
-            noteTextInputEdit.setText(expenses.note)
-            noteTextInputEdit.onFocusChangeListener =
-                View.OnFocusChangeListener { _, p1 ->
-                    if (isNoteEdited and !p1) viewModel.addExpenses(expenses.copy(note = noteTextInputEdit.text.toString()))
-                }
-            noteTextInputEdit.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(p0: Editable?) {
-                }
+        myDropdownAdapter =
+            context?.let {
+                MyArrayAdapter(it, android.R.layout.simple_list_item_1, mutableListOf())
+            }
+        currencyTextInputEdit?.setAdapter(myDropdownAdapter)
 
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    isNoteEdited = true
-                }
-            })
-
-            sumTextInputEdit.setText(expenses.sum.toString())
-            sumTextInputEdit.onFocusChangeListener =
-                View.OnFocusChangeListener { _, p1 ->
-                    if (isSumEdited and !p1) viewModel.addExpenses(
-                        expenses.copy(
-                            sum = sumTextInputEdit.text.toString().toFloat()
+        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, Observer { value ->
+            value.first?.let { expenses ->
+                sumTextInputEdit.setText(expenses.sum.toString())
+                dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
+                expenseTextInputEdit.setText(expenses.expense)
+                noteTextInputEdit.setText(expenses.note)
+                noteTextInputEdit.onFocusChangeListener =
+                    View.OnFocusChangeListener { _, p1 ->
+                        if (!p1) viewModel.addExpenses(expenses.copy(note = noteTextInputEdit.text.toString()))
+                    }
+                sumTextInputEdit.onFocusChangeListener =
+                    View.OnFocusChangeListener { _, p1 ->
+                        if (!p1) viewModel.addExpenses(
+                            expenses.copy(
+                                sum = sumTextInputEdit.text.toString().toDouble()
+                            )
                         )
+                    }
+                currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
+                    if (!p1) {
+                        val newValue = currencyTextInputEdit.text.toString()
+                        if (expenses.currency != newValue) {
+                            viewModel.resetDef()
+                            viewModel.setDefCurrency(newValue)
+                            viewModel.addExpenses(expenses.copy(currency = newValue))
+                        } else Log.d("blablabla", "Не сохраняем")
+                    } else {
+                        val imm =
+                            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(view.windowToken, 0)
+                    }
+                }
+            }
+            value.second?.let { list ->
+                myDropdownAdapter?.addAll(list.map { it.name })
+            }
+
+            value.first?.currency.let {
+                val currencyPosition = myDropdownAdapter?.getPosition(it)
+                if (currencyPosition != null && currencyPosition >= 0) {
+                    currencyTextInputEdit?.setText(
+                        myDropdownAdapter?.getItem(currencyPosition).toString(), false
                     )
                 }
-            sumTextInputEdit.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(p0: Editable?) {
-                }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    isSumEdited = true
-                }
-            })
-
-            expenseTextInputEdit.setOnClickListener {
-                val navController = findNavController()
-                navController.navigate(R.id.toChoiceExpenseFragment)
             }
-            currencyTextInputEdit.setOnClickListener {
-                val navController = findNavController()
-                navController.navigate(R.id.toChoiceCurrencyFragment)
-            }
-            val adapter = context?.let { ArrayAdapter(it,android.R.layout.simple_list_item_1 , listOf("одын", "джва", "трэ")) }
-            (textField.editText as? AutoCompleteTextView)?.setAdapter(adapter)
-//            currencyTextInputLayout.setEndIconOnClickListener { Log.d("blablabla", "setEndIconOnClickListener") }
 
         })
+        expenseTextInputEdit.setOnClickListener {
+            val navController = findNavController()
+            navController.navigate(R.id.toChoiceExpenseForEditFragment)
+        }
     }
 }

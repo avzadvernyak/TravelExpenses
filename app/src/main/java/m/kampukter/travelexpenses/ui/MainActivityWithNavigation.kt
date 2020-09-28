@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -42,9 +43,14 @@ class MainActivityWithNavigation : AppCompatActivity() {
 
         setupActionBar(navController, appBarConfiguration)
 
-        bottom_nav?.let {
+        navigation_view?.let {
             NavigationUI.setupWithNavController(it, navController)
         }
+
+        viewModel.savedSettings.observe(this, Observer {
+            if (it?.defCurrency == 0) navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
+                false
+        })
 /*
         nav_view?.let {
             NavigationUI.setupWithNavController(it, navController)

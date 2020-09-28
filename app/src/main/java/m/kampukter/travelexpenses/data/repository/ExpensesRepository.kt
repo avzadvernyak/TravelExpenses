@@ -6,20 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import androidx.work.*
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import m.kampukter.travelexpenses.workers.BackupWorker
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.dao.*
 import m.kampukter.travelexpenses.data.dto.BackupServer
 import m.kampukter.travelexpenses.mainApplication
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import m.kampukter.travelexpenses.workers.BackupWorker
 import java.util.*
 
 class ExpensesRepository(
@@ -134,6 +128,7 @@ class ExpensesRepository(
         idWorkRequest?.let { WorkManager.getInstance(mainApplication).cancelWorkById(it) }
     }
 
+
     fun saveBackup() {
         GlobalScope.launch {
             val settings = settingsDao.getSettings()
@@ -143,10 +138,9 @@ class ExpensesRepository(
                 expenses = expensesDao.getAllExpenses()
             )
             settings?.let {
-                backupServer.getRestoreBackup(it.userName){ restoreBackup ->
+                backupServer.getRestoreBackup(it.userName) { restoreBackup ->
                     Log.d("blablabla", "Date backup in server ${restoreBackup?.backupTime}")
-                    var isSave = false
-                    isSave = if (restoreBackup?.backupTime != null) {
+                    val isSave = if (restoreBackup?.backupTime != null) {
                         val diff =
                             Calendar.getInstance().time.time - restoreBackup.backupTime.time
 
@@ -191,5 +185,11 @@ class ExpensesRepository(
                 emit(ExpenseDeletionResult.Warning(expense, countRecords))
             }
         }
+
+    /*
+    * Для изменения Expense
+    */
+    suspend fun updateExpense(newExpenseName: String, oldExpenseName: String) =
+        expenseDao.updateRecord(newExpenseName, oldExpenseName)
 
 }

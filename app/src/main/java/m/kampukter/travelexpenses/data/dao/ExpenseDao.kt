@@ -1,11 +1,9 @@
 package m.kampukter.travelexpenses.data.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import m.kampukter.travelexpenses.data.Expense
+import m.kampukter.travelexpenses.data.Expenses
 
 @Dao
 interface ExpenseDao {
@@ -27,4 +25,7 @@ interface ExpenseDao {
 
     @Query("delete from expense WHERE expense.name = :selectedExpense")
     suspend fun deleteExpenseByName(selectedExpense: String)
+
+    @Query("update expense set name = :newExpanseName where name = :oldExpenseName ")
+    suspend fun updateRecord(newExpanseName: String, oldExpenseName: String): Int
 }

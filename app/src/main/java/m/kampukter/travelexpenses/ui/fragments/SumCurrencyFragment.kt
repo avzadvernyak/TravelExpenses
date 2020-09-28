@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expenses_sum_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.ui.ExpenseSumAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class SumExpenseFragment : Fragment() {
-
+class SumCurrencyFragment: Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private var expensesSumAdapter: ExpenseSumAdapter? = null
 
@@ -32,13 +32,13 @@ class SumExpenseFragment : Fragment() {
         with(expensesSumRecyclerView) {
             layoutManager = LinearLayoutManager(
                 context,
-                androidx.recyclerview.widget.RecyclerView.VERTICAL,
+                RecyclerView.VERTICAL,
                 false
             )
             adapter = expensesSumAdapter
         }
 
-        viewModel.getExpensesSum().observe(viewLifecycleOwner, Observer { list ->
+        viewModel.getCurrencySum().observe(viewLifecycleOwner, Observer { list ->
             expensesSumAdapter?.setList(list)
         })
 

@@ -6,10 +6,15 @@
                 android:id="@id/homeExpensesFragment"
                 android:icon="@drawable/ic_balance_wallet_black"
                 android:title="Расходы" />
+
         <item
-                android:id="@id/archiveExchangeFragment"
+                android:id="@id/currentExchangeFragment"
                 android:icon="@drawable/ic_expenses"
                 android:title="Курсы валют" />
+        <item
+                android:id="@id/expenseFragment"
+                android:icon="@drawable/ic_format_list_bulleted_24"
+                android:title="@string/menu_expense" />
         <item
                 android:id="@id/deeplink_export"
                 android:icon="@drawable/ic_archive_black"
@@ -23,5 +28,19 @@
                 android:icon="@drawable/ic_settings_black"
                 android:title="Настройки" />
 
+    </group>
+    <group android:id="@+id/secondary">
+        <item android:title="Итоги">
+            <menu>
+                <item
+                        android:id="@id/sumExpenseFragment"
+                        android:icon="@drawable/ic_functions_24"
+                        android:title="По статьям" />
+                <item
+                        android:icon="@drawable/ic_expenses"
+                        android:id="@+id/sumCurrencyFragment"
+                        android:title="По валютам" />
+            </menu>
+        </item>
     </group>
 </menu>
