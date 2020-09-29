@@ -18,7 +18,7 @@
                 app:destination="@+id/editExpensesFragment" />
         <action
                 android:id="@+id/toDelExpensesDialogFragment"
-                app:destination="@+id/delExpensesDialogFragment" />
+                app:destination="@+id/delExpensesDialogFragment"/>
         <action
                 android:id="@+id/toDelAllExpensesDialogFragment"
                 app:destination="@+id/delAllExpensesDialogFragment" />
@@ -37,6 +37,9 @@
         <action
                 android:id="@+id/toCurrentExchangeFragment"
                 app:destination="@+id/currentExchangeFragment" />
+        <action
+                android:id="@+id/toExportFragment"
+                app:destination="@+id/exportFragment" />
 
     </fragment>
 
@@ -68,6 +71,7 @@
             android:id="@+id/delExpensesDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.fragments.DelExpensesDialogFragment"
             android:label="Dialog Fragment">
+
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
@@ -95,15 +99,14 @@
             android:label="Статьи"
             tools:layout="@layout/expense_fragment">
         <action
-                android:id="@+id/toDelExpenseDialogFragment"
-                app:destination="@id/delExpenseDialogFragment" />
+                android:id="@+id/toDelExpensePhaseOneDialogFragment"
+                app:destination="@id/delExpensePhaseOneDialogFragment" />
+        <action
+                android:id="@+id/toDelExpensePhaseSecondDialogFragment"
+                app:destination="@id/delExpensePhaseSecondDialogFragment" />
         <action
                 android:id="@+id/toEditExpenseDialogFragment"
                 app:destination="@id/editExpenseDialogFragment">
-            <argument
-                    android:name="expenseArg"
-                    android:defaultValue=""
-                    app:argType="string" />
         </action>
         <action
                 android:id="@+id/toAddExpenseDialogFragment"
@@ -111,8 +114,16 @@
 
     </fragment>
     <dialog
-            android:id="@+id/delExpenseDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.fragments.DelExpenseDialogFragment"
+            android:id="@+id/delExpensePhaseOneDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.DelExpensePhaseOneDialogFragment"
+            android:label="Dialog Fragment">
+        <action
+                android:id="@+id/toExpenseFragment"
+                app:popUpTo="@id/expenseFragment" />
+    </dialog>
+    <dialog
+            android:id="@+id/delExpensePhaseSecondDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.DelExpensePhaseSecondDialogFragment"
             android:label="Dialog Fragment">
         <action
                 android:id="@+id/toExpenseFragment"
@@ -166,18 +177,6 @@
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
     <fragment
-            android:id="@+id/archiveExchangeFragment"
-            android:name="m.kampukter.travelexpenses.ui.fragments.ArchiveExchangeFragment"
-            android:label="Архив курсов"
-            tools:layout="@layout/archive_exchange_fragment">
-        <action
-                android:id="@+id/next_action"
-                app:popUpTo="@id/homeExpensesFragment" />
-        <action
-                android:id="@+id/toCurrentExchangeFragment"
-                app:destination="@id/currentExchangeFragment" />
-    </fragment>
-    <fragment
             android:id="@+id/currentExchangeFragment"
             android:name="m.kampukter.travelexpenses.ui.fragments.CurrentExchangeFragment"
             android:label="Курс валют"
@@ -188,9 +187,6 @@
         <action
                 android:id="@+id/toDatePickerDialogFragment"
                 app:destination="@id/datePickerDialogFragment" />
-        <action
-                android:id="@+id/toArchiveExchangeFragment"
-                app:destination="@id/archiveExchangeFragment" />
     </fragment>
     <fragment
             android:id="@+id/choiceExpenseForAddFragment"
@@ -227,5 +223,14 @@
             android:id="@+id/deeplink_export"
 
             android:label="Export" />
+    <fragment
+            android:id="@+id/exportFragment"
+            android:name="m.kampukter.travelexpenses.ui.fragments.ExportFragment"
+            android:label="Export"
+            tools:layout="@layout/expense_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
 
 </navigation>

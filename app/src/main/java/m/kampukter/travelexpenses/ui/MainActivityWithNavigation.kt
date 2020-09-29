@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.ui
 
 import android.os.Bundle
-import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -13,7 +12,9 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import kotlinx.android.synthetic.main.navigation_activity.*
+import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -48,8 +49,12 @@ class MainActivityWithNavigation : AppCompatActivity() {
         }
 
         viewModel.savedSettings.observe(this, Observer {
-            if (it?.defCurrency == 0) navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
-                false
+            navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
+                it?.defCurrency != 0
+        })
+        NetworkLiveData.observe(this, Observer {
+            navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
+                it and (mainApplication.getActiveCurrencySession() != null)
         })
 /*
         nav_view?.let {

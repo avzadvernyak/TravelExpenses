@@ -9,6 +9,7 @@ import m.kampukter.travelexpenses.workers.APISynchronizationWorker
 import org.koin.core.KoinComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import retrofit2.Retrofit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -40,6 +41,7 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
     fun dispose() {
         workerId?.let { WorkManager.getInstance(mainApplication).cancelWorkById(it) }
         currentAPIScope.close()
+
     }
     fun getCurrentScope() = currentAPIScope
     fun getCurrencyId() = currencyId

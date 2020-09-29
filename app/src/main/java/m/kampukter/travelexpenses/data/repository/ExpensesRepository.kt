@@ -48,7 +48,6 @@ class ExpensesRepository(
         expensesDao.deleteAll()
     }
 
-    suspend fun getAllExpenses() = expensesDao.getAllExpenses()
     suspend fun getAllForSend(): LiveData<String> {
         var resultString = ""
         val result = MutableLiveData<String>()
@@ -67,7 +66,6 @@ class ExpensesRepository(
 
     // CurrencyDao
     fun getCurrencyAllLiveData(): LiveData<List<CurrencyTable>> = currencyDao.getAllLiveData()
-    suspend fun getCurrencyAll(): List<CurrencyTable> = currencyDao.getAll()
 
     fun setDefCurrency(currencyName: String) {
         GlobalScope.launch(context = Dispatchers.IO) {
@@ -164,7 +162,6 @@ class ExpensesRepository(
 
     // Из ExpenseRepository
     fun getExpenseAllLiveData(): LiveData<List<Expense>> = expenseDao.getAllLiveData()
-    suspend fun getExpenseAll(): List<Expense> = expenseDao.getAll()
     fun getExpenseByName(expense: String) = expenseDao.search(expense)
     fun addExpense(expense: Expense) {
         GlobalScope.launch(context = Dispatchers.IO) {
@@ -186,10 +183,36 @@ class ExpensesRepository(
             }
         }
 
+    // Second variant
+    suspend fun deleteExpenseRecord(expense: String, isDelete: Boolean): Long {
+        var numberRecords = 0L
+        if (isDelete) expenseDao.deleteExpenseByName(expense)
+        else numberRecords = expensesDao.getExpensesCount(expense)
+        return numberRecords
+
+    }
+
     /*
     * Для изменения Expense
     */
     suspend fun updateExpense(newExpenseName: String, oldExpenseName: String) =
         expenseDao.updateRecord(newExpenseName, oldExpenseName)
 
+    /*
+    * Получение курсов валют за дату
+    */
+    private val exchangeRateMutableLiveDate = MutableLiveData<ResultCurrentExchangeRate>()
+    val exchangeRateLiveDate: LiveData<ResultCurrentExchangeRate>
+        get() = exchangeRateMutableLiveDate
+
+    fun getExchangeRate(par: ResultCurrentExchangeRate) {
+        exchangeRateMutableLiveDate.postValue(par)
+    }
+
+    private var foundDate: Date = Calendar.getInstance().time
+    fun setFoundDate(date: Date) {
+        foundDate = date
+    }
+
+    fun getFoundDate() = foundDate
 }

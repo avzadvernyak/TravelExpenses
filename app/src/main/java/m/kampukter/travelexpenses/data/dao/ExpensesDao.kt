@@ -45,7 +45,7 @@ interface ExpensesDao {
     fun getExpensesById(id: Long): LiveData<Expenses>
 
     @Query("select count(expense) from expenses where expense = :name")
-    fun getExpensesCount(name: String): Long
+    suspend fun getExpensesCount(name: String): Long
 
     @Query(
         """ select sum(sum) AS sum, expense AS name, currency_field AS note 

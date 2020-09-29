@@ -17,9 +17,8 @@ import m.kampukter.travelexpenses.data.ResultCurrentExchangeRate
 import m.kampukter.travelexpenses.ui.ExchangeRateAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import java.util.*
 
-class CurrentExchangeFragment: Fragment() {
+class CurrentExchangeFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
     private var exchangeRateAdapter: ExchangeRateAdapter? = null
@@ -47,8 +46,8 @@ class CurrentExchangeFragment: Fragment() {
             adapter = exchangeRateAdapter
         }
 
-        viewModel.setTriggerForCurrencyExchange()
-        viewModel.currentExchangeRate.observe(
+        viewModel.setDateForCurrencyExchange(null)
+        viewModel.exchangeRateLiveDate.observe(
             viewLifecycleOwner,
             Observer { resultCurrentExchangeRate ->
                 when (resultCurrentExchangeRate) {
@@ -60,7 +59,7 @@ class CurrentExchangeFragment: Fragment() {
                     is ResultCurrentExchangeRate.Success -> {
                         progressBar?.visibility = View.GONE
                         exchangeRateAdapter?.setList(resultCurrentExchangeRate.currentExchangeRate)
-                        val _exchangeDate =
+                        val exchangeDateString =
                             resultCurrentExchangeRate.currentExchangeRate.first().exchangeDate
                         val myHint = when (defaultProgramCurrency) {
                             // Гривна по умолчанию
@@ -72,21 +71,18 @@ class CurrentExchangeFragment: Fragment() {
                             else -> getString(R.string.noCurrency)
                         }
                         dateTextInputLayout.hint = myHint
-                        dateTextInputEdit.setText(_exchangeDate)
+                        dateTextInputEdit.setText(exchangeDateString)
                     }
                 }
             })
         reloadRateButton?.setOnClickListener {
             errorApiTextView.visibility = View.INVISIBLE
             reloadRateButton.visibility = View.INVISIBLE
-            viewModel.setTriggerForCurrencyExchange()
+            viewModel.setDateForCurrencyExchange(null)
             progressBar.visibility = View.VISIBLE
         }
-        //toDatePickerDialogFragment
         dateTextInputEdit.setOnClickListener {
-            //toDatePickerDialogFragment
             findNavController().navigate(R.id.toDatePickerDialogFragment)
-            //fragmentManager?.let { pickerRange.show(it, "Picker") }
         }
     }
 }

@@ -10,8 +10,6 @@ class APISynchronizationWorker(context: Context, params: WorkerParameters) :
 
     override fun doWork(): Result {
         mainApplication.startAPISynch()
-
-
         return Result.success()
     }
 }

@@ -2,8 +2,13 @@ package m.kampukter.travelexpenses.data.repository
 
 import android.text.format.DateFormat
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
@@ -17,6 +22,7 @@ import m.kampukter.travelexpenses.data.dto.RateCurrencyNBRB
 import m.kampukter.travelexpenses.data.dto.RateCurrencyNbu
 import m.kampukter.travelexpenses.data.dto.ValCurs
 import m.kampukter.travelexpenses.mainApplication
+import m.kampukter.travelexpenses.workers.BredWorker
 import org.koin.core.KoinComponent
 import retrofit2.Response
 import java.io.IOException
@@ -26,17 +32,20 @@ import java.util.*
 class RateCurrencyAPIRepository(
     private val expensesDao: ExpensesDao,
     private val rateCurrencyDao: RateCurrencyDao,
-    private val rateCurrencyAPI: RateCurrencyAPI
+    private val rateCurrencyAPI: RateCurrencyAPI,
+    private val expensesRepository:ExpensesRepository
 ) : KoinComponent {
 
-    suspend fun getCurrentRate(date: Date): ResultCurrentExchangeRate {
-        return when (mainApplication.getActiveCurrencySession()) {
-            //DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(date)
-            DEFAULT_CURRENCY_CONST_UAH -> getRateNBUXML(date)
+    fun getCurrentRate(): ResultCurrentExchangeRate {
+        //expensesRepository.setFoundDate(date)
+        startBredWorker()
+        return ResultCurrentExchangeRate.ErrorAPI("Error choice")
+        /*return when (mainApplication.getActiveCurrencySession()) {
+            DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(date)
             DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(date)
             DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(date)
             else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
-        }
+        }*/
     }
 
     private suspend fun getRateNBU(date: Date): ResultCurrentExchangeRate {
@@ -57,6 +66,7 @@ class RateCurrencyAPIRepository(
                         )
                     )
                 }
+
                 return ResultCurrentExchangeRate.Success(resultListRate)
             } else {
                 Log.e("blablabla", " Error in API (response.code NBU) ${response.code()}")
@@ -69,34 +79,7 @@ class RateCurrencyAPIRepository(
         }
 
     }
-    private suspend fun getRateNBUXML(date: Date): ResultCurrentExchangeRate {
-        val foundDateString = DateFormat.format("yyyyMMdd", date).toString()
 
-        val resultListRate = mutableListOf<CurrentExchangeRate>()
-        try {
-            val response = rateCurrencyAPI.getRateNbu_XML(foundDateString)
-            if (response.code() == 200) {
-                response.body()?.currency?.forEach { _valute ->
-                    resultListRate.add(
-                        CurrentExchangeRate(
-                            currencyCode = _valute.cc,
-                            currencyName = _valute.txt,
-                            rate = _valute.rate,
-                            exchangeDate = _valute.exchangedate
-                        )
-                    )
-                }
-                return ResultCurrentExchangeRate.Success(resultListRate)
-            } else {
-
-                Log.e("blablabla", " Error in API (response.code CBR) ${response.code()}")
-                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
-            }
-        } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (IOException) $e")
-            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
-        }
-    }
     private suspend fun getRateCBR(date: Date): ResultCurrentExchangeRate {
 
         val foundDateString = DateFormat.format("dd/MM/yyyy", date).toString()
@@ -174,7 +157,7 @@ class RateCurrencyAPIRepository(
         when (currencyId) {
             DEFAULT_CURRENCY_CONST_UAH -> {
                 Log.d("Worker", "TravelExpenses -> SynchronizationNBU")
-                //rateSynchronizationNBU()
+                rateSynchronizationNBU()
             }
             DEFAULT_CURRENCY_CONST_RUB -> {
                 Log.d("Worker", "TravelExpenses -> SynchronizationCBR")
@@ -182,7 +165,7 @@ class RateCurrencyAPIRepository(
             }
             DEFAULT_CURRENCY_CONST_BYN -> {
                 Log.d("Worker", "TravelExpenses -> SynchronizationNBRB")
-                //rateSynchronizationNBRB()
+                rateSynchronizationNBRB()
             }
         }
     }
@@ -199,7 +182,6 @@ class RateCurrencyAPIRepository(
             Log.e("blablabla", " Error in API (getRateCurrencyNbu) $e")
         }
 
-        //Log.d("blablabla", "Code HTTP- ${response?.code()}")
         if (response?.code() != 200) return null
 
         val rateCurrencyNBU = response.body()
@@ -211,7 +193,6 @@ class RateCurrencyAPIRepository(
     // Работа с API НБУ
     private suspend fun rateSynchronizationNBU() {
         val infoRateList = expensesDao.getInfoForRate()
-        //Log.d("blablabla", "infoForRate  NBU $infoRateList")
         infoRateList.forEach { infoRateItem ->
             val currencySearchResult =
                 rateCurrencyDao.searchByDate(infoRateItem.currency_field, infoRateItem.dateRate)
@@ -256,7 +237,6 @@ class RateCurrencyAPIRepository(
     // Работа с API ЦБР
     private suspend fun rateSynchronizationCBR() {
         val infoRateList = expensesDao.getInfoForRate()
-        //Log.d("blablabla", "infoForRates  CBR $infoRateList")
         infoRateList.forEach { infoRateItem ->
             if (infoRateItem.currency_field != "RUB") {
 
@@ -313,7 +293,6 @@ class RateCurrencyAPIRepository(
     // Работа с API НБPB
     private suspend fun rateSynchronizationNBRB() {
         val infoRateList = expensesDao.getInfoForRate()
-        //Log.d("blablabla", "infoForRate  NBRB $infoRateList")
         infoRateList.forEach { infoRateItem ->
             val currencySearchResult =
                 rateCurrencyDao.searchByDate(infoRateItem.currency_field, infoRateItem.dateRate)
@@ -338,4 +317,33 @@ class RateCurrencyAPIRepository(
         }
     }
 
+    private fun startBredWorker() {
+
+        val myWorkRequest = OneTimeWorkRequest.Builder(BredWorker::class.java)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+
+        WorkManager
+            .getInstance(mainApplication)
+            .enqueue(myWorkRequest)
+    }
+
+    fun bredInRepo() {
+        val foundDate = expensesRepository.getFoundDate()
+        GlobalScope.launch(context = Dispatchers.IO) {
+
+            val testResult = when (mainApplication.getActiveCurrencySession()) {
+                DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(foundDate)
+                DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(foundDate)
+                DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(foundDate)
+                else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
+            }
+            expensesRepository.getExchangeRate(testResult)
+
+        }
+    }
 }

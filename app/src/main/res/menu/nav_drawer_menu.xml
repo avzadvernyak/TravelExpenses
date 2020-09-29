@@ -16,7 +16,7 @@
                 android:icon="@drawable/ic_format_list_bulleted_24"
                 android:title="@string/menu_expense" />
         <item
-                android:id="@id/deeplink_export"
+                android:id="@id/exportFragment"
                 android:icon="@drawable/ic_archive_black"
                 android:title="Экспорт" />
         <item

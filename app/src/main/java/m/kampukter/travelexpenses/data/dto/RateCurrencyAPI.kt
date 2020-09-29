@@ -29,11 +29,6 @@ interface RateCurrencyAPI {
         @QueryName str: String
     ): Response<List<RateCurrencyNbu>>
 
-    @GET("exchange?")
-    suspend fun getRateNbu_XML(
-        @Query("date") date: String
-    ): Response<Exchange>
-
     @GET("rates/{currency}")
     suspend fun getRateCurrencyNBRB(
         @Path("currency") currencyString: String,
@@ -116,29 +111,4 @@ data class Valute(
 
     @PropertyElement(name = "Value", converter = CBRFloatConverter::class)
     var value: Float = 0F
-)
-
-// CBR
-@Xml(name = "exchange")
-data class Exchange(
-    @Element(name = "currency")
-    var currency: List<Currency>
-)
-
-@Xml(name = "currency")
-data class Currency(
-    @PropertyElement(name = "r030")
-    var r030: String = "",
-
-    @PropertyElement(name = "txt")
-    var txt: String = "",
-
-    @PropertyElement(name = "rate", converter = CBRFloatConverter::class)
-    var rate: Float = 0F,
-
-    @PropertyElement(name = "cc")
-    var cc: String = "",
-
-    @PropertyElement(name = "exchangedate")
-    var exchangedate: String = ""
 )

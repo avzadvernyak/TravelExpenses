@@ -2,10 +2,12 @@ package m.kampukter.travelexpenses.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.createGraph
@@ -47,7 +49,14 @@ class HomeExpensesFragment : Fragment() {
 
                 override fun onLongClick(item: ExpensesWithRate) {
                     viewModel.setQueryExpensesId(item.id)
-                    navController.navigate(R.id.toDelExpensesDialogFragment)
+                    val arg = resources.getString(
+                        R.string.expenses_del_supporting_text,
+                        DateFormat.format("dd/MM/yyyy HH:mm", item.dateTime).toString(),
+                        item.sum, item.currency
+                    )
+                    //val arg = "От ${ DateFormat.format("dd/MM/yyyy HH:mm", item.dateTime).toString() } \nна сумму ${item.sum} ${item.currency}"
+                    val bundle = bundleOf("expenses" to arg)
+                    navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
         expensesAdapter = ExpensesAdapter(clickEventDelegate)
@@ -62,7 +71,7 @@ class HomeExpensesFragment : Fragment() {
         viewModel.expensesWithRate.observe(viewLifecycleOwner, Observer {
             expensesAdapter.setList(it)
         })
-        viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, Observer{
+        viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, Observer {
             Snackbar.make(view, getString(R.string.expenses_del_record), Snackbar.LENGTH_SHORT)
                 .show()
         })

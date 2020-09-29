@@ -43,6 +43,7 @@ class EditExpenseFragment : Fragment() {
         viewModel.expenseList.observe(viewLifecycleOwner,  Observer { list ->
             expenseEditAdapter?.setItems(list)
         })
+
         viewModel.expenseDeletionResultLiveData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is ExpenseDeletionResult.Warning -> {

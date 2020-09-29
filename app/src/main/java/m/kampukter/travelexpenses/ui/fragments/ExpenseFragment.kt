@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -33,6 +34,7 @@ class ExpenseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val navController = findNavController()
+        //viewModel.deleteExpenseName(null)
 
         expenseAdapter = ExpenseEditAdapter()
         with(recyclerView) {
@@ -50,28 +52,23 @@ class ExpenseFragment : Fragment() {
 
             viewModel.setQueryExpense(expense.name)
             navController.navigate(R.id.toEditExpenseDialogFragment)
-            /* val bundle = bundleOf("expenseArg" to expense.name)
-             navController.navigate(R.id.toEditExpenseDialogFragment, bundle)*/
         }
         expenseAdapter.onLongClickCallback = { expense ->
-            MaterialAlertDialogBuilder(view.context)
-                .setTitle(resources.getString(R.string.delete_record_title))
-                .setMessage(resources.getString(R.string.delete_record_title2, expense.name))
-                .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
-                    viewModel.deleteExpense(expense.name, false)
-                    dialog.dismiss()
-                }
-                .show()
-
+            viewModel.deleteExpenseName(expense.name)
+            val bundle = bundleOf("expensePhaseOne" to expense.name)
+            navController.navigate(R.id.toDelExpensePhaseOneDialogFragment, bundle)
             true
         }
         viewModel.expenseUpdateMediator.observe(viewLifecycleOwner, Observer {
             Snackbar.make(view, getString(R.string.expense_update_message), Snackbar.LENGTH_SHORT)
                 .show()
         })
-        viewModel.expenseDeletionResultLiveData.observe(viewLifecycleOwner, Observer { result ->
+
+        /*viewModel.expenseDeletionResultLiveData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is ExpenseDeletionResult.Warning -> {
+                    *//* val bundle = bundleOf("expensePhaseSecond" to expense.name)
+           navController.navigate(R.id.toDelExpensePhaseOneDialogFragment, bundle)*//*
                     MaterialAlertDialogBuilder(view.context)
                         .setTitle(resources.getString(R.string.delete_record_title))
                         .setMessage(
@@ -90,6 +87,25 @@ class ExpenseFragment : Fragment() {
                 is ExpenseDeletionResult.Success -> Snackbar.make(
                     view,
                     getString(R.string.expense_del_message),
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        })*/
+        viewModel.expenseDeletionResult.observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is ExpenseDeletionResult.Warning -> {
+                    val bundle = bundleOf(
+                        "expensePhaseSecond" to resources.getString(
+                            R.string.expense_del_warning,
+                            result.expenseName,
+                            result.countRecords
+                        )
+                    )
+                    navController.navigate(R.id.toDelExpensePhaseSecondDialogFragment, bundle)
+                }
+                is ExpenseDeletionResult.Success -> Snackbar.make(
+                    view,
+                    "Success",
                     Snackbar.LENGTH_SHORT
                 ).show()
             }

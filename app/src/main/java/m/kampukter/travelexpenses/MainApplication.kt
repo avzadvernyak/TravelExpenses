@@ -105,7 +105,7 @@ class MainApplication : Application() {
                 RateCurrencyAPIRepository(
                     get<MyDatabase>().expensesDao(),
                     get<MyDatabase>().rateCurrencyDao(),
-                    get()
+                    get(),get()
                 )
             }
         }
@@ -119,7 +119,6 @@ class MainApplication : Application() {
             .addConverterFactory(
                 when (getActiveCurrencySession()) {
                     DEFAULT_CURRENCY_CONST_RUB -> TikXmlConverterFactory.create()
-                    DEFAULT_CURRENCY_CONST_UAH -> TikXmlConverterFactory.create()
                     else -> GsonConverterFactory.create()
                 }
             ).build()
@@ -138,14 +137,11 @@ class MainApplication : Application() {
             modules(module)
         }
 
+
         GlobalScope.launch(context = Dispatchers.IO) {
 
             val mySettings = getKoin().get<ExpensesRepository>().getSettings()
             if (mySettings != null) {
-                /*val myHash = mySettings.userName.hashCode().absoluteValue
-                val  testString = "${mySettings.userName}-${myHash.toString(16)}"
-                val res = testString.split("-").last()
-                //Log.d("blablabla", "hashCode $res")*/
                 currencySession =
                     if (mySettings.defCurrency != 0) CurrencySession(mySettings.defCurrency)
                     else null
@@ -163,11 +159,6 @@ class MainApplication : Application() {
                         backupPeriod = 0
                     )
                 )
-                startActivity(
-                    Intent(baseContext, SettingsActivity::class.java).addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK
-                    )
-                )
             }
         }
     }
@@ -176,7 +167,6 @@ class MainApplication : Application() {
     fun getCurrentScope() = currencySession?.getCurrentScope()
     fun changeActiveCurrency(currencyId: Int) {
         currencySession?.dispose()
-
         currencySession = if (currencyId != 0) CurrencySession(currencyId)
         else null
     }

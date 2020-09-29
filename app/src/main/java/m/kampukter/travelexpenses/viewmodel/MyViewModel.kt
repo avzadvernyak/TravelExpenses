@@ -2,6 +2,7 @@ package m.kampukter.travelexpenses.viewmodel
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.dto.BackupServer
@@ -13,8 +14,6 @@ import java.util.*
 class MyViewModel(
     private val expensesRepository: ExpensesRepository
 ) : ViewModel() {
-
-    private val rateRepository = mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()
 
     /*
     * получение итогов по статьям и по валютам
@@ -136,6 +135,64 @@ class MyViewModel(
         val isForced: Boolean
     )
 
+    // Удаление записи в Expense и связанных записей. В два этапа
+    // 1 если нет связанных записей, удаляем сразу
+    // 2 если есть связанные то удаление после подтверждения
+    private val expenseDelTrigger = MutableLiveData<Boolean>()
+    private val expenseDeleteName = MutableLiveData<String>()
+    val expenseDeletionResult: LiveData<ExpenseDeletionResult> =
+        MediatorLiveData<ExpenseDeletionResult>().apply {
+            var lastExpenseName: String? = null
+            var lastExpenseTrigger: Boolean? = null
+            fun reset(){
+                expenseDelTrigger.postValue(null)
+                expenseDeleteName.postValue(null)
+                postValue(ExpenseDeletionResult.Empty)
+            }
+            fun update() {
+                val expenseName = lastExpenseName
+                val expenseTrigger = lastExpenseTrigger
+
+                if (expenseName == null || expenseTrigger == null) return
+
+                viewModelScope.launch {
+                    if (expenseTrigger) {
+                        expensesRepository.deleteExpenseRecord(expenseName, true)
+                        postValue(ExpenseDeletionResult.Success)
+                        delay(1000)
+                        reset()
+                    } else {
+                        val numberRec = expensesRepository.deleteExpenseRecord(
+                            expenseName,
+                            expenseTrigger
+                        )
+                        if (numberRec == 0L) {
+                            expensesRepository.deleteExpenseRecord(expenseName, true)
+                            postValue(ExpenseDeletionResult.Success)
+                            delay(1000)
+                            reset()
+                        } else postValue(ExpenseDeletionResult.Warning(expenseName, numberRec))
+                    }
+                }
+            }
+            addSource(expenseDeleteName) {
+                lastExpenseName = it
+                update()
+            }
+            addSource(expenseDelTrigger) {
+                lastExpenseTrigger = it
+                update()
+            }
+        }
+
+    fun deleteExpenseName(expenseName: String) {
+        expenseDeleteName.postValue(expenseName)
+    }
+
+    fun deleteExpenseTrigger(isDelete: Boolean) {
+        expenseDelTrigger.postValue(isDelete)
+    }
+
     // Update Expense
     private val expenseUpdateTrigger = MutableLiveData<String>()
     val expenseUpdateMediator = MediatorLiveData<Int>().apply {
@@ -240,36 +297,15 @@ class MyViewModel(
     }
 
     private val triggerForCurrencyExchange = MutableLiveData<Boolean>()
-    private val dateForCurrencyExchange = MutableLiveData<Date>().apply {
-        postValue(Calendar.getInstance().time)
-    }
 
-    fun setDateForCurrencyExchange(date: Date) {
-        dateForCurrencyExchange.postValue(date)
-    }
-
-    fun setTriggerForCurrencyExchange() {
+    fun setDateForCurrencyExchange(date: Date?) {
         triggerForCurrencyExchange.postValue(true)
+        if (date != null) expensesRepository.setFoundDate(date)
     }
 
-    val currentExchangeRate: LiveData<ResultCurrentExchangeRate> =
-        MediatorLiveData<ResultCurrentExchangeRate>().apply {
-            var findDate: Date? = null
-            fun update() {
-                viewModelScope.launch {
-                    rateRepository?.let { repository ->
-                        findDate?.let { date -> postValue(repository.getCurrentRate(date)) }
-                    }
-                }
-            }
-            addSource(dateForCurrencyExchange) {
-                if (it != null) {
-                    findDate = it
-                    update()
-                }
-            }
-            addSource(triggerForCurrencyExchange) {
-                if (it != null) update()
-            }
-        }
+    val exchangeRateLiveDate = Transformations.switchMap(triggerForCurrencyExchange) {
+        mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()?.getCurrentRate()
+        expensesRepository.exchangeRateLiveDate
+
+    }
 }

@@ -11,9 +11,8 @@
 
     <string name="expense_del_message">Статья была удалена</string>
     <string name="expense_update_message">Все записи изменены</string>
-    <string name="expense_del_warning">"Есть связанные с этой статьей записи в количестве %1$s шт."
-    "Данные будут безвозвратно потеряны! \n"
-    " Удалить?"</string>
+    <string name="expense_del_warning">"%1$s\nЕсть связанные с этой статьей записи в количестве %2$d шт."
+    "Данные будут безвозвратно потеряны! "</string>
     <!--"Deleting this expense will impact ${result.countRecords} expenses"-->
     <string name="expense_update_warning">"Есть связанные с этой статьей записи в количестве %1$s шт."
     "Все они будут изменены. \n"
@@ -24,11 +23,11 @@
     <string name="expense_frag_title">Выберите статью</string>
     <string name="delete_record_title">Удалить запись</string>
     <string name="update_record_title">Изменить запись</string>
-    <string name="expenses_del_all_title">Удалить</string>
+    <string name="expenses_del_all_title">Удалить?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_cancel">Нет</string>
     <string name="dialog_save">Сохранить</string>
-    <string name="expenses_del_supporting_text">Статья %1$s \nСумма %2$s \nПримечания - %3$s</string>
+    <string name="expenses_del_supporting_text">От %1$s \nна сумму %2$8.2f  %3$s</string>
     <string name="expenses_del_all_message">Все записи с расходами будут безвозвратно потеряны.Для их сохранения в другом месте воспользуйтесь Экспортом.
     </string>
     <string name="expenses_del_title">Удалить запись?</string>
