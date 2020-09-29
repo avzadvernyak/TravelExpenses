@@ -5,15 +5,14 @@
     <string name="edit_expense">Изменение статей расходов</string>
 
     <string name="about_title">О программе</string>
-    <string name="about_message">"\n\nВерсия 1.10\n\n Особая благодарность Олегу за титанические усилия по вразумению автора"
-    " прораммы в процессе написания\n\n Для тех, кто хочет поддержать проект\n"
+    <string name="about_message">"Версия 2.00\n\n Особая благодарность Олегу за титанические усилия по вразумению автора"
+    " прораммы в процессе написания\n\n Для тех, кто хочет поддержать проект "
     "WMZ Z463710705149\n"</string>
 
     <string name="expense_del_message">Статья была удалена</string>
     <string name="expense_update_message">Все записи изменены</string>
     <string name="expense_del_warning">"%1$s\nЕсть связанные с этой статьей записи в количестве %2$d шт."
     "Данные будут безвозвратно потеряны! "</string>
-    <!--"Deleting this expense will impact ${result.countRecords} expenses"-->
     <string name="expense_update_warning">"Есть связанные с этой статьей записи в количестве %1$s шт."
     "Все они будут изменены. \n"
     "Изменить?"</string>
@@ -60,6 +59,7 @@
     <string name="currency_frag_title">Выберите валюту</string>
 
     <string name="delete_record_title2">Будет удалена запись \n %1$s</string>
+    <string name="last_bacup">Last backup in %1$s</string>
 
 
 </resources>

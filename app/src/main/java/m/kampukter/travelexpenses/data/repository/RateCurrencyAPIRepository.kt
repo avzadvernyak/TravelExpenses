@@ -37,7 +37,6 @@ class RateCurrencyAPIRepository(
 ) : KoinComponent {
 
     fun getCurrentRate(): ResultCurrentExchangeRate {
-        //expensesRepository.setFoundDate(date)
         startBredWorker()
         return ResultCurrentExchangeRate.ErrorAPI("Error choice")
         /*return when (mainApplication.getActiveCurrencySession()) {

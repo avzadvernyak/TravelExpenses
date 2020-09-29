@@ -47,13 +47,6 @@ class MyViewModel(
         viewModelScope.launch { expensesRepository.addExpenses(expenses) }
     }
 
-    fun updateExpenses(expenses: Expenses) {
-        viewModelScope.launch { expensesRepository.updateExpenses(expenses) }
-    }
-
-    fun expensesDelete(expensesId: Long) {
-        viewModelScope.launch { expensesRepository.deleteExpensesById(expensesId) }
-    }
 
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
     val expensesWithRate = expensesRepository.getAllExpensesWithRate()
@@ -115,25 +108,6 @@ class MyViewModel(
     fun addExpense(expense: Expense) {
         expensesRepository.addExpense(expense)
     }
-
-    /*
-    * Для удаления Expense. Код Олега
-    */
-
-    private val expenseDeletionTrigger = MutableLiveData<ExpenseDeletionRequest>()
-    val expenseDeletionResultLiveData: LiveData<ExpenseDeletionResult> =
-        Transformations.switchMap(expenseDeletionTrigger) { request ->
-            expensesRepository.deleteExpense(request.name, request.isForced)
-        }
-
-    fun deleteExpense(expenseName: String, isForced: Boolean) {
-        expenseDeletionTrigger.postValue(ExpenseDeletionRequest(expenseName, isForced))
-    }
-
-    data class ExpenseDeletionRequest(
-        val name: String,
-        val isForced: Boolean
-    )
 
     // Удаление записи в Expense и связанных записей. В два этапа
     // 1 если нет связанных записей, удаляем сразу
@@ -220,7 +194,6 @@ class MyViewModel(
         viewModelScope.launch { expensesRepository.deleteRate() }
     }
 
-    val allRate: LiveData<List<RateCurrency>> = expensesRepository.getAllRate()
 
     fun saveSettings(settings: Settings) {
         viewModelScope.launch { expensesRepository.insertSettings(settings) }

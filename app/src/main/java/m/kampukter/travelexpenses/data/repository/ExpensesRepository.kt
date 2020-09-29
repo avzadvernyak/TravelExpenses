@@ -4,7 +4,6 @@ import android.text.format.DateFormat
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -36,9 +35,6 @@ class ExpensesRepository(
         expensesDao.insert(expenses)
     }
 
-    suspend fun updateExpenses(expenses: Expenses) {
-        expensesDao.updateRecord(expenses)
-    }
 
     suspend fun deleteExpensesById(selectedId: Long) {
         expensesDao.deleteExpensesById(selectedId)
@@ -82,8 +78,6 @@ class ExpensesRepository(
     suspend fun deleteRate() {
         rateCurrencyDao.deleteAll()
     }
-
-    fun getAllRate() = rateCurrencyDao.getAll()
 
     // SettingsDao
     suspend fun getSettings() = settingsDao.getSettings()
@@ -169,21 +163,6 @@ class ExpensesRepository(
         }
     }
 
-    /*
-    * Для удаления Expense. Код Олега
-    */
-    fun deleteExpense(expense: String, isForced: Boolean): LiveData<ExpenseDeletionResult> =
-        liveData(context = Dispatchers.IO) {
-            val countRecords = expensesDao.getExpensesCount(expense)
-            if (isForced || countRecords == 0L) {
-                expenseDao.deleteExpenseByName(expense)
-                emit(ExpenseDeletionResult.Success)
-            } else {
-                emit(ExpenseDeletionResult.Warning(expense, countRecords))
-            }
-        }
-
-    // Second variant
     suspend fun deleteExpenseRecord(expense: String, isDelete: Boolean): Long {
         var numberRecords = 0L
         if (isDelete) expenseDao.deleteExpenseByName(expense)

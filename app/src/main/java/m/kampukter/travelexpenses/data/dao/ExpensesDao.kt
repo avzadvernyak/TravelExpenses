@@ -38,9 +38,6 @@ interface ExpensesDao {
     @Query("delete from expenses WHERE expenses.id = :selectedId")
     suspend fun deleteExpensesById(selectedId: Long)
 
-    @Update
-    suspend fun updateRecord(expanses: Expenses)
-
     @Query("select * from expenses where id = :id")
     fun getExpensesById(id: Long): LiveData<Expenses>
 

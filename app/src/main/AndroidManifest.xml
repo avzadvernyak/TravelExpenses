@@ -11,73 +11,13 @@
                  android:supportsRtl="true"
                  android:theme="@style/AppTheme"
                  android:name=".MainApplication" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.MainActivityWithNavigation">
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.NewExpensesActivity"
-                  android:label="NewExpensesActivity"
-                  android:parentActivityName=".ui.MainActivity"
-                  android:windowSoftInputMode="adjustResize"
-        >
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.MainActivity">
-            </meta-data>
-        </activity>
-        <activity android:name=".ui.EditExpensesActivity"
-                  android:label="EditExpensesActivity"
-                  android:parentActivityName=".ui.MainActivity"
-                  android:windowSoftInputMode="adjustResize"
-        >
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.MainActivity">
-            </meta-data>
-        </activity>
-        <activity android:name=".ui.EditExpenseActivity"
-                  android:label="EditExpenseActivity"
-                  android:parentActivityName=".ui.MainActivity"
-                  android:windowSoftInputMode="adjustResize"
-        >
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.MainActivity">
-            </meta-data>
-        </activity>
-        <activity android:name=".ui.ExpenseActivity"
-                  android:label="ExpenseActivity"
-                  android:parentActivityName=".ui.NewExpensesActivity">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.NewExpensesActivity">
-            </meta-data>
-        </activity>
-        <activity android:name=".ui.ExpensesSumActivity"
-                  android:label="ExpensesSumActivity"
-                  android:parentActivityName=".ui.MainActivity">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.NewExpensesActivity">
-            </meta-data>
-        </activity>
-        <activity android:name=".ui.RateActivity"
-                android:parentActivityName=".ui.MainActivity">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.MainActivity">
-            </meta-data>
-        </activity>
-        <activity android:name=".ui.SettingsActivity" />
-        <activity android:name=".ui.CurrentExchangeRateActivity"
-                android:parentActivityName=".ui.MainActivity">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.MainActivity">
-            </meta-data>
-        </activity>
+
     </application>
 
 </manifest>

@@ -1,9 +1,7 @@
 package m.kampukter.travelexpenses
 
 import android.app.Application
-import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -18,7 +16,6 @@ import m.kampukter.travelexpenses.data.dto.FirebaseBackupServer
 import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
-import m.kampukter.travelexpenses.ui.SettingsActivity
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
@@ -30,7 +27,6 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
-import kotlin.math.absoluteValue
 
 lateinit var mainApplication: MainApplication
 
