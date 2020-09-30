@@ -1,6 +1,7 @@
 package m.kampukter.travelexpenses.ui.expense
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,6 +60,7 @@ class ExpenseFragment : Fragment() {
             Snackbar.make(view, getString(R.string.expense_update_message), Snackbar.LENGTH_SHORT)
                 .show()
         })
+
         viewModel.expenseDeletionResult.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is ExpenseDeletionResult.Warning -> {
@@ -76,6 +78,7 @@ class ExpenseFragment : Fragment() {
                     "Success",
                     Snackbar.LENGTH_SHORT
                 ).show()
+
             }
         })
 

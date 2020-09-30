@@ -2,13 +2,6 @@ package m.kampukter.travelexpenses.data.repository
 
 import android.text.format.DateFormat
 import android.util.Log
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
@@ -22,7 +15,6 @@ import m.kampukter.travelexpenses.data.dto.RateCurrencyNBRB
 import m.kampukter.travelexpenses.data.dto.RateCurrencyNbu
 import m.kampukter.travelexpenses.data.dto.ValCurs
 import m.kampukter.travelexpenses.mainApplication
-import m.kampukter.travelexpenses.workers.BredWorker
 import org.koin.core.KoinComponent
 import retrofit2.Response
 import java.io.IOException
@@ -33,18 +25,20 @@ class RateCurrencyAPIRepository(
     private val expensesDao: ExpensesDao,
     private val rateCurrencyDao: RateCurrencyDao,
     private val rateCurrencyAPI: RateCurrencyAPI,
-    private val expensesRepository:ExpensesRepository
+    private val expensesRepository: ExpensesRepository
 ) : KoinComponent {
 
-    fun getCurrentRate(): ResultCurrentExchangeRate {
-        startBredWorker()
-        return ResultCurrentExchangeRate.ErrorAPI("Error choice")
-        /*return when (mainApplication.getActiveCurrencySession()) {
-            DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(date)
-            DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(date)
-            DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(date)
+    suspend fun getCurrentRate() {
+        val foundDate = expensesRepository.getFoundDate()
+
+        val result = when (mainApplication.getActiveCurrencySession()) {
+            DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(foundDate)
+            DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(foundDate)
+            DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(foundDate)
             else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
-        }*/
+        }
+        expensesRepository.getExchangeRate(result)
+
     }
 
     private suspend fun getRateNBU(date: Date): ResultCurrentExchangeRate {
@@ -313,36 +307,6 @@ class RateCurrencyAPIRepository(
                     }
                 }
             }
-        }
-    }
-
-    private fun startBredWorker() {
-
-        val myWorkRequest = OneTimeWorkRequest.Builder(BredWorker::class.java)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            )
-            .build()
-
-        WorkManager
-            .getInstance(mainApplication)
-            .enqueue(myWorkRequest)
-    }
-
-    fun bredInRepo() {
-        val foundDate = expensesRepository.getFoundDate()
-        GlobalScope.launch(context = Dispatchers.IO) {
-
-            val testResult = when (mainApplication.getActiveCurrencySession()) {
-                DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(foundDate)
-                DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(foundDate)
-                DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(foundDate)
-                else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
-            }
-            expensesRepository.getExchangeRate(testResult)
-
         }
     }
 }

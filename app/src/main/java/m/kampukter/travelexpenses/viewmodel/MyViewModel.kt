@@ -92,7 +92,7 @@ class MyViewModel(
         expensesRepository.resetDef()
     }
 
-    val currencyTableList: LiveData<List<CurrencyTable>> =
+    private val currencyTableList: LiveData<List<CurrencyTable>> =
         expensesRepository.getCurrencyAllLiveData()
 
 
@@ -121,7 +121,7 @@ class MyViewModel(
             fun reset(){
                 expenseDelTrigger.postValue(null)
                 expenseDeleteName.postValue(null)
-                postValue(ExpenseDeletionResult.Empty)
+                postValue(null)
             }
             fun update() {
                 val expenseName = lastExpenseName
@@ -277,7 +277,7 @@ class MyViewModel(
     }
 
     val exchangeRateLiveDate = Transformations.switchMap(triggerForCurrencyExchange) {
-        mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()?.getCurrentRate()
+        viewModelScope.launch { mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()?.getCurrentRate()}
         expensesRepository.exchangeRateLiveDate
 
     }
