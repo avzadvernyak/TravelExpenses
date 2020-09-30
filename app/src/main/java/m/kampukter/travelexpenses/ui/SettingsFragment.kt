@@ -55,7 +55,7 @@ class SettingsFragment : Fragment() {
                                         "dd/MM/yyyy HH:mm",
                                         restoreBackup.backupTime
                                     ).toString()
-                                    lastBackupTextView.text = resources.getString( R.string.last_bacup, dateStr)
+                                    lastBackupTextView.text = resources.getString( R.string.last_backup, dateStr)
                                 }
                             })
                     }

@@ -1,27 +1,43 @@
 <resources>
     <string name="app_name">Travel Expenses</string>
 
-    <string name="addNewRepairError">Есть не заполненные поля.</string>
-    <string name="edit_expense">Изменение статей расходов</string>
+    <string name="menu_expenses">Расходы</string>
+    <string name="menu_expense">Статьи</string>
+    <string name="menu_export">Экспорт</string>
+    <string name="menu_exchange">Крсы валют</string>
+    <string name="menu_sum_expenses">Итоги</string>
+    <string name="menu_clear_expenses">Очистить</string>
+    <string name="menu_about">О программе</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_sum_expense">По статьям</string>
+    <string name="menu_sum_currency">По валютам</string>
+
+    <string name="nav_label_expenses">Расходы</string>
+    <string name="nav_label_about">О программе</string>
+    <string name="nav_label_add_expenses">Новая запись</string>
+    <string name="nav_label_edit_expenses">Редактировать запись</string>
+    <string name="nav_label_settings">Настройки</string>
+    <string name="nav_label_expense">Статьи</string>
+    <string name="nav_label_edit_expense">Редактировать статью</string>
+    <string name="nav_label_sum_expense">Итоги по статьям</string>
+    <string name="nav_label_sum_currency">Итоги по валютам</string>
+    <string name="nav_label_exchange">Курсы валют</string>
+    <string name="nav_label_expense_choice">Выберите статью</string>
+    <string name="nav_label_export">Экспорт</string>
 
     <string name="about_title">О программе</string>
     <string name="about_message">"Версия 2.00\n\n Особая благодарность Олегу за титанические усилия по вразумению автора"
     " прораммы в процессе написания\n\n Для тех, кто хочет поддержать проект "
     "WMZ Z463710705149\n"</string>
 
-    <string name="expense_del_message">Статья была удалена</string>
+    <string name="last_backup">Last backup in %1$s</string>
     <string name="expense_update_message">Все записи изменены</string>
     <string name="expense_del_warning">"%1$s\nЕсть связанные с этой статьей записи в количестве %2$d шт."
     "Данные будут безвозвратно потеряны! "</string>
-    <string name="expense_update_warning">"Есть связанные с этой статьей записи в количестве %1$s шт."
-    "Все они будут изменены. \n"
-    "Изменить?"</string>
 
     <string name="edit_record_title">Редактирование записи</string>
     <string name="expense_del_title">Удалить запись</string>
-    <string name="expense_frag_title">Выберите статью</string>
-    <string name="delete_record_title">Удалить запись</string>
-    <string name="update_record_title">Изменить запись</string>
+
     <string name="expenses_del_all_title">Удалить?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_cancel">Нет</string>
@@ -31,23 +47,10 @@
     </string>
     <string name="expenses_del_title">Удалить запись?</string>
     <string name="expenses_del_record">Запись удалена</string>
-    <string name="new_expense_title">Статья расходов</string>
-    <string name="travel_expenses_title">Расходы</string>
-    <string name="menu_expense">Статьи</string>
-    <string name="menu_export">Экспорт</string>
-    <string name="menu_sum_expenses">Итоги</string>
-    <string name="menu_clear_expenses">Очистить</string>
-    <string name="menu_about">О программе</string>
     <string name="hint_datetime_created">Запись создана</string>
-    <string name="hint_choice_expense">Выберите статью</string>
     <string name="hint_sum">Сумма</string>
     <string name="hint_note">Примечание</string>
-    <string name="description_image">expenseImage</string>
     <string name="add_record_title">Добавить запись</string>
-    <string name="expenses_sum_title">Итоги</string>
-    <string name="settings">Настройки</string>
-    <string name="showRate">Курс валют</string>
-    <string name="showArchiveRate">Архив курсов валют</string>
     <string name="oneUah">за 1 UAH на</string>
     <string name="oneRub">за 1 RUB на</string>
     <string name="oneByn">за 1 BYN на</string>
@@ -56,10 +59,5 @@
     <string name="reload">Повторить</string>
     <string name="hint_expense">Статья расходов</string>
     <string name="hint_currency">Валюта</string>
-    <string name="currency_frag_title">Выберите валюту</string>
-
-    <string name="delete_record_title2">Будет удалена запись \n %1$s</string>
-    <string name="last_bacup">Last backup in %1$s</string>
-
 
 </resources>

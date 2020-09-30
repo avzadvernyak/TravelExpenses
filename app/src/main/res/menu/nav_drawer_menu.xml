@@ -5,12 +5,12 @@
         <item
                 android:id="@id/homeExpensesFragment"
                 android:icon="@drawable/ic_balance_wallet_black"
-                android:title="Расходы" />
+                android:title="@string/menu_expenses" />
 
         <item
                 android:id="@id/currentExchangeFragment"
                 android:icon="@drawable/ic_expenses"
-                android:title="Курсы валют" />
+                android:title="@string/menu_exchange" />
         <item
                 android:id="@id/expenseFragment"
                 android:icon="@drawable/ic_format_list_bulleted_24"
@@ -18,32 +18,32 @@
         <item
                 android:id="@id/exportFragment"
                 android:icon="@drawable/ic_archive_black"
-                android:title="Экспорт" />
+                android:title="@string/menu_export" />
         <item
                 android:id="@id/delAllExpensesDialogFragment"
                 android:icon="@drawable/ic_delete_forever_black"
-                android:title="Очистить" />
+                android:title="@string/menu_clear_expenses" />
         <item
                 android:id="@id/settingsFragment"
                 android:icon="@drawable/ic_settings_black"
-                android:title="Настройки" />
+                android:title="@string/menu_settings" />
         <item
                 android:id="@id/aboutDialogFragment"
                 android:icon="@drawable/ic_info_24"
-                android:title="О программе" />
+                android:title="@string/menu_about" />
 
     </group>
     <group android:id="@+id/secondary">
-        <item android:title="Итоги">
+        <item android:title="@string/menu_sum_expenses">
             <menu>
                 <item
                         android:id="@id/sumExpenseFragment"
                         android:icon="@drawable/ic_functions_24"
-                        android:title="По статьям" />
+                        android:title="@string/menu_sum_expense" />
                 <item
                         android:icon="@drawable/ic_expenses"
                         android:id="@+id/sumCurrencyFragment"
-                        android:title="По валютам" />
+                        android:title="@string/menu_sum_currency" />
             </menu>
         </item>
     </group>
