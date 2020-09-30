@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import m.kampukter.travelexpenses.data.RateCurrency
 

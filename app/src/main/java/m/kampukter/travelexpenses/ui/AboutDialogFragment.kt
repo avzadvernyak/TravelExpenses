@@ -1,12 +1,8 @@
 package m.kampukter.travelexpenses.ui
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.view.Gravity
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import m.kampukter.travelexpenses.R
 

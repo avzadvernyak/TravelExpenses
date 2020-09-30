@@ -8,10 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.current_exchange_fragment.*
-import kotlinx.android.synthetic.main.exchange_rate_fragment.errorApiTextView
-import kotlinx.android.synthetic.main.exchange_rate_fragment.exchangeRateRecyclerView
-import kotlinx.android.synthetic.main.exchange_rate_fragment.progressBar
-import kotlinx.android.synthetic.main.exchange_rate_fragment.reloadRateButton
 import m.kampukter.travelexpenses.*
 import m.kampukter.travelexpenses.data.ResultCurrentExchangeRate
 import m.kampukter.travelexpenses.viewmodel.MyViewModel

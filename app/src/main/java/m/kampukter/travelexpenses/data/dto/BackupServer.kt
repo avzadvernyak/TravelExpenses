@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.data.dto
 
 import androidx.lifecycle.LiveData
-import com.google.firebase.database.ValueEventListener
 import m.kampukter.travelexpenses.data.CurrencyTable
 import m.kampukter.travelexpenses.data.Expense
 import m.kampukter.travelexpenses.data.Expenses

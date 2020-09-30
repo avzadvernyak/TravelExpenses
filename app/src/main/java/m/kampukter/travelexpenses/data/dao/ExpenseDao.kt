@@ -3,7 +3,6 @@ package m.kampukter.travelexpenses.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import m.kampukter.travelexpenses.data.Expense
-import m.kampukter.travelexpenses.data.Expenses
 
 @Dao
 interface ExpenseDao {

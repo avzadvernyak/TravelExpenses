@@ -8,9 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.expenses_sum_fragment.*
+import kotlinx.android.synthetic.main.sum_viewing_fragment.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.ui.ExpenseSumAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/primary">
+    <group>
         <item
                 android:id="@id/homeExpensesFragment"
                 android:icon="@drawable/ic_balance_wallet_black"
@@ -33,7 +33,7 @@
                 android:title="@string/menu_about" />
 
     </group>
-    <group android:id="@+id/secondary">
+    <group>
         <item android:title="@string/menu_sum_expenses">
             <menu>
                 <item

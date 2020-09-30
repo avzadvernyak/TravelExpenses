@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses
 
-import android.util.Log
 import androidx.work.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -9,7 +8,6 @@ import m.kampukter.travelexpenses.workers.APISynchronizationWorker
 import org.koin.core.KoinComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import retrofit2.Retrofit
 import java.util.*
 import java.util.concurrent.TimeUnit
 

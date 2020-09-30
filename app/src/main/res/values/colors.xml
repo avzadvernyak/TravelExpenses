@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#4CAF50</color>
 
-    <color name="colorOk">#228B22</color>
     <color name="colorDateTime">#878787</color>
     <color name="colorExp">#660505</color>
 </resources>
