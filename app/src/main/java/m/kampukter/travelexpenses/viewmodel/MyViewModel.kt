@@ -1,5 +1,6 @@
 package m.kampukter.travelexpenses.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -9,6 +10,7 @@ import m.kampukter.travelexpenses.data.dto.BackupServer
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.mainApplication
+import org.osmdroid.util.GeoPoint
 import java.util.*
 
 class MyViewModel(
@@ -118,11 +120,12 @@ class MyViewModel(
         MediatorLiveData<ExpenseDeletionResult>().apply {
             var lastExpenseName: String? = null
             var lastExpenseTrigger: Boolean? = null
-            fun reset(){
+            fun reset() {
                 expenseDelTrigger.postValue(null)
                 expenseDeleteName.postValue(null)
                 postValue(null)
             }
+
             fun update() {
                 val expenseName = lastExpenseName
                 val expenseTrigger = lastExpenseTrigger
@@ -238,24 +241,30 @@ class MyViewModel(
         isSaveNewExpenses.postValue(true)
     }
 
+    private val bufferForSaveExpenseLocation = MutableLiveData<MyLocation?>()
+    fun setBufferExpensesLocation(location: MyLocation) {
+        bufferForSaveExpenseLocation.postValue(location)
+    }
+
+
     private val bufferForSaveExpense = MutableLiveData<Expenses?>()
     val bufferExpensesMediatorLiveData =
         MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
-            var expenses: Expenses? = null
+            var lastExpenses: Expenses? = null
             var currencyList: List<CurrencyTable> = emptyList()
             addSource(bufferForSaveExpense) {
-                expenses = it
-                postValue(Pair(expenses, currencyList))
+                lastExpenses = it
+                postValue(Pair(lastExpenses, currencyList))
                 isSavingAllowed.postValue(
                     it != null && !it.currency.isBlank() && (it.sum != 0.0) && !it.note.isBlank() && !it.expense.isBlank()
                 )
             }
             addSource(currencyTableList) {
                 if (it != null) currencyList = it
-                postValue(Pair(expenses, currencyList))
+                postValue(Pair(lastExpenses, currencyList))
             }
             addSource(isSaveNewExpenses) {
-                if (it) expenses?.let { _expenses ->
+                if (it) lastExpenses?.let { _expenses ->
                     viewModelScope.launch {
                         expensesRepository.addExpenses(_expenses)
                         isSaveNewExpenses.postValue(false)
@@ -263,11 +272,18 @@ class MyViewModel(
                 }
 
             }
+            addSource(bufferForSaveExpenseLocation) {
+                if (it != null) {
+                    lastExpenses = lastExpenses?.copy(location = it)
+                    postValue(Pair(lastExpenses, currencyList))
+                }
+            }
         }
 
     fun setBufferExpenses(expenses: Expenses?) {
         bufferForSaveExpense.postValue(expenses)
     }
+
 
     private val triggerForCurrencyExchange = MutableLiveData<Boolean>()
 
@@ -277,8 +293,19 @@ class MyViewModel(
     }
 
     val exchangeRateLiveDate = Transformations.switchMap(triggerForCurrencyExchange) {
-        viewModelScope.launch { mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()?.getCurrentRate()}
+        viewModelScope.launch {
+            mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()?.getCurrentRate()
+        }
         expensesRepository.exchangeRateLiveDate
 
+    }
+
+    // For map (osmdroid)
+    private val paramMapViewMutableLiveData = MutableLiveData<Pair<Double, GeoPoint>>()
+    val paramMapViewLiveData: LiveData<Pair<Double, GeoPoint>>
+        get() = paramMapViewMutableLiveData
+
+    fun setParamMapView(param: Pair<Double, GeoPoint>) {
+        paramMapViewMutableLiveData.postValue(param)
     }
 }

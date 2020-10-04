@@ -111,7 +111,7 @@
                 app:destination="@id/delExpensePhaseSecondDialogFragment" />
         <action
                 android:id="@+id/toEditExpenseDialogFragment"
-                app:destination="@id/editExpenseDialogFragment"/>
+                app:destination="@id/editExpenseDialogFragment" />
         <action
                 android:id="@+id/toAddExpenseDialogFragment"
                 app:destination="@id/addExpenseDialogFragment" />
@@ -213,6 +213,37 @@
             android:name="m.kampukter.travelexpenses.ui.ExportFragment"
             android:label="@string/nav_label_export"
             tools:layout="@layout/expense_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/mapExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.MapExpensesFragment"
+            android:label="Расходы на карте">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+
+    <!--                  Test                      -->
+    <fragment
+            android:id="@+id/testAddExpenseFragment"
+            android:name="m.kampukter.travelexpenses.ui.test.TestAddExpenseFragment"
+            android:label="Test">
+        <action
+                android:id="@+id/toChoiceExpenseForAddFragment"
+                app:destination="@id/choiceExpenseForAddFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/testMapFragment"
+            android:name="m.kampukter.travelexpenses.ui.test.MapFragment"
+            android:label="Map">
+
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />

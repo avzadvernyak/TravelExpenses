@@ -11,6 +11,7 @@
     <string name="menu_settings">Настройки</string>
     <string name="menu_sum_expense">По статьям</string>
     <string name="menu_sum_currency">По валютам</string>
+    <string name="menu_map">Карта</string>
 
     <string name="nav_label_expenses">Расходы</string>
     <string name="nav_label_about">О программе</string>
@@ -58,5 +59,7 @@
 
     <string name="reload">Повторить</string>
     <string name="errorAPI">Ошибка связи с банком. \nПопробуйте позже.</string>
+    <string name="map_expenses_button_all">Все</string>
+
 
 </resources>

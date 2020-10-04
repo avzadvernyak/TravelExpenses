@@ -66,8 +66,8 @@ class HomeExpensesFragment : Fragment() {
             expensesAdapter.setList(it)
         })
         viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, Observer {
-            Snackbar.make(view, getString(R.string.expenses_del_record), Snackbar.LENGTH_SHORT)
-                .show()
+            /*Snackbar.make(view, getString(R.string.expenses_del_record), Snackbar.LENGTH_SHORT)
+                .show()*/
         })
         addExpensesFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
     }

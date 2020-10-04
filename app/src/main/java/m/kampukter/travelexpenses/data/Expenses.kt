@@ -30,5 +30,13 @@ data class Expenses(
     val sum: Double,
     @ColumnInfo(name = "currency_field")
     val currency: String,
-    val note: String
+    val note: String,
+    @TypeConverters(DateConverter::class)
+    val location: MyLocation?
+)
+
+data class MyLocation(
+    val accuracy: Float,
+    val latitude: Double,
+    val longitude: Double
 )

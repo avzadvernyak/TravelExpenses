@@ -20,6 +20,10 @@
                 android:icon="@drawable/ic_archive_black"
                 android:title="@string/menu_export" />
         <item
+                android:id="@id/mapExpensesFragment"
+                android:icon="@drawable/ic_map_24"
+                android:title="@string/menu_map" />
+        <item
                 android:id="@id/delAllExpensesDialogFragment"
                 android:icon="@drawable/ic_delete_forever_black"
                 android:title="@string/menu_clear_expenses" />
@@ -41,10 +45,20 @@
                         android:icon="@drawable/ic_functions_24"
                         android:title="@string/menu_sum_expense" />
                 <item
-                        android:icon="@drawable/ic_expenses"
                         android:id="@+id/sumCurrencyFragment"
+                        android:icon="@drawable/ic_expenses"
                         android:title="@string/menu_sum_currency" />
             </menu>
         </item>
     </group>
+
+
+    <item
+            android:id="@id/testAddExpenseFragment"
+            android:title="Test" />
+    <item
+            android:id="@id/testMapFragment"
+            android:title="Map" />
 </menu>
+
+

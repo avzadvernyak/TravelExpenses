@@ -21,6 +21,7 @@ import java.util.*
 class AddExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private var myDropdownAdapter: MyArrayAdapter? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,7 +31,6 @@ class AddExpensesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         val navController = findNavController()
 
         myDropdownAdapter =
@@ -63,7 +63,8 @@ class AddExpensesFragment : Fragment() {
                                 sum = 0.0,
                                 currency = defCurrencyName,
                                 expense = "",
-                                note = ""
+                                note = "",
+                                location = null
                             )
                         )
                     }
@@ -83,11 +84,15 @@ class AddExpensesFragment : Fragment() {
                 )
             }
 
-            sumTextInputEdit.doOnTextChanged { text, _, _, _ ->
+            sumTextInputEdit.doOnTextChanged { text, p1, p2, p3 ->
                 val inputString = text.toString()
-                if (!inputString.isBlank()) viewModel.setBufferExpenses(
-                    tempExpenses?.copy(sum = inputString.toDouble())
-                ) else viewModel.setBufferExpenses(tempExpenses?.copy(sum = 0.0))
+                if (inputString.length == 1 && inputString == ".") {
+                    sumTextInputEdit.setText("0.")
+                } else {
+                    if (!inputString.isBlank()) viewModel.setBufferExpenses(
+                        tempExpenses?.copy(sum = inputString.toDouble())
+                    ) else viewModel.setBufferExpenses(tempExpenses?.copy(sum = 0.0))
+                }
             }
 
             currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
