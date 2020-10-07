@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -307,5 +306,33 @@ class MyViewModel(
 
     fun setParamMapView(param: Pair<Double, GeoPoint>) {
         paramMapViewMutableLiveData.postValue(param)
+    }
+
+
+    private val filterForExpensesMap = MutableLiveData<FilterForExpensesMap>()
+    val expensesForMapMutableLiveData = MediatorLiveData<List<Expenses>>().apply {
+        var lastExpenses = listOf<Expenses>()
+        addSource(expenses) {
+            lastExpenses = it
+            postValue(it)
+
+        }
+        addSource(filterForExpensesMap) { filter ->
+            when (filter) {
+                is FilterForExpensesMap.All -> postValue(lastExpenses)
+
+                is FilterForExpensesMap.DateRangeFilter -> {
+                    postValue(lastExpenses.filter { it.dateTime.time in filter.startPeriod..filter.endPeriod })
+                }
+
+                is FilterForExpensesMap.ExpenseFilter ->
+                    postValue(lastExpenses.filter { it.expense == filter.expenseName })
+
+            }
+        }
+    }
+
+    fun setFilterForExpensesMap(filter: FilterForExpensesMap) {
+        filterForExpensesMap.postValue(filter)
     }
 }

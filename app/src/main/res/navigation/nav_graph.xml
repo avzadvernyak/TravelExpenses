@@ -217,14 +217,27 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
+
     <fragment
             android:id="@+id/mapExpensesFragment"
-            android:name="m.kampukter.travelexpenses.ui.MapExpensesFragment"
-            android:label="Расходы на карте">
-
+            android:name="m.kampukter.travelexpenses.ui.map.MapExpensesFragment"
+            android:label="На карте">
+        <action
+                android:id="@+id/toChoiceExpenseForMapFragment"
+                app:destination="@id/choiceExpenseForMapFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/choiceExpenseForMapFragment"
+            android:name="m.kampukter.travelexpenses.ui.map.ChoiceExpenseForMapFragment"
+            android:label="@string/nav_label_expense_choice"
+            tools:layout="@layout/choice_expense_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/mapExpensesFragment" />
+
     </fragment>
 
     <!--                  Test                      -->
