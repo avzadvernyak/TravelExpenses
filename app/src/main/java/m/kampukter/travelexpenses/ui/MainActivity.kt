@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         NetworkLiveData.observe(this, Observer {
             navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
                 it and (mainApplication.getActiveCurrencySession() != null)
+
+            navigation_view?.menu?.findItem(R.id.mapExpensesFragment)?.isVisible = it
         })
 
     }

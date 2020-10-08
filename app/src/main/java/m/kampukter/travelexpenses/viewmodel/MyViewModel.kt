@@ -310,27 +310,45 @@ class MyViewModel(
 
 
     private val filterForExpensesMap = MutableLiveData<FilterForExpensesMap>()
-    val expensesForMapMutableLiveData = MediatorLiveData<List<Expenses>>().apply {
-        var lastExpenses = listOf<Expenses>()
-        addSource(expenses) {
-            lastExpenses = it
-            postValue(it)
-
-        }
-        addSource(filterForExpensesMap) { filter ->
-            when (filter) {
-                is FilterForExpensesMap.All -> postValue(lastExpenses)
-
-                is FilterForExpensesMap.DateRangeFilter -> {
-                    postValue(lastExpenses.filter { it.dateTime.time in filter.startPeriod..filter.endPeriod })
-                }
-
-                is FilterForExpensesMap.ExpenseFilter ->
-                    postValue(lastExpenses.filter { it.expense == filter.expenseName })
+    val expensesForMapMutableLiveData =
+        MediatorLiveData<Pair<List<Expenses>, FilterForExpensesMap?>>().apply {
+            var lastExpenses = listOf<Expenses>()
+            var lastFilterForExpensesMap: FilterForExpensesMap? = null
+            addSource(expenses) {
+                lastExpenses = it
+                postValue(Pair(it, lastFilterForExpensesMap))
 
             }
+            addSource(filterForExpensesMap) { filter ->
+                lastFilterForExpensesMap = filter
+                when (filter) {
+                    is FilterForExpensesMap.All -> postValue(
+                        Pair(
+                            lastExpenses,
+                            lastFilterForExpensesMap
+                        )
+                    )
+
+                    is FilterForExpensesMap.DateRangeFilter -> {
+                        postValue(
+                            Pair(
+                                lastExpenses.filter { it.dateTime.time in filter.startPeriod..filter.endPeriod },
+                                lastFilterForExpensesMap
+                            )
+                        )
+                    }
+
+                    is FilterForExpensesMap.ExpenseFilter ->
+                        postValue(
+                            Pair(
+                                lastExpenses.filter { it.expense == filter.expenseName },
+                                lastFilterForExpensesMap
+                            )
+                        )
+
+                }
+            }
         }
-    }
 
     fun setFilterForExpensesMap(filter: FilterForExpensesMap) {
         filterForExpensesMap.postValue(filter)

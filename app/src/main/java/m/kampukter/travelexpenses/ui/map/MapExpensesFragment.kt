@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.map_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
@@ -16,7 +19,6 @@ import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
@@ -29,18 +31,39 @@ class MapExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private var firstStart = true
 
+    private val actionModeCallback = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.customView
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            return true
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
+
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.map_expenses_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setHasOptionsMenu(true)
+        //(activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
 
         Configuration.getInstance()
             .load(view.context, PreferenceManager.getDefaultSharedPreferences(view.context))
@@ -60,87 +83,108 @@ class MapExpensesFragment : Fragment() {
             mapController.setZoom(8.5)
             mapController.setCenter(GeoPoint(48.0154, 37.8647))
         }
-        viewModel.expensesForMapMutableLiveData.observe(viewLifecycleOwner, Observer { expenses ->
+        viewModel.expensesForMapMutableLiveData.observe(
+            viewLifecycleOwner,
+            Observer { resObserver ->
+                val expenses = resObserver.first
+                mapMapView.overlays.clear()
 
-            mapMapView.overlays.clear()
+                var pointsLongitudeMax: Double = -90.0
+                var pointsLongitudeMin: Double = 90.0
+                var pointsLatitudeMax: Double = -180.0
+                var pointsLatitudeMin: Double = 180.0
 
-            var pointsLongitudeMax: Double = -90.0
-            var pointsLongitudeMin: Double = 90.0
-            var pointsLatitudeMax: Double = -180.0
-            var pointsLatitudeMin: Double = 180.0
+                var count = 0
 
-            expenses.forEach { itemExpenses ->
+                expenses.forEach { itemExpenses ->
+                    if (itemExpenses.location != null) {
 
-                if (itemExpenses.location != null) {
+                        count += 1
 
-                    Log.d("blabla", "${itemExpenses.location} ")
+                        //Log.d("blabla", "${itemExpenses.location} ")
 
-                    if (itemExpenses.location.latitude > pointsLatitudeMax) pointsLatitudeMax =
-                        itemExpenses.location.latitude
-                    if (itemExpenses.location.latitude < pointsLatitudeMin) pointsLatitudeMin =
-                        itemExpenses.location.latitude
-                    if (itemExpenses.location.longitude > pointsLongitudeMax) pointsLongitudeMax =
-                        itemExpenses.location.longitude
-                    if (itemExpenses.location.longitude < pointsLongitudeMin) pointsLongitudeMin =
-                        itemExpenses.location.longitude
+                        if (itemExpenses.location.latitude > pointsLatitudeMax) pointsLatitudeMax =
+                            itemExpenses.location.latitude
+                        if (itemExpenses.location.latitude < pointsLatitudeMin) pointsLatitudeMin =
+                            itemExpenses.location.latitude
+                        if (itemExpenses.location.longitude > pointsLongitudeMax) pointsLongitudeMax =
+                            itemExpenses.location.longitude
+                        if (itemExpenses.location.longitude < pointsLongitudeMin) pointsLongitudeMin =
+                            itemExpenses.location.longitude
 
-                    val myMarker = Marker(mapMapView)
-                    myMarker.position =
-                        GeoPoint(itemExpenses.location.latitude, itemExpenses.location.longitude)
+                        val myMarker = Marker(mapMapView)
+                        myMarker.position =
+                            GeoPoint(
+                                itemExpenses.location.latitude,
+                                itemExpenses.location.longitude
+                            )
 
-                    myMarker.title = "${
-                        DateFormat.format(
-                            "dd/MM/yyyy HH:mm",
-                            itemExpenses.dateTime
-                        )
-                    } ${itemExpenses.sum} ${itemExpenses.currency}"
+                        myMarker.title = "${
+                            DateFormat.format(
+                                "dd/MM/yyyy HH:mm",
+                                itemExpenses.dateTime
+                            )
+                        } ${itemExpenses.sum} ${itemExpenses.currency}"
 
-                    myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    myMarker.snippet = itemExpenses.expense
-                    myMarker.subDescription = itemExpenses.note
+                        myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        myMarker.snippet = itemExpenses.expense
+                        myMarker.subDescription = itemExpenses.note
 
-                    mapMapView.overlays.add(myMarker)
+                        mapMapView.overlays.add(myMarker)
+                    }
                 }
-            }
 
-            /* val boundingBox = BoundingBox(
-                 pointsLatitudeMax + ((pointsLatitudeMax - pointsLatitudeMin) * 0.15),
-                 pointsLongitudeMax + ((pointsLongitudeMax - pointsLongitudeMin) * 0.05),
-                 pointsLatitudeMin - ((pointsLatitudeMax - pointsLatitudeMin) * 0.05),
-                 pointsLongitudeMin - ((pointsLongitudeMax - pointsLongitudeMin) * 0.05)
-             )*/
+                when (val filter = resObserver.second) {
+                    is FilterForExpensesMap.ExpenseFilter -> {
+                        val actionMode =
+                            (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                        actionMode?.title = "Найдено записей: $count"
+                        actionMode?.subtitle = filter.expenseName
 
-            val centerLatitude = pointsLatitudeMin + ((pointsLatitudeMax - pointsLatitudeMin) / 2.0)
-            val centerLongitude =
-                pointsLongitudeMin + ((pointsLongitudeMax - pointsLongitudeMin) / 2.0)
+                    }
+                    is FilterForExpensesMap.DateRangeFilter -> {
+                        val actionMode =
+                            (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                        actionMode?.title = "Найдено записей: ${expenses.size}"
+                        val startDate =
+                            DateFormat.format("dd/MM/yyyy", filter.startPeriod).toString()
+                        val endDate = DateFormat.format("dd/MM/yyyy", filter.endPeriod).toString()
+                        actionMode?.subtitle = "c $startDate по $endDate"
+                    }
+                }
 
-            Log.d(
-                "blabla",
-                "${pointsLatitudeMax - pointsLatitudeMin} $centerLatitude $centerLongitude"
-            )
+                val centerLatitude =
+                    pointsLatitudeMin + ((pointsLatitudeMax - pointsLatitudeMin) / 2.0)
+                val centerLongitude =
+                    pointsLongitudeMin + ((pointsLongitudeMax - pointsLongitudeMin) / 2.0)
 
-            when {
-                pointsLatitudeMax - pointsLatitudeMin > 360 -> mapController.setZoom(0.1)
-                pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(1.0)
-                pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(2.0)
-                pointsLatitudeMax - pointsLatitudeMin > 45 -> mapController.setZoom(3.0)
-                pointsLatitudeMax - pointsLatitudeMin > 22.5 -> mapController.setZoom(4.0)
-                pointsLatitudeMax - pointsLatitudeMin > 11.25 -> mapController.setZoom(5.0)
-                pointsLatitudeMax - pointsLatitudeMin > 5.625 -> mapController.setZoom(6.0)
-                pointsLatitudeMax - pointsLatitudeMin > 2.813 -> mapController.setZoom(7.0)
-                pointsLatitudeMax - pointsLatitudeMin > 1.406 -> mapController.setZoom(8.0)
-                pointsLatitudeMax - pointsLatitudeMin > 0.703 -> mapController.setZoom(9.0)
-                pointsLatitudeMax - pointsLatitudeMin > 0.352 -> mapController.setZoom(10.0)
-                pointsLatitudeMax - pointsLatitudeMin > 0.176 -> mapController.setZoom(11.0)
-                pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(12.0)
-                pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(13.0)
-                pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
-                else -> mapController.setZoom(15.0)
-            }
-            mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
 
-            //mapMapView.zoomToBoundingBox(boundingBox, false)
-        })
+                if (pointsLatitudeMax - pointsLatitudeMin == -360.0) {
+                    Snackbar.make(view, "Empty list points, show ALL", Snackbar.LENGTH_SHORT)
+                        .show()
+                    viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
+                }
+
+                when {
+                    pointsLatitudeMax - pointsLatitudeMin > 360 -> mapController.setZoom(0.1)
+                    pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(1.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(2.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 45 -> mapController.setZoom(3.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 22.5 -> mapController.setZoom(4.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 11.25 -> mapController.setZoom(5.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 5.625 -> mapController.setZoom(6.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 2.813 -> mapController.setZoom(7.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 1.406 -> mapController.setZoom(8.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.703 -> mapController.setZoom(9.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.352 -> mapController.setZoom(10.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.176 -> mapController.setZoom(11.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(12.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(13.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
+                    else -> mapController.setZoom(15.0)
+                }
+                mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
+            })
     }
 
     override fun onResume() {
@@ -165,10 +209,6 @@ class MapExpensesFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.allPoints -> {
-                firstStart = true
-                viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
-            }
             R.id.pointsDateFilter -> {
                 Log.d("blabla", "DateFilter")
                 val pickerRange = MaterialDatePicker.Builder.dateRangePicker().build()
@@ -183,7 +223,7 @@ class MapExpensesFragment : Fragment() {
                         viewModel.setFilterForExpensesMap(
                             FilterForExpensesMap.DateRangeFilter(
                                 startLong,
-                                endLong + (24 * 60 * 60 * 1000)
+                                endLong + (24 * 60 * 60 * 1000) - 1000
                             )
                         )
                 }

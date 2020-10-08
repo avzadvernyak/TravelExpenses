@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-            android:id="@+id/allPoints"
-            android:icon="@drawable/ic_filter_none_24"
-            android:title="Все"
-            android:contentDescription="Показать все точки"
-            app:showAsAction="ifRoom" />
+
     <item
             android:id="@+id/pointsDateFilter"
+            android:contentDescription="Показать все за дату"
             android:icon="@drawable/ic_today_24"
             android:title="По дате"
-            android:contentDescription="Показать все за дату"
             app:showAsAction="ifRoom" />
     <item
             android:id="@+id/pointsExpenseFilter"
+            android:contentDescription="Показать все точки по статье"
             android:icon="@drawable/ic_expenses"
             android:title="По статье"
-            android:contentDescription="Показать все точки по статье"
             app:showAsAction="ifRoom" />
+    <vector
+            android:tint="?attr/colorControlNormal">
+    </vector>
 </menu>
