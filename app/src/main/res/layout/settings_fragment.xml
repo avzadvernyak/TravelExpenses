@@ -56,6 +56,17 @@
                         android:layout_height="wrap_content"
                         android:text="в BYN (по курсу НБРБ)" />
             </RadioGroup>
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/gpsSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/currencyRadioGroup"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:checked="false"
+                    android:text="Использовать GPS"/>
 
             <RadioGroup
                     android:id="@+id/controlBackupRadioGroup"
@@ -64,7 +75,7 @@
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="4dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/currencyRadioGroup">
+                    app:layout_constraintTop_toBottomOf="@+id/gpsSwitch">
 
                 <TextView
                         android:layout_width="match_parent"

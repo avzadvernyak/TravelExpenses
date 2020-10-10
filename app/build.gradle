@@ -52,22 +52,22 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
 
-    implementation 'androidx.core:core-ktx:1.5.0-alpha03'
+    implementation 'androidx.core:core-ktx:1.5.0-alpha04'
 
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.0-alpha07"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-alpha07"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.0-beta01"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-beta01"
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test:runner:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
 
     //  Bottom Sheet components
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
-    implementation 'androidx.fragment:fragment-ktx:1.3.0-alpha08'
-    implementation 'androidx.activity:activity-ktx:1.2.0-alpha08'
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-beta01'
+    implementation 'androidx.activity:activity-ktx:1.2.0-beta01'
 
     //Material Components
     implementation 'com.google.android.material:material:1.2.1'
@@ -103,7 +103,7 @@ dependencies {
     implementation "com.tickaroo.tikxml:retrofit-converter:$tikxml_version"
 
     //firebase
-    implementation 'com.google.firebase:firebase-database-ktx:19.4.0'
+    implementation 'com.google.firebase:firebase-database-ktx:19.5.0'
 
     //Location
     implementation "com.google.android.gms:play-services-location:17.1.0"

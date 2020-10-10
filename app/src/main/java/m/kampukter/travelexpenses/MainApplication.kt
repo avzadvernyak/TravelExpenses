@@ -29,6 +29,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
 lateinit var mainApplication: MainApplication
+var switchStatusGPS = 0
 
 const val DEFAULT_CURRENCY_CONST_RUB = 1
 const val DEFAULT_CURRENCY_CONST_UAH = 2
@@ -138,6 +139,7 @@ class MainApplication : Application() {
 
             val mySettings = getKoin().get<ExpensesRepository>().getSettings()
             if (mySettings != null) {
+                switchStatusGPS = mySettings.statusGPS
                 currencySession =
                     if (mySettings.defCurrency != 0) CurrencySession(mySettings.defCurrency)
                     else null

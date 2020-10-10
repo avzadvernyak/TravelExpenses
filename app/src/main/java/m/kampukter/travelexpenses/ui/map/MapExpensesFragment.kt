@@ -90,9 +90,9 @@ class MapExpensesFragment : Fragment() {
                 mapMapView.overlays.clear()
 
                 var pointsLongitudeMax: Double = -90.0
-                var pointsLongitudeMin: Double = 90.0
+                var pointsLongitudeMin = 90.0
                 var pointsLatitudeMax: Double = -180.0
-                var pointsLatitudeMin: Double = 180.0
+                var pointsLatitudeMin = 180.0
 
                 var count = 0
 
@@ -133,57 +133,64 @@ class MapExpensesFragment : Fragment() {
                         mapMapView.overlays.add(myMarker)
                     }
                 }
+                if (count != 0) {
 
-                when (val filter = resObserver.second) {
-                    is FilterForExpensesMap.ExpenseFilter -> {
-                        val actionMode =
-                            (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
-                        actionMode?.title = "Найдено записей: $count"
-                        actionMode?.subtitle = filter.expenseName
+                    when (val filter = resObserver.second) {
+                        is FilterForExpensesMap.ExpenseFilter -> {
+                            val actionMode =
+                                (context as AppCompatActivity).startSupportActionMode(
+                                    actionModeCallback
+                                )
+                            actionMode?.title = "Найдено записей: $count"
+                            actionMode?.subtitle = filter.expenseName
 
+                        }
+                        is FilterForExpensesMap.DateRangeFilter -> {
+                            val actionMode =
+                                (context as AppCompatActivity).startSupportActionMode(
+                                    actionModeCallback
+                                )
+                            actionMode?.title = "Найдено записей: ${expenses.size}"
+                            val startDate =
+                                DateFormat.format("dd/MM/yyyy", filter.startPeriod).toString()
+                            val endDate =
+                                DateFormat.format("dd/MM/yyyy", filter.endPeriod).toString()
+                            actionMode?.subtitle = "c $startDate по $endDate"
+                        }
                     }
-                    is FilterForExpensesMap.DateRangeFilter -> {
-                        val actionMode =
-                            (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
-                        actionMode?.title = "Найдено записей: ${expenses.size}"
-                        val startDate =
-                            DateFormat.format("dd/MM/yyyy", filter.startPeriod).toString()
-                        val endDate = DateFormat.format("dd/MM/yyyy", filter.endPeriod).toString()
-                        actionMode?.subtitle = "c $startDate по $endDate"
+
+                    val centerLatitude =
+                        pointsLatitudeMin + ((pointsLatitudeMax - pointsLatitudeMin) / 2.0)
+                    val centerLongitude =
+                        pointsLongitudeMin + ((pointsLongitudeMax - pointsLongitudeMin) / 2.0)
+
+
+                    if (pointsLatitudeMax - pointsLatitudeMin == -360.0) {
+                        Snackbar.make(view, "Empty list points, show ALL", Snackbar.LENGTH_SHORT)
+                            .show()
+                        viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
                     }
+
+                    when {
+                        pointsLatitudeMax - pointsLatitudeMin > 360 -> mapController.setZoom(0.1)
+                        pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(1.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(2.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 45 -> mapController.setZoom(3.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 22.5 -> mapController.setZoom(4.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 11.25 -> mapController.setZoom(5.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 5.625 -> mapController.setZoom(6.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 2.813 -> mapController.setZoom(7.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 1.406 -> mapController.setZoom(8.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.703 -> mapController.setZoom(9.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.352 -> mapController.setZoom(10.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.176 -> mapController.setZoom(11.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(12.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(13.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
+                        else -> mapController.setZoom(15.0)
+                    }
+                    mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
                 }
-
-                val centerLatitude =
-                    pointsLatitudeMin + ((pointsLatitudeMax - pointsLatitudeMin) / 2.0)
-                val centerLongitude =
-                    pointsLongitudeMin + ((pointsLongitudeMax - pointsLongitudeMin) / 2.0)
-
-
-                if (pointsLatitudeMax - pointsLatitudeMin == -360.0) {
-                    Snackbar.make(view, "Empty list points, show ALL", Snackbar.LENGTH_SHORT)
-                        .show()
-                    viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
-                }
-
-                when {
-                    pointsLatitudeMax - pointsLatitudeMin > 360 -> mapController.setZoom(0.1)
-                    pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(1.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(2.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 45 -> mapController.setZoom(3.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 22.5 -> mapController.setZoom(4.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 11.25 -> mapController.setZoom(5.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 5.625 -> mapController.setZoom(6.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 2.813 -> mapController.setZoom(7.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 1.406 -> mapController.setZoom(8.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.703 -> mapController.setZoom(9.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.352 -> mapController.setZoom(10.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.176 -> mapController.setZoom(11.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(12.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(13.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
-                    else -> mapController.setZoom(15.0)
-                }
-                mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
             })
     }
 

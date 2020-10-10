@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.mainApplication
+import m.kampukter.travelexpenses.switchStatusGPS
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -51,12 +52,16 @@ class MainActivity : AppCompatActivity() {
         viewModel.savedSettings.observe(this, Observer {
             navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
                 it?.defCurrency != 0
+            if (switchStatusGPS != it?.statusGPS && it?.statusGPS != null) switchStatusGPS = it.statusGPS
+            navigation_view?.menu?.findItem(R.id.mapExpensesFragment)?.isVisible =
+                switchStatusGPS == 1
+
         })
         NetworkLiveData.observe(this, Observer {
             navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
                 it and (mainApplication.getActiveCurrencySession() != null)
-
-            navigation_view?.menu?.findItem(R.id.mapExpensesFragment)?.isVisible = it
+            navigation_view?.menu?.findItem(R.id.mapExpensesFragment)?.isVisible =
+                it && (switchStatusGPS == 1)
         })
 
     }

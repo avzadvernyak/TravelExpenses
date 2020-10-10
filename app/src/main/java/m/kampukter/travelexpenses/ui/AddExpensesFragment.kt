@@ -1,19 +1,32 @@
 package m.kampukter.travelexpenses.ui
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.app.ActivityCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
+import kotlinx.android.synthetic.main.add_expenses_fragment.currencyTextInputEdit
+import kotlinx.android.synthetic.main.add_expenses_fragment.expenseTextInputEdit
+import kotlinx.android.synthetic.main.add_expenses_fragment.noteTextInputEdit
+import kotlinx.android.synthetic.main.add_expenses_fragment.saveNewExpensesButton
+import kotlinx.android.synthetic.main.add_expenses_fragment.sumTextInputEdit
+import kotlinx.android.synthetic.main.test_add_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
+import m.kampukter.travelexpenses.data.MyLocation
+import m.kampukter.travelexpenses.switchStatusGPS
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.*
@@ -21,6 +34,22 @@ import java.util.*
 class AddExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private var myDropdownAdapter: MyArrayAdapter? = null
+
+    /*
+    Work with Location
+     */
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult ?: return
+            Log.d("blabla","locationResult ${locationResult.locations.last().longitude}")
+        }
+    }
+    private val locationRequest = LocationRequest.create()?.apply {
+        interval = 10000
+        fastestInterval = 5000
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +60,16 @@ class AddExpensesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        /*
+        Work with Location
+        */
+        if (switchStatusGPS  == 1) {
+            fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(view.context.applicationContext)
+            locationRequest?.let { LocationSettingsRequest.Builder().addLocationRequest(it) }
+            startLocationUpdates()
+        }
+
         val navController = findNavController()
 
         myDropdownAdapter =
@@ -140,5 +179,27 @@ class AddExpensesFragment : Fragment() {
         val imm =
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    }
+    /*
+    Work with Location
+    */
+    private fun startLocationUpdates() {
+        val context = requireContext()
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("blabla", "Permission no granted")
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
     }
 }
