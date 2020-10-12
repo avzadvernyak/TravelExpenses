@@ -30,31 +30,31 @@
                         android:id="@+id/title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Автоматическая конвертация" />
+                        android:text="@string/settings_currency_title" />
 
                 <RadioButton
                         android:id="@+id/offRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="отключено" />
+                        android:text="@string/settings_currency_item_off" />
 
                 <RadioButton
                         android:id="@+id/uahRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="в UAH (по курсу НБУ)" />
+                        android:text="@string/settings_currency_item_uah" />
 
                 <RadioButton
                         android:id="@+id/rubRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="в RUB (по курсу ЦРБ)" />
+                        android:text="@string/settings_currency_item_rub" />
 
                 <RadioButton
                         android:id="@+id/bynRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="в BYN (по курсу НБРБ)" />
+                        android:text="@string/settings_currency_item_byn" />
             </RadioGroup>
             <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/gpsSwitch"
@@ -66,7 +66,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:checked="false"
-                    android:text="Использовать GPS"/>
+                    android:text="@string/settings_gps"/>
 
             <RadioGroup
                     android:id="@+id/controlBackupRadioGroup"
@@ -80,31 +80,31 @@
                 <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Автосохранение" />
+                        android:text="@string/settings_backup_title" />
 
                 <RadioButton
                         android:id="@+id/withoutBackupRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="отключено" />
+                        android:text="@string/settings_backup_item_off" />
 
                 <RadioButton
                         android:id="@+id/halfDayRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="каждые 12 часов" />
+                        android:text="@string/settings_backup_item_12" />
 
                 <RadioButton
                         android:id="@+id/dayRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ежедневно" />
+                        android:text="@string/settings_backup_item_24" />
 
                 <RadioButton
                         android:id="@+id/weekRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="еженедельно" />
+                        android:text="@string/settings_backup_item_week" />
             </RadioGroup>
 
             <TextView

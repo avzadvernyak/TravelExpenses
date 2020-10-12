@@ -63,5 +63,16 @@
 
     <string name="dialog_location_access_required">"Получить разрешения на определение ваших координат? В случае отказа опция будет отключена"</string>
     <string name="dialog_permission_required">"Получение разрешений"</string>
+    <string name="settings_currency_title">Автоматическая конвертация</string>
+    <string name="settings_currency_item_off">отключено</string>
+    <string name="settings_currency_item_uah">в UAH (по курсу НБУ)</string>
+    <string name="settings_currency_item_rub">в RUB (по курсу ЦРБ)</string>
+    <string name="settings_currency_item_byn">в BYN (по курсу НБРБ)</string>
+    <string name="settings_gps">Использовать GPS</string>
+    <string name="settings_backup_title">Автосохранение</string>
+    <string name="settings_backup_item_off">отключено</string>
+    <string name="settings_backup_item_12">каждые 12 часов</string>
+    <string name="settings_backup_item_24">ежедневно</string>
+    <string name="settings_backup_item_week">еженедельно</string>
 
 </resources>
