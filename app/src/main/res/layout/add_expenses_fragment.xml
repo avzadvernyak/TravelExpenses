@@ -100,6 +100,81 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_gps_fixed_24"
+                android:id="@+id/gpsImageView"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/saveNewExpensesButton"
+                app:layout_constraintTop_toTopOf="@+id/saveNewExpensesButton"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/accuracyTextView"
+                android:visibility="invisible"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@+id/gpsImageView"
+                android:layout_marginStart="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/saveNewExpensesButton"
+                app:layout_constraintTop_toTopOf="@+id/saveNewExpensesButton"
+                />
+
+        <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/gpsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_gps_fixed_24"
+                android:visibility="invisible"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/noteTextInputLayout"
+
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="16dp"/>
+        <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/gpsOffButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_gps_off_24"
+                android:text="GPS Off"
+                android:visibility="invisible"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/noteTextInputLayout"
+
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/saveNewGpsOffButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cornerRadius="16dp"
+                android:text="@string/dialog_save"
+                app:icon="@drawable/ic_gps_off_24"
+                android:visibility="invisible"
+
+                android:enabled="false"
+
+                app:layout_constraintEnd_toStartOf="@id/saveNewExpensesButton"
+                app:layout_constraintTop_toBottomOf="@id/noteTextInputLayout"
+
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"/>
+
         <com.google.android.material.button.MaterialButton
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:id="@+id/saveNewExpensesButton"

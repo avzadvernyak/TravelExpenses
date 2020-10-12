@@ -52,13 +52,6 @@
         </item>
     </group>
 
-
-    <item
-            android:id="@id/testAddExpenseFragment"
-            android:title="Test" />
-    <item
-            android:id="@id/testMapFragment"
-            android:title="Map" />
 </menu>
 
 

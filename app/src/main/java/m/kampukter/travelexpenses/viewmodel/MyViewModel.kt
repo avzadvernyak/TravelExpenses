@@ -203,6 +203,27 @@ class MyViewModel(
 
     val savedSettings = expensesRepository.getSettingsLiveData()
 
+    private val settingStatusGPS = MutableLiveData<Int>()
+    fun setSettingStatusGPS(status: Int){
+        settingStatusGPS.postValue(status)
+    }
+    val savedSettingsLiveData = MediatorLiveData<Settings>().apply {
+        var lastSettings: Settings? = null
+        addSource(savedSettings) {
+            if (it != null) lastSettings = it
+            postValue(it)
+        }
+        addSource(settingStatusGPS) { statusGps ->
+            lastSettings?.let {
+                viewModelScope.launch {
+                    expensesRepository.insertSettings(
+                        it.copy(statusGPS = statusGps)
+                    )
+                }
+            }
+        }
+    }
+
     fun startBackup(periodic: Periodic) {
         expensesRepository.startBackupWorker(periodic)
     }

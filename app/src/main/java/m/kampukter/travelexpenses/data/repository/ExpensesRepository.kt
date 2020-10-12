@@ -195,6 +195,4 @@ class ExpensesRepository(
 
     fun getFoundDate() = foundDate
 
-    suspend fun getExpensesForMap() = expensesDao.getAllExpenses()
-
 }

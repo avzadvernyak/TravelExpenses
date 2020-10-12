@@ -2,7 +2,6 @@ package m.kampukter.travelexpenses.ui.map
 
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -63,8 +62,6 @@ class MapExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //(activity as? AppCompatActivity)?.setSupportActionBar(toolbar)
-
         Configuration.getInstance()
             .load(view.context, PreferenceManager.getDefaultSharedPreferences(view.context))
 
@@ -85,8 +82,8 @@ class MapExpensesFragment : Fragment() {
         }
         viewModel.expensesForMapMutableLiveData.observe(
             viewLifecycleOwner,
-            Observer { resObserver ->
-                val expenses = resObserver.first
+            Observer { expensesAndFilter ->
+                val expenses = expensesAndFilter.first
                 mapMapView.overlays.clear()
 
                 var pointsLongitudeMax: Double = -90.0
@@ -133,9 +130,14 @@ class MapExpensesFragment : Fragment() {
                         mapMapView.overlays.add(myMarker)
                     }
                 }
+                /* Текущее положение устройства на карте
+                 val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), mapMapView)
+                 myLocationOverlay.enableMyLocation()
+                 mapMapView.overlays.add(myLocationOverlay)
+                 */
                 if (count != 0) {
 
-                    when (val filter = resObserver.second) {
+                    when (val filter = expensesAndFilter.second) {
                         is FilterForExpensesMap.ExpenseFilter -> {
                             val actionMode =
                                 (context as AppCompatActivity).startSupportActionMode(
@@ -150,7 +152,7 @@ class MapExpensesFragment : Fragment() {
                                 (context as AppCompatActivity).startSupportActionMode(
                                     actionModeCallback
                                 )
-                            actionMode?.title = "Найдено записей: ${expenses.size}"
+                            actionMode?.title = "Найдено записей: $count"
                             val startDate =
                                 DateFormat.format("dd/MM/yyyy", filter.startPeriod).toString()
                             val endDate =
@@ -190,7 +192,14 @@ class MapExpensesFragment : Fragment() {
                         else -> mapController.setZoom(15.0)
                     }
                     mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
+                } else {
+                    if (expensesAndFilter.second != FilterForExpensesMap.All && expensesAndFilter.second != null) {
+                        viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
+                        Snackbar.make(mapMapView, "Нет записей по фильтру", Snackbar.LENGTH_SHORT)
+                            .show()
+                    }
                 }
+
             })
     }
 
@@ -217,9 +226,9 @@ class MapExpensesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.pointsDateFilter -> {
-                Log.d("blabla", "DateFilter")
+                //Log.d("blabla", "DateFilter")
                 val pickerRange = MaterialDatePicker.Builder.dateRangePicker().build()
-                fragmentManager?.let { pickerRange.show(it, "Picker") }
+                pickerRange.show(parentFragmentManager, "Picker")
                 pickerRange.addOnPositiveButtonClickListener { dateSelected ->
                     val start = DateFormat.format("yyyyMMdd", dateSelected.first).toString()
                     val startLong =

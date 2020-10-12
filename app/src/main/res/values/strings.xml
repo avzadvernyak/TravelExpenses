@@ -61,5 +61,7 @@
     <string name="errorAPI">Ошибка связи с банком. \nПопробуйте позже.</string>
     <string name="map_expenses_button_all">Все</string>
 
+    <string name="dialog_location_access_required">"Получить разрешения на определение ваших координат? В случае отказа опция будет отключена"</string>
+    <string name="dialog_permission_required">"Получение разрешений"</string>
 
 </resources>

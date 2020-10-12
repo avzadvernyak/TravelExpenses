@@ -42,7 +42,6 @@
         <action
                 android:id="@+id/toAboutDialogFragment"
                 app:destination="@+id/aboutDialogFragment" />
-
     </fragment>
     <dialog
             android:id="@+id/aboutDialogFragment"
@@ -60,6 +59,9 @@
         <action
                 android:id="@+id/toChoiceExpenseForAddFragment"
                 app:destination="@id/choiceExpenseForAddFragment" />
+        <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
@@ -98,6 +100,11 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
+
+    <dialog
+            android:id="@+id/locationPermissionsDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.LocationPermissionsDialogFragment" />
+
     <fragment
             android:id="@+id/expenseFragment"
             android:name="m.kampukter.travelexpenses.ui.expense.ExpenseFragment"
@@ -238,28 +245,6 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/mapExpensesFragment" />
 
-    </fragment>
-
-    <!--                  Test                      -->
-    <fragment
-            android:id="@+id/testAddExpenseFragment"
-            android:name="m.kampukter.travelexpenses.ui.test.TestAddExpenseFragment"
-            android:label="Test">
-        <action
-                android:id="@+id/toChoiceExpenseForAddFragment"
-                app:destination="@id/choiceExpenseForAddFragment" />
-        <action
-                android:id="@+id/next_action"
-                app:popUpTo="@id/homeExpensesFragment" />
-    </fragment>
-    <fragment
-            android:id="@+id/testMapFragment"
-            android:name="m.kampukter.travelexpenses.ui.test.MapFragment"
-            android:label="Map">
-
-        <action
-                android:id="@+id/next_action"
-                app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
 
 </navigation>

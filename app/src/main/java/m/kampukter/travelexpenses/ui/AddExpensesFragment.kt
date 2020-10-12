@@ -1,48 +1,50 @@
 package m.kampukter.travelexpenses.ui
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
-import kotlinx.android.synthetic.main.add_expenses_fragment.currencyTextInputEdit
-import kotlinx.android.synthetic.main.add_expenses_fragment.expenseTextInputEdit
-import kotlinx.android.synthetic.main.add_expenses_fragment.noteTextInputEdit
-import kotlinx.android.synthetic.main.add_expenses_fragment.saveNewExpensesButton
-import kotlinx.android.synthetic.main.add_expenses_fragment.sumTextInputEdit
-import kotlinx.android.synthetic.main.test_add_expenses_fragment.*
+import m.kampukter.travelexpenses.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.data.MyLocation
-import m.kampukter.travelexpenses.switchStatusGPS
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.*
 
 class AddExpensesFragment : Fragment() {
+
     private val viewModel by sharedViewModel<MyViewModel>()
     private var myDropdownAdapter: MyArrayAdapter? = null
 
     /*
     Work with Location
      */
+    private var lastLocationResult: Location? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
-            Log.d("blabla","locationResult ${locationResult.locations.last().longitude}")
+            accuracyTextView.visibility = View.VISIBLE
+            gpsImageView.visibility = View.VISIBLE
+            accuracyTextView.text = locationResult.locations.last().accuracy.toInt().toString()
+
+            //gpsButton.visibility = View.VISIBLE
+
+            //gpsButton.text = locationResult.locations.last().accuracy.toString()
+            lastLocationResult = locationResult.locations.last()
         }
     }
     private val locationRequest = LocationRequest.create()?.apply {
@@ -60,17 +62,58 @@ class AddExpensesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val navController = findNavController()
+
         /*
         Work with Location
         */
-        if (switchStatusGPS  == 1) {
-            fusedLocationClient =
-                LocationServices.getFusedLocationProviderClient(view.context.applicationContext)
-            locationRequest?.let { LocationSettingsRequest.Builder().addLocationRequest(it) }
-            startLocationUpdates()
-        }
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(view.context.applicationContext)
+        viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, Observer { settings ->
+            if (settings.statusGPS == STATUS_GPS_ON) {
 
-        val navController = findNavController()
+                locationRequest?.let { LocationSettingsRequest.Builder().addLocationRequest(it) }
+                val isLocationPermission = permissionsForLocation.all {
+                    ContextCompat.checkSelfPermission(
+                        view.context,
+                        it
+                    ) == PackageManager.PERMISSION_GRANTED
+                }
+                if (isLocationPermission) fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                ) else {
+                    //Log.d("blabla", "Permission no granted")
+                    viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
+                    navController.navigate(R.id.toLocationPermissionsDialogFragment)
+                }
+                /*saveNewExpensesButton.icon = resources.getDrawable(R.drawable.ic_gps_fixed_24, null)
+                gpsButton.setOnClickListener {
+                    gpsButton.visibility = View.INVISIBLE
+                    fusedLocationClient.removeLocationUpdates(locationCallback)
+                    lastLocationResult = null
+                    //gpsOffButton.visibility = View.VISIBLE
+                }
+                gpsOffButton.setOnClickListener {
+                    gpsOffButton.visibility = View.INVISIBLE
+                    fusedLocationClient.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
+                    //gpsButton.visibility = View.VISIBLE
+                }*/
+            } else {
+                fusedLocationClient.removeLocationUpdates(locationCallback)
+                lastLocationResult = null
+                //gpsButton.visibility = View.INVISIBLE
+                //gpsOffButton.visibility = View.INVISIBLE
+
+            }
+        })
+
+
 
         myDropdownAdapter =
             context?.let {
@@ -106,6 +149,22 @@ class AddExpensesFragment : Fragment() {
                                 location = null
                             )
                         )
+                    } else {
+                        val defaultCurrency = when (mainApplication.getActiveCurrencySession()) {
+                            DEFAULT_CURRENCY_CONST_RUB -> "RUB"
+                            DEFAULT_CURRENCY_CONST_BYN -> "BYN"
+                            else -> "UAH"
+                        }
+                        viewModel.setBufferExpenses(
+                            Expenses(
+                                dateTime = Calendar.getInstance().time,
+                                sum = 0.0,
+                                currency = defaultCurrency,
+                                expense = "",
+                                note = "",
+                                location = null
+                            )
+                        )
                     }
                 }
             } else {
@@ -123,7 +182,7 @@ class AddExpensesFragment : Fragment() {
                 )
             }
 
-            sumTextInputEdit.doOnTextChanged { text, p1, p2, p3 ->
+            sumTextInputEdit.doOnTextChanged { text, _, _, _ ->
                 val inputString = text.toString()
                 if (inputString.length == 1 && inputString == ".") {
                     sumTextInputEdit.setText("0.")
@@ -143,7 +202,7 @@ class AddExpensesFragment : Fragment() {
                         viewModel.resetDef()
                         viewModel.setDefCurrency(newValue)
                         viewModel.setBufferExpenses(tempExpenses?.copy(currency = newValue))
-                    } else Log.d("blablabla", "Не сохраняем")
+                    } //else Log.d("blablabla", "Не сохраняем")
                 }
             }
             tempExpenses?.currency.let {
@@ -160,6 +219,15 @@ class AddExpensesFragment : Fragment() {
             _isSavingAllowed?.let { saveNewExpensesButton.isEnabled = it }
         })
         saveNewExpensesButton.setOnClickListener {
+            lastLocationResult?.let { lastLocation ->
+                viewModel.setBufferExpensesLocation(
+                    location = MyLocation(
+                        accuracy = lastLocation.accuracy,
+                        latitude = lastLocation.latitude,
+                        longitude = lastLocation.longitude
+                    )
+                )
+            }
             viewModel.saveNewExpenses()
             //сброс временной переменной
             viewModel.setBufferExpenses(null)
@@ -172,34 +240,16 @@ class AddExpensesFragment : Fragment() {
         expenseTextInputEdit.setOnClickListener {
             navController.navigate(R.id.toChoiceExpenseForAddFragment)
         }
+    }
 
+    override fun onPause() {
+        super.onPause()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     private fun hideSystemKeyboard() {
         val imm =
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
-    }
-    /*
-    Work with Location
-    */
-    private fun startLocationUpdates() {
-        val context = requireContext()
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.d("blabla", "Permission no granted")
-            return
-        }
-        fusedLocationClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
     }
 }

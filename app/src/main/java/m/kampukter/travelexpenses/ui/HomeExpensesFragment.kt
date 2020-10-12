@@ -3,6 +3,7 @@ package m.kampukter.travelexpenses.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,8 +67,12 @@ class HomeExpensesFragment : Fragment() {
             expensesAdapter.setList(it)
         })
         viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, Observer {
-            /*Snackbar.make(view, getString(R.string.expenses_del_record), Snackbar.LENGTH_SHORT)
-                .show()*/
+            if (!it) Snackbar.make(
+                view,
+                getString(R.string.expenses_del_record),
+                Snackbar.LENGTH_SHORT
+            )
+                .show()
         })
         addExpensesFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
     }
