@@ -14,26 +14,6 @@ class LocationPermissionsDialogFragment : DialogFragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
 
-    /*override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val context = requireContext()
-        return MaterialAlertDialogBuilder(context)
-            .setTitle("Получение разрешений")
-            .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
-                ActivityCompat.requestPermissions(
-                    activity as Activity,
-                    permissionsForLocation,
-                    1
-                )
-                dialog.dismiss()
-            }
-            .setNegativeButton(resources.getString(R.string.dialog_cancel)) { dialog, _ ->
-                viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
-                dialog.dismiss()
-            }
-            .setMessage("А давайте получим разрешения")
-            .create()
-
-    }*/
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         context?.let { context ->
             return MaterialAlertDialogBuilder(context)

@@ -32,7 +32,7 @@ class ChoiceExpenseForMapFragment: Fragment() {
 
         val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
-        expenseAdapter = ExpenseChoiceAdapter(){ item->
+        expenseAdapter = ExpenseChoiceAdapter{ item->
             viewModel.setFilterForExpensesMap(FilterForExpensesMap.ExpenseFilter(item.name))
             findNavController().navigate(R.id.next_action)
         }
