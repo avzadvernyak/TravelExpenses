@@ -189,7 +189,9 @@ class MapExpensesFragment : Fragment() {
                         pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(12.0)
                         pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(13.0)
                         pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
-                        else -> mapController.setZoom(15.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.011 -> mapController.setZoom(15.0)
+                        pointsLatitudeMax - pointsLatitudeMin > 0.0055 -> mapController.setZoom(16.0)
+                        else -> mapController.setZoom(17.0)
                     }
                     mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
                 } else {

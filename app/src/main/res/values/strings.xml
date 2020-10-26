@@ -20,8 +20,9 @@
     <string name="nav_label_settings">Настройки</string>
     <string name="nav_label_expense">Статьи</string>
     <string name="nav_label_edit_expense">Редактировать статью</string>
-    <string name="nav_label_sum_expense">Итоги по статьям</string>
-    <string name="nav_label_sum_currency">Итоги по валютам</string>
+    <string name="nav_label_sum">Итоги</string>
+    <string name="nav_label_sum_expense">по статьям</string>
+    <string name="nav_label_sum_currency">по валютам</string>
     <string name="nav_label_exchange">Курсы валют</string>
     <string name="nav_label_expense_choice">Выберите статью</string>
     <string name="nav_label_export">Экспорт</string>
@@ -74,5 +75,13 @@
     <string name="settings_backup_item_12">каждые 12 часов</string>
     <string name="settings_backup_item_24">ежедневно</string>
     <string name="settings_backup_item_week">еженедельно</string>
+    <string name="menu_map_date_filter">Показать все за дату</string>
+    <string name="menu_map_date_filter_title">По дате</string>
+    <string name="menu_map_expense_filter">Показать все точки по статье</string>
+    <string name="menu_map_expense_filter_title">По статье</string>
+    <string name="menu_save">Сохранить запись</string>
+    <string name="menu_save_title">Сохранить</string>
+
+    <string name="accuracy_value">%1$d m.</string>
 
 </resources>

@@ -5,14 +5,13 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
@@ -29,6 +28,7 @@ class AddExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private var myDropdownAdapter: MyArrayAdapter? = null
 
+    private lateinit var  navController: NavController
     /*
     Work with Location
      */
@@ -39,7 +39,7 @@ class AddExpensesFragment : Fragment() {
             locationResult ?: return
             accuracyTextView.visibility = View.VISIBLE
             gpsImageView.visibility = View.VISIBLE
-            accuracyTextView.text = locationResult.locations.last().accuracy.toInt().toString()
+            accuracyTextView.text = getString(R.string.accuracy_value,locationResult.locations.last().accuracy.toInt())
 
             //gpsButton.visibility = View.VISIBLE
 
@@ -58,11 +58,13 @@ class AddExpensesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.add_expenses_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val navController = findNavController()
+
+        navController = findNavController()
 
         /*
         Work with Location
@@ -215,7 +217,7 @@ class AddExpensesFragment : Fragment() {
             }
 
         })
-        viewModel.isSavingAllowed.observe(viewLifecycleOwner, Observer { _isSavingAllowed ->
+        /*viewModel.isSavingAllowed.observe(viewLifecycleOwner, Observer { _isSavingAllowed ->
             _isSavingAllowed?.let { saveNewExpensesButton.isEnabled = it }
         })
         saveNewExpensesButton.setOnClickListener {
@@ -236,7 +238,7 @@ class AddExpensesFragment : Fragment() {
             viewModel.setDefCurrency(currencyTextInputEdit.text.toString())
             hideSystemKeyboard()
             navController.navigate(R.id.next_action)
-        }
+        }*/
         expenseTextInputEdit.setOnClickListener {
             navController.navigate(R.id.toChoiceExpenseForAddFragment)
         }
@@ -245,6 +247,40 @@ class AddExpensesFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.add_expenses, menu)
+
+        viewModel.isSavingAllowed.observe(viewLifecycleOwner, Observer { _isSavingAllowed ->
+            _isSavingAllowed?.let { menu.findItem(R.id.saveExpenses).isEnabled = it }
+        })
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.saveExpenses){
+            lastLocationResult?.let { lastLocation ->
+                viewModel.setBufferExpensesLocation(
+                    location = MyLocation(
+                        accuracy = lastLocation.accuracy,
+                        latitude = lastLocation.latitude,
+                        longitude = lastLocation.longitude
+                    )
+                )
+            }
+            viewModel.saveNewExpenses()
+            //сброс временной переменной
+            viewModel.setBufferExpenses(null)
+            //установка сохраняемой валюты как по умолчанию
+            viewModel.resetDef()
+            viewModel.setDefCurrency(currencyTextInputEdit.text.toString())
+            hideSystemKeyboard()
+            navController.navigate(R.id.next_action)
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun hideSystemKeyboard() {

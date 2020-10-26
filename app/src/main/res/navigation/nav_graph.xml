@@ -28,11 +28,8 @@
                 android:id="@+id/toExpenseFragment"
                 app:destination="@+id/expenseFragment" />
         <action
-                android:id="@+id/toSumExpenseFragment"
-                app:destination="@+id/sumExpenseFragment" />
-        <action
-                android:id="@+id/toSumCurrencyFragment"
-                app:destination="@+id/sumCurrencyFragment" />
+                android:id="@+id/toSumFragment"
+                app:destination="@+id/sumFragment" />
         <action
                 android:id="@+id/toCurrentExchangeFragment"
                 app:destination="@+id/currentExchangeFragment" />
@@ -164,25 +161,17 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/currentExchangeFragment" />
     </dialog>
+    <fragment
+            android:id="@+id/sumFragment"
+            android:name="m.kampukter.travelexpenses.ui.SumFragment"
+            android:label="@string/nav_label_sum"
+            tools:layout="@layout/sum_fragment">
 
-    <fragment
-            android:id="@+id/sumExpenseFragment"
-            android:name="m.kampukter.travelexpenses.ui.SumExpenseFragment"
-            android:label="@string/nav_label_sum_expense"
-            tools:layout="@layout/sum_viewing_fragment">
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
-    <fragment
-            android:id="@+id/sumCurrencyFragment"
-            android:name="m.kampukter.travelexpenses.ui.SumCurrencyFragment"
-            android:label="@string/nav_label_sum_currency"
-            tools:layout="@layout/sum_viewing_fragment">
-        <action
-                android:id="@+id/next_action"
-                app:popUpTo="@id/homeExpensesFragment" />
-    </fragment>
+
     <fragment
             android:id="@+id/currentExchangeFragment"
             android:name="m.kampukter.travelexpenses.ui.CurrentExchangeFragment"

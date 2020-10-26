@@ -24,6 +24,10 @@
                 android:icon="@drawable/ic_map_24"
                 android:title="@string/menu_map" />
         <item
+                android:id="@id/sumFragment"
+                android:icon="@drawable/ic_functions_24"
+                android:title="@string/menu_sum_expenses" />
+        <item
                 android:id="@id/delAllExpensesDialogFragment"
                 android:icon="@drawable/ic_delete_forever_black"
                 android:title="@string/menu_clear_expenses" />
@@ -36,20 +40,6 @@
                 android:icon="@drawable/ic_info_24"
                 android:title="@string/menu_about" />
 
-    </group>
-    <group>
-        <item android:title="@string/menu_sum_expenses">
-            <menu>
-                <item
-                        android:id="@id/sumExpenseFragment"
-                        android:icon="@drawable/ic_functions_24"
-                        android:title="@string/menu_sum_expense" />
-                <item
-                        android:id="@+id/sumCurrencyFragment"
-                        android:icon="@drawable/ic_expenses"
-                        android:title="@string/menu_sum_currency" />
-            </menu>
-        </item>
     </group>
 
 </menu>
