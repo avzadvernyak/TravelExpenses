@@ -10,15 +10,16 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
-import m.kampukter.travelexpenses.*
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
+import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.data.MyLocation
+import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.*
@@ -28,7 +29,8 @@ class AddExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private var myDropdownAdapter: MyArrayAdapter? = null
 
-    private lateinit var  navController: NavController
+    private lateinit var navController: NavController
+
     /*
     Work with Location
      */
@@ -39,11 +41,9 @@ class AddExpensesFragment : Fragment() {
             locationResult ?: return
             accuracyTextView.visibility = View.VISIBLE
             gpsImageView.visibility = View.VISIBLE
-            accuracyTextView.text = getString(R.string.accuracy_value,locationResult.locations.last().accuracy.toInt())
+            accuracyTextView.text =
+                getString(R.string.accuracy_value, locationResult.locations.last().accuracy.toInt())
 
-            //gpsButton.visibility = View.VISIBLE
-
-            //gpsButton.text = locationResult.locations.last().accuracy.toString()
             lastLocationResult = locationResult.locations.last()
         }
     }
@@ -71,7 +71,7 @@ class AddExpensesFragment : Fragment() {
         */
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(view.context.applicationContext)
-        viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, Observer { settings ->
+        viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, { settings ->
             if (settings.statusGPS == STATUS_GPS_ON) {
 
                 locationRequest?.let { LocationSettingsRequest.Builder().addLocationRequest(it) }
@@ -90,28 +90,10 @@ class AddExpensesFragment : Fragment() {
                     viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
                     navController.navigate(R.id.toLocationPermissionsDialogFragment)
                 }
-                /*saveNewExpensesButton.icon = resources.getDrawable(R.drawable.ic_gps_fixed_24, null)
-                gpsButton.setOnClickListener {
-                    gpsButton.visibility = View.INVISIBLE
-                    fusedLocationClient.removeLocationUpdates(locationCallback)
-                    lastLocationResult = null
-                    //gpsOffButton.visibility = View.VISIBLE
-                }
-                gpsOffButton.setOnClickListener {
-                    gpsOffButton.visibility = View.INVISIBLE
-                    fusedLocationClient.requestLocationUpdates(
-                        locationRequest,
-                        locationCallback,
-                        Looper.getMainLooper()
-                    )
-                    //gpsButton.visibility = View.VISIBLE
-                }*/
+
             } else {
                 fusedLocationClient.removeLocationUpdates(locationCallback)
                 lastLocationResult = null
-                //gpsButton.visibility = View.INVISIBLE
-                //gpsOffButton.visibility = View.INVISIBLE
-
             }
         })
 
@@ -123,7 +105,7 @@ class AddExpensesFragment : Fragment() {
             }
         currencyTextInputEdit?.setAdapter(myDropdownAdapter)
         sumTextInputEdit.setText("")
-        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, Observer { value ->
+        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
 
             value.second?.let { list -> myDropdownAdapter?.addAll(list.map { it.name }) }
 
@@ -217,28 +199,6 @@ class AddExpensesFragment : Fragment() {
             }
 
         })
-        /*viewModel.isSavingAllowed.observe(viewLifecycleOwner, Observer { _isSavingAllowed ->
-            _isSavingAllowed?.let { saveNewExpensesButton.isEnabled = it }
-        })
-        saveNewExpensesButton.setOnClickListener {
-            lastLocationResult?.let { lastLocation ->
-                viewModel.setBufferExpensesLocation(
-                    location = MyLocation(
-                        accuracy = lastLocation.accuracy,
-                        latitude = lastLocation.latitude,
-                        longitude = lastLocation.longitude
-                    )
-                )
-            }
-            viewModel.saveNewExpenses()
-            //сброс временной переменной
-            viewModel.setBufferExpenses(null)
-            //установка сохраняемой валюты как по умолчанию
-            viewModel.resetDef()
-            viewModel.setDefCurrency(currencyTextInputEdit.text.toString())
-            hideSystemKeyboard()
-            navController.navigate(R.id.next_action)
-        }*/
         expenseTextInputEdit.setOnClickListener {
             navController.navigate(R.id.toChoiceExpenseForAddFragment)
         }
@@ -253,14 +213,14 @@ class AddExpensesFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.add_expenses, menu)
 
-        viewModel.isSavingAllowed.observe(viewLifecycleOwner, Observer { _isSavingAllowed ->
+        viewModel.isSavingAllowed.observe(viewLifecycleOwner, { _isSavingAllowed ->
             _isSavingAllowed?.let { menu.findItem(R.id.saveExpenses).isEnabled = it }
         })
 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.saveExpenses){
+        if (item.itemId == R.id.saveExpenses) {
             lastLocationResult?.let { lastLocation ->
                 viewModel.setBufferExpensesLocation(
                     location = MyLocation(

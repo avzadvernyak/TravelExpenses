@@ -71,7 +71,7 @@ class MapExpensesFragment : Fragment() {
 
         val mapController = mapMapView.controller
 
-        viewModel.paramMapViewLiveData.observe(viewLifecycleOwner, Observer {
+        viewModel.paramMapViewLiveData.observe(viewLifecycleOwner, {
             firstStart = false
             mapController.setZoom(it.first)
             mapController.setCenter(it.second)
@@ -82,7 +82,7 @@ class MapExpensesFragment : Fragment() {
         }
         viewModel.expensesForMapMutableLiveData.observe(
             viewLifecycleOwner,
-            Observer { expensesAndFilter ->
+            { expensesAndFilter ->
                 val expenses = expensesAndFilter.first
                 mapMapView.overlays.clear()
 
