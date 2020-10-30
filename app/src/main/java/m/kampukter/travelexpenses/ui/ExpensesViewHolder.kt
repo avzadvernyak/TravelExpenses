@@ -32,7 +32,7 @@ class ExpensesViewHolder(
             currencyTextView.text = result.currency
             noteTextView.text = result.note
             dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", result.dateTime)
-            val pattern = when (defaultProgramCurrency ){
+            val pattern = when (defaultProgramCurrency) {
                 // Гривна по умолчанию
                 DEFAULT_CURRENCY_CONST_UAH -> "######.## UAH"
                 // Рубль по умолчению
@@ -41,7 +41,9 @@ class ExpensesViewHolder(
                 DEFAULT_CURRENCY_CONST_BYN -> "####.#### BYN"
                 else -> "######.##"
             }
-            result.rate?.let { rateTextView.text = DecimalFormat( pattern ).format(result.sum * it) }
+            result.rate?.let { rateTextView.text = DecimalFormat(pattern).format(result.sum * it) }
+            attachmentImageView.visibility =
+                if (result.imageUri == null) View.INVISIBLE else View.VISIBLE
         }
     }
 }

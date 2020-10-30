@@ -7,13 +7,16 @@ import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.dto.BackupServer
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
+import m.kampukter.travelexpenses.data.repository.FSRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.mainApplication
 import org.osmdroid.util.GeoPoint
+import java.io.File
 import java.util.*
 
 class MyViewModel(
-    private val expensesRepository: ExpensesRepository
+    private val expensesRepository: ExpensesRepository,
+    private val fileSystemRepository: FSRepository
 ) : ViewModel() {
 
     /*
@@ -204,9 +207,10 @@ class MyViewModel(
     val savedSettings = expensesRepository.getSettingsLiveData()
 
     private val settingStatusGPS = MutableLiveData<Int>()
-    fun setSettingStatusGPS(status: Int){
+    fun setSettingStatusGPS(status: Int) {
         settingStatusGPS.postValue(status)
     }
+
     val savedSettingsLiveData = MediatorLiveData<Settings>().apply {
         var lastSettings: Settings? = null
         addSource(savedSettings) {
@@ -254,8 +258,8 @@ class MyViewModel(
         }
     }
 
-    val isSavingAllowed = MutableLiveData<Boolean?>(false)
-    private val isSaveNewExpenses = MutableLiveData<Boolean>(false)
+    val isSavingAllowed = MutableLiveData<Boolean?>()
+    private val isSaveNewExpenses = MutableLiveData<Boolean>()
 
     fun saveNewExpenses() {
         isSaveNewExpenses.postValue(true)
@@ -264,6 +268,11 @@ class MyViewModel(
     private val bufferForSaveExpenseLocation = MutableLiveData<MyLocation?>()
     fun setBufferExpensesLocation(location: MyLocation) {
         bufferForSaveExpenseLocation.postValue(location)
+    }
+
+    private val bufferForSaveExpensePhoto = MutableLiveData<String?>()
+    fun setBufferExpensesPhoto(file: String?) {
+        bufferForSaveExpensePhoto.postValue(file)
     }
 
 
@@ -287,6 +296,11 @@ class MyViewModel(
                 if (it) lastExpenses?.let { _expenses ->
                     viewModelScope.launch {
                         expensesRepository.addExpenses(_expenses)
+
+                        //установка сохраняемой валюты как по умолчанию
+                        expensesRepository.resetDef()
+                        expensesRepository.setDefCurrency(_expenses.currency)
+
                         isSaveNewExpenses.postValue(false)
                     }
                 }
@@ -297,6 +311,10 @@ class MyViewModel(
                     lastExpenses = lastExpenses?.copy(location = it)
                     postValue(Pair(lastExpenses, currencyList))
                 }
+            }
+            addSource(bufferForSaveExpensePhoto) {
+                lastExpenses = lastExpenses?.copy(imageUri = it)
+                postValue(Pair(lastExpenses, currencyList))
             }
         }
 
@@ -374,4 +392,7 @@ class MyViewModel(
     fun setFilterForExpensesMap(filter: FilterForExpensesMap) {
         filterForExpensesMap.postValue(filter)
     }
+
+    fun createJPGFile() = fileSystemRepository.createJPGFile()
+    fun deleteFile(file: File) = fileSystemRepository.deleteFile(file)
 }

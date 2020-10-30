@@ -9,6 +9,11 @@
             android:label="@string/nav_label_expenses"
             app:startDestination="@id/toAddExpensesFragment"
             tools:layout="@layout/home_expenses_fragment">
+
+        <action
+                android:id="@+id/toAddExpensesWithImageFragment"
+                app:destination="@+id/addExpensesWithImageFragment" />
+
         <action
                 android:id="@+id/toAddExpensesFragment"
                 app:destination="@+id/addExpensesFragment" />
@@ -60,8 +65,22 @@
                 android:id="@+id/toLocationPermissionsDialogFragment"
                 app:destination="@id/locationPermissionsDialogFragment" />
         <action
+                android:id="@+id/toCameraXFragment"
+                app:destination="@id/cameraXFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/cameraXFragment"
+            android:name="m.kampukter.travelexpenses.ui.CameraXFragment"
+            >
+        <action
+                android:id="@+id/toCameraPermissionsDialogFragment"
+                app:destination="@id/cameraPermissionsDialogFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/addExpensesFragment" />
     </fragment>
     <fragment
             android:id="@+id/editExpensesFragment"
@@ -102,6 +121,9 @@
             android:id="@+id/locationPermissionsDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.LocationPermissionsDialogFragment" />
 
+    <dialog
+            android:id="@+id/cameraPermissionsDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.CameraPermissionsDialogFragment" />
     <fragment
             android:id="@+id/expenseFragment"
             android:name="m.kampukter.travelexpenses.ui.expense.ExpenseFragment"

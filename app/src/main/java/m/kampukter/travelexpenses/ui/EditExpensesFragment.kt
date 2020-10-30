@@ -1,6 +1,7 @@
 package m.kampukter.travelexpenses.ui
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
@@ -9,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.edit_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
@@ -31,12 +32,23 @@ class EditExpensesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        myDropdownAdapter = MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
+        myDropdownAdapter =
+            MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
         currencyTextInputEdit?.setAdapter(myDropdownAdapter)
 
-        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, Observer { value ->
+        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, { value ->
             value.first?.let { expenses ->
+
+                if (expenses.imageUri != null) {
+                    attachmentImageView.visibility = View.VISIBLE
+                    Glide.with(view).load(Uri.parse(expenses.imageUri))
+                        .placeholder(R.drawable.ic_photo_24)
+                        .into(attachmentImageView)
+                } else attachmentImageView.visibility = View.INVISIBLE
+
+
                 sumTextInputEdit.setText(expenses.sum.toString())
                 dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
                 expenseTextInputEdit.setText(expenses.expense)

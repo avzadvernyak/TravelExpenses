@@ -3,6 +3,8 @@ package m.kampukter.travelexpenses.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -25,6 +27,12 @@ const val STATUS_GPS_ON = 1
 const val STATUS_GPS_OFF = 0
 
 const val PERMISSION_REQUEST_GPS = 1
+const val PERMISSION_REQUEST_CAMERA = 2
+
+val permissionsForCamera = arrayOf(
+    Manifest.permission.CAMERA,
+    Manifest.permission.READ_EXTERNAL_STORAGE
+)
 
 // Разрешения для работы с локацией
 //    пока не реализовано Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -52,6 +60,14 @@ class MainActivity : AppCompatActivity() {
 
         // Set up Action Bar
         val navController = host.navController
+
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.cameraXFragment -> toolbar.visibility = View.GONE
+                else -> toolbar.visibility = View.VISIBLE
+            }
+        }
 
         appBarConfiguration =
             if (drawer_layout != null) AppBarConfiguration(navController.graph, drawer_layout)
@@ -104,6 +120,17 @@ class MainActivity : AppCompatActivity() {
                     )
                         .show()
                     viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
+                }
+            }
+            PERMISSION_REQUEST_CAMERA -> {
+                if (grantResults.all { it != PackageManager.PERMISSION_GRANTED }) {
+
+                    Snackbar.make(
+                        drawer_layout,
+                        "Запрошенные разрешения не получены.",
+                        Snackbar.LENGTH_SHORT
+                    )
+                        .show()
                 }
             }
         }

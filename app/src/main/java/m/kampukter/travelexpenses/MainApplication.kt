@@ -11,10 +11,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
-import m.kampukter.travelexpenses.data.dto.BackupServer
-import m.kampukter.travelexpenses.data.dto.FirebaseBackupServer
-import m.kampukter.travelexpenses.data.dto.RateCurrencyAPI
+import m.kampukter.travelexpenses.data.dto.*
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
+import m.kampukter.travelexpenses.data.repository.FSRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.android.ext.android.getKoin
@@ -92,6 +91,10 @@ class MainApplication : Application() {
                 get()
             )
         }
+        single<FileSystemAPI> { StandardFSAPI(this@MainApplication) }
+        single {
+            FSRepository( get())
+        }
 
         // Start Retrofit injection
         scope(named("API")) {
@@ -106,7 +109,7 @@ class MainApplication : Application() {
             }
         }
         // End Retrofit injection*/
-        viewModel { MyViewModel(get()) }
+        viewModel { MyViewModel(get(), get()) }
     }
 
     private fun retrofitBuild(apiUrl: String): Retrofit {

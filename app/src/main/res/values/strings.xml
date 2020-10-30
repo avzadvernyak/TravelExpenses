@@ -63,6 +63,7 @@
     <string name="map_expenses_button_all">Все</string>
 
     <string name="dialog_location_access_required">"Получить разрешения на определение ваших координат? В случае отказа опция будет отключена"</string>
+    <string name="dialog_camera_access_required">"Получить разрешения для работы с камерой? "</string>
     <string name="dialog_permission_required">"Получение разрешений"</string>
     <string name="settings_currency_title">Автоматическая конвертация</string>
     <string name="settings_currency_item_off">отключено</string>

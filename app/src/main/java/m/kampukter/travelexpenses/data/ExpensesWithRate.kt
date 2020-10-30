@@ -10,5 +10,6 @@ class ExpensesWithRate(
     val currency: String,
     val note: String,
     val rate: Float?,
-    val exchangeDate: String?
+    val exchangeDate: String?,
+    val imageUri: String?
 )

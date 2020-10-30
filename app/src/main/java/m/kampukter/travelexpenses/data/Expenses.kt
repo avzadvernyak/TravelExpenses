@@ -32,11 +32,6 @@ data class Expenses(
     val currency: String,
     val note: String,
     @TypeConverters(DateConverter::class)
-    val location: MyLocation?
-)
-
-data class MyLocation(
-    val accuracy: Float,
-    val latitude: Double,
-    val longitude: Double
+    val location: MyLocation?,
+    val imageUri: String?
 )

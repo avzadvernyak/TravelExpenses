@@ -114,7 +114,8 @@ class TestAddExpenseFragment : Fragment() {
                                     currency = defCurrencyName,
                                     expense = "",
                                     note = "",
-                                    location = null
+                                    location = null,
+                                    imageUri = null
                                 )
                             )
                         }

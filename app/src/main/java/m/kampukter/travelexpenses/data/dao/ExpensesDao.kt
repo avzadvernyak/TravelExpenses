@@ -24,7 +24,7 @@ interface ExpensesDao {
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
                             expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
-                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate   
+                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
             where date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null

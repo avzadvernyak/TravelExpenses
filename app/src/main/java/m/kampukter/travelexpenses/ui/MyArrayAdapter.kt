@@ -22,4 +22,5 @@ class MyArrayAdapter(context: Context, layout: Int, var values: List<String>) :
     override fun getFilter(): Filter {
         return filterThatDoesNothing
     }
+
 }
