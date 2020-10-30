@@ -83,6 +83,20 @@
                 app:popUpTo="@id/addExpensesFragment" />
     </fragment>
     <fragment
+            android:id="@+id/takePhotoForEditFragment"
+            android:name="m.kampukter.travelexpenses.ui.TakePhotoForEditFragment"
+            >
+        <action
+                android:id="@+id/toCameraPermissionsDialogFragment"
+                app:destination="@id/cameraPermissionsDialogFragment" />
+        <action
+                android:id="@+id/toDelAttachmentPhotoDialogFragment"
+                app:destination="@id/delAttachmentPhotoDialogFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/editExpensesFragment" />
+    </fragment>
+    <fragment
             android:id="@+id/editExpensesFragment"
             android:name="m.kampukter.travelexpenses.ui.EditExpensesFragment"
             android:label="@string/nav_label_edit_expenses"
@@ -90,8 +104,33 @@
         <action
                 android:id="@+id/toChoiceExpenseForEditFragment"
                 app:destination="@id/choiceExpenseForEditFragment" />
+        <action
+                android:id="@+id/toAttachmentPhotoViewFragment"
+                app:destination="@id/attachmentPhotoViewFragment" />
+        <action
+                android:id="@+id/toTakePhotoForEditFragment"
+                app:destination="@id/takePhotoForEditFragment" />
 
     </fragment>
+    <fragment
+            android:id="@+id/attachmentPhotoViewFragment"
+            android:name="m.kampukter.travelexpenses.ui.AttachmentPhotoViewFragment"
+            android:label="@string/nav_label_edit_expenses"
+            tools:layout="@layout/edit_expenses_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/editExpensesFragment"/>
+
+    </fragment>
+
+    <dialog
+            android:id="@+id/delAttachmentPhotoDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.DelAttachmentPhotoDialogFragment">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/editExpensesFragment" />
+    </dialog>
     <dialog
             android:id="@+id/delExpensesDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.DelExpensesDialogFragment">

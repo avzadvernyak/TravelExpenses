@@ -15,12 +15,12 @@ class DelAllExpensesDialogFragment: DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(resources.getString(R.string.expenses_del_all_title))
+            .setTitle(resources.getString(R.string.dialog_expenses_del_all_title))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
                 viewModel.deleteAllExpenses()
                 dialog.dismiss()
             }
-            .setMessage(resources.getString(R.string.expenses_del_all_message))
+            .setMessage(resources.getString(R.string.dialog_expenses_del_all_message))
             .create()
 
     }

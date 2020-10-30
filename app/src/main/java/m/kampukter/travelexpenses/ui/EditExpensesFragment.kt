@@ -5,9 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -28,11 +26,14 @@ class EditExpensesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.edit_expenses_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val navController = findNavController()
 
         myDropdownAdapter =
             MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
@@ -46,7 +47,9 @@ class EditExpensesFragment : Fragment() {
                     Glide.with(view).load(Uri.parse(expenses.imageUri))
                         .placeholder(R.drawable.ic_photo_24)
                         .into(attachmentImageView)
-                } else attachmentImageView.visibility = View.INVISIBLE
+                } else {
+                    attachmentImageView.visibility = View.INVISIBLE
+                }
 
 
                 sumTextInputEdit.setText(expenses.sum.toString())
@@ -95,8 +98,28 @@ class EditExpensesFragment : Fragment() {
 
         })
         expenseTextInputEdit.setOnClickListener {
-            val navController = findNavController()
             navController.navigate(R.id.toChoiceExpenseForEditFragment)
         }
+        attachmentImageView.setOnClickListener {
+            navController.navigate(R.id.toAttachmentPhotoViewFragment)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.edit_expenses, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, { value ->
+            value.first?.let { expenses ->
+                menu.findItem(R.id.addPhoto).isVisible = expenses.imageUri == null
+            }
+        })
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.addPhoto) {
+            findNavController().navigate(R.id.toTakePhotoForEditFragment)
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

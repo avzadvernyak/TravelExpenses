@@ -29,7 +29,6 @@ class CameraXFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
 
     private var imageCapture: ImageCapture? = null
-    private var photoFile: File? = null
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -66,31 +65,10 @@ class CameraXFragment : Fragment() {
             setUpCamera(view.context)
         }
         viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
-            if(! value.first?.imageUri.isNullOrEmpty()) findNavController().navigate(R.id.next_action)
+            if (!value.first?.imageUri.isNullOrEmpty()) findNavController().navigate(R.id.next_action)
         })
         camera_capture_button.setOnClickListener {
-            imageCapture?.let { _imageCapture ->
-                photoFile = viewModel.createJPGFile()
-                photoFile?.let { file ->
-                    val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-                    _imageCapture.takePicture(
-                        outputOptions,
-                        cameraExecutor,
-                        object : ImageCapture.OnImageSavedCallback {
-                            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                val savedUri = outputFileResults.savedUri ?: fromFile(photoFile)
-                                viewModel.setBufferExpensesPhoto(savedUri.toString())
-                            }
-
-                            override fun onError(exception: ImageCaptureException) {
-                                Log.e(
-                                    "blabla",
-                                    "Error (OnImageSavedCallback): ${exception.message}"
-                                )
-                            }
-                        })
-                }
-            }
+            viewModel.createJPGFile()?.let { takePhoto(it) }
         }
 
     }
@@ -127,6 +105,30 @@ class CameraXFragment : Fragment() {
             }
 
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    private fun takePhoto( file: File ) {
+        imageCapture?.let { _imageCapture ->
+
+                val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+                _imageCapture.takePicture(
+                    outputOptions,
+                    cameraExecutor,
+                    object : ImageCapture.OnImageSavedCallback {
+                        override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                            val savedUri = outputFileResults.savedUri ?: fromFile(file)
+                            viewModel.setBufferExpensesPhoto(savedUri.toString())
+                        }
+
+                        override fun onError(exception: ImageCaptureException) {
+                            Log.e(
+                                "blabla",
+                                "Error (OnImageSavedCallback): ${exception.message}"
+                            )
+                        }
+                    })
+
+        }
     }
 
     override fun onDestroy() {

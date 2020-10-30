@@ -15,7 +15,7 @@ class DelExpensePhaseOneDialogFragment: DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(resources.getString(R.string.expenses_del_title))
+            .setTitle(resources.getString(R.string.dialog_expenses_del_title))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
                 viewModel.deleteExpenseTrigger(false)
                 findNavController().navigate(R.id.toExpenseFragment)

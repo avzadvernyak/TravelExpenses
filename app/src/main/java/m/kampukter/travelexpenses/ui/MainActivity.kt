@@ -3,18 +3,15 @@ package m.kampukter.travelexpenses.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.NetworkLiveData
@@ -64,7 +61,8 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.cameraXFragment -> toolbar.visibility = View.GONE
+                R.id.cameraXFragment, R.id.attachmentPhotoViewFragment, R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility =
+                    View.GONE
                 else -> toolbar.visibility = View.VISIBLE
             }
         }
@@ -75,11 +73,13 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBar(navController, appBarConfiguration)
 
+        toolbar.setupWithNavController(navController, appBarConfiguration)
+
         navigation_view?.let {
             NavigationUI.setupWithNavController(it, navController)
         }
 
-        viewModel.savedSettings.observe(this, Observer { settings ->
+        viewModel.savedSettings.observe(this, { settings ->
             // Изменение текущей валюты в зависимости от настроек программы
             settings?.let {
                 if (it.defCurrency != mainApplication.getActiveCurrencySession())
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
                 settings?.defCurrency != 0
         })
-        NetworkLiveData.observe(this, Observer {
+        NetworkLiveData.observe(this, {
             navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
                 it and (mainApplication.getActiveCurrencySession() != null)
             navigation_view?.menu?.findItem(R.id.mapExpensesFragment)?.isVisible = it
@@ -98,9 +98,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return findNavController(R.id.my_nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
+    // заменил на toolbar.setupWithNavController(navController, appBarConfiguration)
+    /*  override fun onSupportNavigateUp(): Boolean {
+          return findNavController(R.id.my_nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+      }*/
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

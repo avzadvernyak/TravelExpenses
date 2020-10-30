@@ -45,7 +45,7 @@ class HomeExpensesFragment : Fragment() {
                 override fun onLongClick(item: ExpensesWithRate) {
                     viewModel.setQueryExpensesId(item.id)
                     val arg = resources.getString(
-                        R.string.expenses_del_supporting_text,
+                        R.string.dialog_expenses_del_supporting_text,
                         DateFormat.format("dd/MM/yyyy HH:mm", item.dateTime).toString(),
                         item.sum, item.currency
                     )
@@ -62,13 +62,13 @@ class HomeExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
-        viewModel.expensesWithRate.observe(viewLifecycleOwner, Observer {
+        viewModel.expensesWithRate.observe(viewLifecycleOwner, {
             expensesAdapter.setList(it)
         })
-        viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, Observer {
+        viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
             if (!it) Snackbar.make(
                 view,
-                getString(R.string.expenses_del_record),
+                getString(R.string.dialog_expenses_del_record),
                 Snackbar.LENGTH_SHORT
             )
                 .show()
