@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses
 
 import android.content.Context
 import android.net.Uri

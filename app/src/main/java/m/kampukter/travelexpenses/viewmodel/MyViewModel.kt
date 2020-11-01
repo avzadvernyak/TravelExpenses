@@ -395,4 +395,11 @@ class MyViewModel(
 
     fun createJPGFile() = fileSystemRepository.createJPGFile()
     fun deleteFile(file: File) = fileSystemRepository.deleteFile(file)
+
+    fun deleteInvalidFiles(){
+        viewModelScope.launch {
+            fileSystemRepository.deleteInvalidFiles()
+        }
+    }
+
 }

@@ -15,7 +15,7 @@ class StandardFSAPI(
     override fun createFile(name: String, extension: String): File? =
         try {
             File(
-                getOutputDirectory(), name + "_" + SimpleDateFormat(FILENAME, Locale.US)
+                getOutputDirectory(), name  + SimpleDateFormat(FILENAME, Locale.US)
                     .format(System.currentTimeMillis()) + "." + extension
             )
         } catch (exception: IOException) {
@@ -31,6 +31,22 @@ class StandardFSAPI(
             false
         }
 
+    override fun getAllFilesDirectory(): Array<File>? = getOutputDirectory().listFiles()
+   /* override fun deleteInvalidFiles( ){
+
+        // Get root directory of media from navigation arguments
+        val rootDirectory = File(getOutputDirectory().toString())
+
+
+        // Walk through all files in the root directory
+        // We reverse the order of the list to present the last photos first
+        val mediaList = rootDirectory.listFiles { file ->
+            arrayOf("JPG").contains(file.extension.toUpperCase(Locale.ROOT))
+        }
+        Log.d("blabla"," ->$mediaList")
+
+    }*/
+
     private fun getOutputDirectory(): File {
         val appContext = context.applicationContext
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
@@ -39,6 +55,7 @@ class StandardFSAPI(
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else appContext.filesDir
     }
+
 
     companion object {
         private const val FILENAME = "yyyy-MM-dd-HH-mm-ss-SSS"

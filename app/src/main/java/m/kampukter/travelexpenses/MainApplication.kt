@@ -93,7 +93,7 @@ class MainApplication : Application() {
         }
         single<FileSystemAPI> { StandardFSAPI(this@MainApplication) }
         single {
-            FSRepository( get())
+            FSRepository( get(), get<MyDatabase>().expensesDao())
         }
 
         // Start Retrofit injection
@@ -135,7 +135,8 @@ class MainApplication : Application() {
             androidContext(this@MainApplication)
             modules(module)
         }
-
+        // Delete Invalid Photo Files
+        getKoin().get<MyViewModel>().deleteInvalidFiles()
 
         GlobalScope.launch(context = Dispatchers.IO) {
 
