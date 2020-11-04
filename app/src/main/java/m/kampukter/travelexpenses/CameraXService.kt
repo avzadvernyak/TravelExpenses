@@ -18,7 +18,7 @@ class CameraXService(private val cameraExecutor: ExecutorService) {
 
     private var imageCapture: ImageCapture? = null
 
-    fun setUpCamera( lifecycleOwner: LifecycleOwner, context: Context, viewFinder: PreviewView ) {
+    fun setUpCamera(lifecycleOwner: LifecycleOwner, context: Context, viewFinder: PreviewView) {
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
@@ -34,29 +34,26 @@ class CameraXService(private val cameraExecutor: ExecutorService) {
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-            try {
-                // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
+            // Unbind use cases before rebinding
+            cameraProvider.unbindAll()
 
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    lifecycleOwner, cameraSelector, preview, imageCapture
-                )
+            // Bind use cases to camera
+            cameraProvider.bindToLifecycle(
+                lifecycleOwner, cameraSelector, preview, imageCapture
+            )
 
-                // Attach the viewfinder's surface provider to preview use case
-                preview.setSurfaceProvider(viewFinder.surfaceProvider)
+            // Attach the viewfinder's surface provider to preview use case
+            preview.setSurfaceProvider(viewFinder.surfaceProvider)
 
-            } catch (exc: Exception) {
-                Log.e("blabla", "Use case binding failed", exc)
-            }
 
         }, ContextCompat.getMainExecutor(context))
     }
-    fun takePhoto( file: File, onSavePhotoUriToExpenses: ((String) -> Unit)) {
-        imageCapture?.let { _imageCapture ->
+
+    fun takePhoto(file: File, onSavePhotoUriToExpenses: ((String) -> Unit)) {
+        imageCapture?.let { imageCapture ->
 
             val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-            _imageCapture.takePicture(
+            imageCapture.takePicture(
                 outputOptions,
                 cameraExecutor,
                 object : ImageCapture.OnImageSavedCallback {

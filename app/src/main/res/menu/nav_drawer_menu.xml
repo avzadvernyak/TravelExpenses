@@ -15,18 +15,25 @@
                 android:id="@id/expenseFragment"
                 android:icon="@drawable/ic_format_list_bulleted_24"
                 android:title="@string/menu_expense" />
-        <item
-                android:id="@id/exportFragment"
-                android:icon="@drawable/ic_archive_black"
-                android:title="@string/menu_export" />
+
         <item
                 android:id="@id/mapExpensesFragment"
                 android:icon="@drawable/ic_map_24"
                 android:title="@string/menu_map" />
         <item
+                android:id="@id/galleryFragment"
+                android:icon="@drawable/ic_baseline_photo_library_24"
+                android:title="@string/menu_gallery" />
+        <item
                 android:id="@id/sumFragment"
                 android:icon="@drawable/ic_functions_24"
                 android:title="@string/menu_sum_expenses" />
+    </group>
+    <group android:checkableBehavior="single" android:id="@+id/grp1">
+        <item
+                android:id="@id/exportFragment"
+                android:icon="@drawable/ic_archive_black"
+                android:title="@string/menu_export" />
         <item
                 android:id="@id/delAllExpensesDialogFragment"
                 android:icon="@drawable/ic_delete_forever_black"
@@ -39,7 +46,6 @@
                 android:id="@id/aboutDialogFragment"
                 android:icon="@drawable/ic_info_24"
                 android:title="@string/menu_about" />
-
     </group>
 
 </menu>

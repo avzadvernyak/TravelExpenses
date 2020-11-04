@@ -296,5 +296,14 @@
                 app:popUpTo="@id/mapExpensesFragment" />
 
     </fragment>
+    <!--   Gallery   -->
+    <fragment
+            android:id="@+id/galleryFragment"
+            android:name="m.kampukter.travelexpenses.ui.gallery.GalleryFragment"
+            android:label="Галерея">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
 
 </navigation>

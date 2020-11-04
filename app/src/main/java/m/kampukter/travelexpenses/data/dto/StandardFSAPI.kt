@@ -1,7 +1,9 @@
 package m.kampukter.travelexpenses.data.dto
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toFile
 import m.kampukter.travelexpenses.R
 import java.io.File
 import java.io.IOException
@@ -14,9 +16,10 @@ class StandardFSAPI(
 
     override fun createFile(name: String, extension: String): File? =
         try {
+            val timeStamp = SimpleDateFormat(FILENAME, Locale.US)
+                .format(System.currentTimeMillis())
             File(
-                getOutputDirectory(), name  + SimpleDateFormat(FILENAME, Locale.US)
-                    .format(System.currentTimeMillis()) + "." + extension
+                getOutputDirectory(), "$name$timeStamp.$extension"
             )
         } catch (exception: IOException) {
             Log.e("blabla", "Error (createTempFile): ${exception.message}")
@@ -31,21 +34,28 @@ class StandardFSAPI(
             false
         }
 
-    override fun getAllFilesDirectory(): Array<File>? = getOutputDirectory().listFiles()
-   /* override fun deleteInvalidFiles( ){
-
-        // Get root directory of media from navigation arguments
-        val rootDirectory = File(getOutputDirectory().toString())
-
-
-        // Walk through all files in the root directory
-        // We reverse the order of the list to present the last photos first
-        val mediaList = rootDirectory.listFiles { file ->
-            arrayOf("JPG").contains(file.extension.toUpperCase(Locale.ROOT))
+    override fun deleteInvalidPhotoFiles(validFiles: List<Uri>) {
+        val listAllFile = getAllFilesDirectory()
+        var i = 0
+        listAllFile?.forEach { file ->
+            if (!validFiles.contains(file)) {
+                deleteFile(file.toFile())
+                i += 1
+            }
         }
-        Log.d("blabla"," ->$mediaList")
+        Log.i("blabla", "Deleted $i file(s)")
 
-    }*/
+    }
+
+    override fun getAllFilesDirectory(): List<Uri>? {
+
+        /*val ret = getOutputDirectory().listFiles()?.map { file -> Uri.fromFile(file) }
+        val ret1 = getOutputDirectory().list()
+        Log.d("blabla", "Ret ${ret?.size}")
+        Log.d("blabla", "Directory ${getOutputDirectory()}")*/
+
+        return getOutputDirectory().listFiles()?.map { file -> Uri.fromFile(file) }
+    }
 
     private fun getOutputDirectory(): File {
         val appContext = context.applicationContext

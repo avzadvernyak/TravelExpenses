@@ -401,5 +401,6 @@ class MyViewModel(
             fileSystemRepository.deleteInvalidFiles()
         }
     }
+    fun getMediaFiles() = fileSystemRepository.getMediaFiles()
 
 }
