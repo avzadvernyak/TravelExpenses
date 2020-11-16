@@ -6,13 +6,13 @@ import androidx.room.TypeConverters
 import m.kampukter.travelexpenses.data.dao.*
 
 @Database(
-    version = 1,exportSchema = false, entities = [
+    version = 2,exportSchema = false, entities = [
         Expenses::class, Expense::class, CurrencyTable::class, RateCurrency::class, Settings::class
     ]
 )
 
 //@TypeConverters(Converters::class)
-@TypeConverters(DateConverter::class)
+@TypeConverters(MyTypeConverter::class)
 
 abstract class MyDatabase : RoomDatabase() {
 

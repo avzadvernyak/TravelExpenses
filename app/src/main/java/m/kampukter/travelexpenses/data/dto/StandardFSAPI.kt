@@ -48,12 +48,6 @@ class StandardFSAPI(
     }
 
     override fun getAllFilesDirectory(): List<Uri>? {
-
-        /*val ret = getOutputDirectory().listFiles()?.map { file -> Uri.fromFile(file) }
-        val ret1 = getOutputDirectory().list()
-        Log.d("blabla", "Ret ${ret?.size}")
-        Log.d("blabla", "Directory ${getOutputDirectory()}")*/
-
         return getOutputDirectory().listFiles()?.map { file -> Uri.fromFile(file) }
     }
 
@@ -70,11 +64,5 @@ class StandardFSAPI(
     companion object {
         private const val FILENAME = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
-/*
-val EXTENSION_WHITELIST = arrayOf("JPG")
-            val mediaList = getOutputDirectory().listFiles { file ->
-                EXTENSION_WHITELIST.contains(file.extension.toUpperCase(Locale.ROOT))
-            }?.sortedDescending()?.toMutableList() ?: mutableListOf()
-            Log.d("blabla", "mediaList: $mediaList")
- */
+
 }

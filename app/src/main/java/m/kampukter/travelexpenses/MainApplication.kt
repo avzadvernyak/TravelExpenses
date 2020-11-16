@@ -43,6 +43,7 @@ class MainApplication : Application() {
     private val module = module {
         single {
             Room.databaseBuilder(androidContext(), MyDatabase::class.java, "expenses.db")
+                .addMigrations(MIGRATION_1_2)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(supportDb: SupportSQLiteDatabase) {
                         GlobalScope.launch(context = Dispatchers.IO) {

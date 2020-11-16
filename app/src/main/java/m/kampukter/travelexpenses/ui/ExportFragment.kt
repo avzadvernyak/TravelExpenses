@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import m.kampukter.travelexpenses.R
@@ -28,7 +27,7 @@ class ExportFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.getExpensesCSV(true)
-        viewModel.expensesCSVForExport.observe(viewLifecycleOwner, Observer { expensesCSV ->
+        viewModel.expensesCSVForExport.observe(viewLifecycleOwner, { expensesCSV ->
             if (expensesCSV.isNullOrEmpty()) {
                 Snackbar.make(view, "Нет данных для экспорта", Snackbar.LENGTH_SHORT)
                     .show()

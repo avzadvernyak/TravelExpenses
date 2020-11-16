@@ -6,7 +6,8 @@ import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DateConverter {
+class MyTypeConverter {
+
     @TypeConverter
     fun dateToString(date: Date): String =
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault()).format(date)

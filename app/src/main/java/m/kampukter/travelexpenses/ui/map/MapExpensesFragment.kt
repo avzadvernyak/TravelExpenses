@@ -2,11 +2,12 @@ package m.kampukter.travelexpenses.ui.map
 
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -123,6 +124,11 @@ class MapExpensesFragment : Fragment() {
                             )
                         } ${itemExpenses.sum} ${itemExpenses.currency}"
 
+
+                        //myMarker.icon = ContextCompat.getDrawable(view.context,R.drawable.ic_gps_fixed_24)
+                        //myMarker.alpha = 1.0f
+                        //Log.d("blabla"," ***** ${myMarker.alpha}")
+
                         myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         myMarker.snippet = itemExpenses.expense
                         myMarker.subDescription = itemExpenses.note
@@ -130,11 +136,7 @@ class MapExpensesFragment : Fragment() {
                         mapMapView.overlays.add(myMarker)
                     }
                 }
-                /* Текущее положение устройства на карте
-                 val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), mapMapView)
-                 myLocationOverlay.enableMyLocation()
-                 mapMapView.overlays.add(myLocationOverlay)
-                 */
+
                 if (count != 0) {
 
                     when (val filter = expensesAndFilter.second) {
@@ -254,4 +256,5 @@ class MapExpensesFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
+
 }

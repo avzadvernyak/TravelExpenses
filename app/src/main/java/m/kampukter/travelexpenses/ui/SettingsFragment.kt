@@ -28,8 +28,6 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        cleanButton.setOnClickListener { viewModel.deleteInvalidFiles() }
-
         controlBackupRadioGroup.visibility = View.INVISIBLE
         viewModel.savedSettings.observe(viewLifecycleOwner, Observer { settings ->
             if (settings != null) {

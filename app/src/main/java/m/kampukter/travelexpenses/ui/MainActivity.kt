@@ -32,7 +32,7 @@ val permissionsForCamera = arrayOf(
 )
 
 // Разрешения для работы с локацией
-//    пока не реализовано Manifest.permission.WRITE_EXTERNAL_STORAGE
+//    не реализовано Manifest.permission.WRITE_EXTERNAL_STORAGE
 val permissionsForLocation = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
     Manifest.permission.ACCESS_COARSE_LOCATION
@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+
         val host: NavHostFragment = supportFragmentManager
             .findFragmentById(R.id.my_nav_host_fragment) as NavHostFragment? ?: return
 
@@ -61,8 +62,10 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.cameraXFragment, R.id.attachmentPhotoViewFragment, R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility =
-                    View.GONE
+                R.id.homeExpensesFragment,
+                R.id.cameraXFragment,
+                R.id.attachmentPhotoViewFragment,
+                R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility = View.GONE
                 else -> toolbar.visibility = View.VISIBLE
             }
         }

@@ -1,6 +1,8 @@
 package m.kampukter.travelexpenses.data
 
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import java.util.*
 
 @Entity(
@@ -31,7 +33,16 @@ data class Expenses(
     @ColumnInfo(name = "currency_field")
     val currency: String,
     val note: String,
-    @TypeConverters(DateConverter::class)
+    @TypeConverters(MyTypeConverter::class)
     val location: MyLocation?,
     val imageUri: String?
 )
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE Expenses ADD COLUMN location TEXT default null")
+        database.execSQL(
+            "ALTER TABLE Expenses ADD COLUMN imageUri TEXT default null")
+    }
+}
