@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.main_activity)
+        setContentView(R.layout.main_activity_with_appbar)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.homeExpensesFragment,
+                //R.id.homeExpensesFragment,
                 R.id.cameraXFragment,
                 R.id.attachmentPhotoViewFragment,
                 R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility = View.GONE

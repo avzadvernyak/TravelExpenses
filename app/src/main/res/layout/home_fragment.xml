@@ -49,27 +49,6 @@
                                 app:layout_constraintBottom_toBottomOf="@+id/drawerMenuImageView"
                                 app:layout_constraintStart_toEndOf="@id/drawerMenuImageView"
                                 app:layout_constraintTop_toTopOf="@+id/drawerMenuImageView" />
-                       <!-- <Button
-                                android:id="@+id/searchTextButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Поиск в расходах"
-                                style="@style/Widget.MaterialComponents.Button.TextButton"
-                                app:layout_constraintBottom_toBottomOf="@+id/drawerMenuImageView"
-                                app:layout_constraintStart_toEndOf="@id/drawerMenuImageView"
-                                app:layout_constraintTop_toTopOf="@+id/drawerMenuImageView"
-                                />-->
-                        <!-- <SearchView
-                                android:id="@+id/searchView"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:iconifiedByDefault="true"
-                                android:queryHint="Поиск"
-                                app:layout_constraintStart_toEndOf="@id/drawerMenuImageView"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                />-->
-
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>

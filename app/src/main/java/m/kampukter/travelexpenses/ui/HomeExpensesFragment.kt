@@ -3,17 +3,18 @@ package m.kampukter.travelexpenses.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.home_fragment.*
+import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.ui.expenses.ExpensesAdapter
@@ -31,22 +32,21 @@ class HomeExpensesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         //return inflater.inflate(R.layout.home_expenses_fragment, container, false)
-        return inflater.inflate(R.layout.home_fragment, container, false)
-    }
+        //return inflater.inflate(R.layout.home_fragment, container, false)
 
+        return inflater.inflate(R.layout.expenses_fragment, container, false)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        val navController = findNavController()
+
+        val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
+        toolbar?.title = "Поиск в расходах"
+        toolbar?.setOnClickListener { navController.navigate(R.id.toSearchExpensesFragment)  }
 
         val imm =
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
-
-        val drawerLayout = activity?.findViewById<DrawerLayout>(R.id.drawer_layout)
-        drawerMenuImageView.setOnClickListener {
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-            drawerLayout?.open()
-        }
-
-        val navController = findNavController()
 
         val clickEventDelegate: ClickEventDelegate<ExpensesWithRate> =
             object : ClickEventDelegate<ExpensesWithRate> {
@@ -67,7 +67,7 @@ class HomeExpensesFragment : Fragment() {
                 }
             }
         expensesAdapter = ExpensesAdapter(clickEventDelegate, TYPE_HEADER_ALL)
-        with(recyclerView) {
+        with(recyclerViewExpenses) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,
                 RecyclerView.VERTICAL,
@@ -86,7 +86,7 @@ class HomeExpensesFragment : Fragment() {
             )
                 .show()
         })
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        recyclerViewExpenses.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE
                     && !addExpensesExtendedFab.isExtended
@@ -98,13 +98,13 @@ class HomeExpensesFragment : Fragment() {
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                Log.d("blabla", "$dx - $dy")
                 if (dy != 0 && addExpensesExtendedFab.isExtended) {
                     addExpensesExtendedFab.shrink()
                 }
-                super.onScrolled(recyclerView, dx, dy)
+                super.onScrolled(recyclerView, dx + 16, dy+16)
             }
         })
         addExpensesExtendedFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
-        searchView.setOnClickListener { navController.navigate(R.id.toSearchExpensesFragment)  }
     }
 }

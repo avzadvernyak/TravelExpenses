@@ -88,12 +88,7 @@ class SearchResultExpensesFragment : Fragment() {
         searchView?.doOnLayout {
             searchView.clearFocus()
         }
-       /* searchView?.setOnSearchClickListener {
-            Log.d("blabla", "Listener")
-        }*/
         searchView?.setOnQueryTextFocusChangeListener { _, isFocused ->
-            Log.d("blabla","Listener $isFocused && ${viewModel.getSearchResultExpensesOpenActive()}")
-
             if (isFocused && viewModel.getSearchResultExpensesOpenActive()) findNavController().navigate(R.id.next_action)
 
         }

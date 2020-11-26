@@ -1,12 +1,10 @@
 package m.kampukter.travelexpenses.ui.expenses
 
-import android.graphics.drawable.Icon
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import androidx.appcompat.app.ActionBar
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +12,7 @@ import kotlinx.android.synthetic.main.search_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+
 
 class SearchExpensesFragment : Fragment() {
 
@@ -53,6 +52,19 @@ class SearchExpensesFragment : Fragment() {
 
         searchView?.isIconified = false
         searchView?.onActionViewExpanded()
+/*
+
+        val magId = resources.getIdentifier("android:id/search_mag_icon", null, null)
+        searchView?.let {
+            val magImage = it.findViewById<View>(magId) as ImageView
+            magImage.layoutParams = LinearLayout.LayoutParams(0, 0)
+        }
+*/
+
+
+        /*val searchHintIcon = activity?.findViewById<ImageView>(R.id.search_mag_icon)
+        searchHintIcon?.visibility = View.INVISIBLE*/
+
 
         viewModel.searchStringExpensesLiveData.observe(
             this,

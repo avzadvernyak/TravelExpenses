@@ -409,7 +409,7 @@ class MyViewModel(
 Search in Expenses
 */
 
-    private val searchStringExpenses = MutableLiveData<String>()
+    private val searchStringExpenses = MutableLiveData<String>().apply { postValue(null) }
     val expensesSearchResult = Transformations.switchMap(searchStringExpenses) { searchString ->
         expensesRepository.getSearchExpensesWithRate(searchString)
     }
