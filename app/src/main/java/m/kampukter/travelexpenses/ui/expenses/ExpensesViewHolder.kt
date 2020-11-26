@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.text.format.DateFormat
 import android.view.View
@@ -9,6 +9,7 @@ import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
 import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.mainApplication
+import m.kampukter.travelexpenses.ui.ClickEventDelegate
 import java.text.DecimalFormat
 
 class ExpensesViewHolder(

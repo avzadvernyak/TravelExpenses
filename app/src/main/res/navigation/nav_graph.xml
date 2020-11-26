@@ -8,11 +8,14 @@
             android:name="m.kampukter.travelexpenses.ui.HomeExpensesFragment"
             android:label="@string/nav_label_expenses"
             app:startDestination="@id/toAddExpensesFragment"
-            tools:layout="@layout/home_expenses_fragment">
+            tools:layout="@layout/home_fragment">
 
         <action
                 android:id="@+id/toAddExpensesWithImageFragment"
                 app:destination="@+id/addExpensesWithImageFragment" />
+        <action
+                android:id="@+id/toSearchExpensesFragment"
+                app:destination="@+id/searchExpensesFragment" />
 
         <action
                 android:id="@+id/toAddExpensesFragment"
@@ -70,6 +73,27 @@
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/searchExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.SearchExpensesFragment"
+            tools:layout="@layout/search_expenses_fragment">
+
+        <action
+                android:id="@+id/toSearchResultExpensesFragment"
+                app:destination="@+id/searchResultExpensesFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/searchResultExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.SearchResultExpensesFragment"
+            tools:layout="@layout/search_result_expenses_fragment">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/searchExpensesFragment" />
     </fragment>
     <fragment
             android:id="@+id/cameraXFragment"

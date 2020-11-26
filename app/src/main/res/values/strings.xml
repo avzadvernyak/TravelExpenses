@@ -23,6 +23,7 @@
     <string name="menu_add_photo_title">Add photo</string>
 
     <string name="nav_label_expenses">Расходы</string>
+    <string name="nav_label_search_result_expenses">Результаты поиска</string>
     <string name="nav_label_about">О программе</string>
     <string name="nav_label_add_expenses">Новая запись</string>
     <string name="nav_label_edit_expenses">Редактировать</string>

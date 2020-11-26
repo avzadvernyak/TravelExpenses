@@ -29,6 +29,7 @@ class ExpensesRepository(
     fun getAll(): LiveData<List<Expenses>> = expensesDao.getAll()
     fun getAllExpensesWithRate() = expensesDao.getAllExpensesWithRate()
 
+
     fun getRecordById(id: Long): LiveData<Expenses> = expensesDao.getExpensesById(id)
 
     suspend fun addExpenses(expenses: Expenses) {
@@ -194,5 +195,19 @@ class ExpensesRepository(
     }
 
     fun getFoundDate() = foundDate
+
+    /*
+    Search in Expenses
+    */
+    private val historySearchStringExpenses = mutableListOf<String>()
+    fun getSearchExpensesWithRate(searchString: String): LiveData<List<ExpensesWithRate>> {
+        if (searchString.isNotBlank() && !historySearchStringExpenses.contains(searchString)) historySearchStringExpenses.add(
+            searchString
+        )
+
+        return expensesDao.getSearchExpensesWithRate("%$searchString%")
+    }
+
+    fun getHistorySearchStringExpenses() = historySearchStringExpenses
 
 }

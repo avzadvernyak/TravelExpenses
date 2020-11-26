@@ -55,6 +55,7 @@ class MyViewModel(
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
     val expensesWithRate = expensesRepository.getAllExpensesWithRate()
 
+
     private val expensesFindId = MutableLiveData<Long>()
     fun setQueryExpensesId(query: Long) {
         expensesFindId.postValue(query)
@@ -396,11 +397,33 @@ class MyViewModel(
     fun createJPGFile() = fileSystemRepository.createJPGFile()
     fun deleteFile(file: File) = fileSystemRepository.deleteFile(file)
 
-    fun deleteInvalidFiles(){
+    fun deleteInvalidFiles() {
         viewModelScope.launch {
             fileSystemRepository.deleteInvalidFiles()
         }
     }
+
     fun getMediaFiles() = fileSystemRepository.getMediaFiles()
 
+/*
+Search in Expenses
+*/
+
+    private val searchStringExpenses = MutableLiveData<String>()
+    val expensesSearchResult = Transformations.switchMap(searchStringExpenses) { searchString ->
+        expensesRepository.getSearchExpensesWithRate(searchString)
+    }
+    val searchStringExpensesLiveData: LiveData<String>
+        get() = searchStringExpenses
+
+    fun setSearchStringExpenses(lastSearchString: String) {
+        searchStringExpenses.postValue(lastSearchString)
+    }
+    fun getHistorySearchStringExpenses() = expensesRepository.getHistorySearchStringExpenses()
+
+    private var isSearchResultExpensesActive = false
+    fun setSearchResultExpensesOpenActive( value: Boolean) {
+        isSearchResultExpensesActive = value
+    }
+    fun getSearchResultExpensesOpenActive() = isSearchResultExpensesActive
 }
