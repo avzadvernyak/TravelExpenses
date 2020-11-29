@@ -38,12 +38,6 @@ class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<Expense
             )
         }
     }
-
-    override fun getItemCount(): Int = expenses.size + 1
-
-    override fun getItemViewType(position: Int): Int = if (position == 0) typeHeader else TYPE_LIST
-
-
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when(holder) {
             is ExpensesHeaderSearchResultViewHolder -> holder.bind()
@@ -52,6 +46,10 @@ class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<Expense
         }
 
     }
+
+    override fun getItemCount(): Int = expenses.size
+
+    override fun getItemViewType(position: Int): Int = if (position == 0) typeHeader else TYPE_LIST
 
     fun setList(newListExpenses: List<ExpensesWithRate>) {
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {

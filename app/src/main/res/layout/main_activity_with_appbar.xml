@@ -9,50 +9,74 @@
         android:layout_height="match_parent"
         tools:context=".ui.MainActivity">
 
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/mainCoordinatorLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
 
+        <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/mainAppBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-
-            <com.google.android.material.appbar.AppBarLayout
-                    android:id="@+id/mainAppBarLayout"
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                   android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@color/colorMyToolbar"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-                <androidx.appcompat.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:background="@color/colorMyToolbar"
-                        android:elevation="4dp"
-                        app:layout_scrollFlags="scroll|enterAlways"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar">
+            </androidx.appcompat.widget.Toolbar>
 
-                </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
 
-            </com.google.android.material.appbar.AppBarLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mainConstraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/mainConstraintLayout"
+            <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/my_nav_host_fragment"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                    app:defaultNavHost="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:navGraph="@navigation/nav_graph" />
 
-                <androidx.fragment.app.FragmentContainerView
-                        android:id="@+id/my_nav_host_fragment"
-                        android:name="androidx.navigation.fragment.NavHostFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:defaultNavHost="true"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:navGraph="@navigation/nav_graph" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/addExpenseFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:contentDescription="@null"
+                app:icon="@drawable/ic_add"
+                android:text="Новая запись"
+                app:backgroundTint="#FFFFFF" />
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/addExpensesExtendedFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                app:backgroundTint="#FFFFFF"
+                android:contentDescription="@null"
+                android:text="Новая запись"
+                app:icon="@drawable/ic_add"/>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!-- </LinearLayout>-->
+
 
     <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"

@@ -8,8 +8,12 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expense_fragment.*
+import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpenseDeletionResult
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
@@ -80,9 +84,31 @@ class ExpenseFragment : Fragment() {
 
             }
         })
-
-        addExpenseFab.setOnClickListener {
+        val addFAB = activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpenseFab)
+        addFAB?.setOnClickListener {
             navController.navigate(R.id.toAddExpenseDialogFragment)
         }
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                addFAB?.let {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE
+                        && !addFAB.isExtended
+                        && recyclerView.computeVerticalScrollOffset() == 0
+                    ) {
+                        addFAB.extend()
+                    }
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                addFAB?.let {
+                    if (dy != 0 && addFAB.isExtended) {
+                        addFAB.shrink()
+                    }
+                }
+                super.onScrolled(recyclerView, dx + 16, dy + 16)
+            }
+        })
     }
 }

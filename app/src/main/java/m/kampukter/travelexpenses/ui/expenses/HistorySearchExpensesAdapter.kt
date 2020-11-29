@@ -6,9 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
 
-class HistorySearchExpensesAdapter : RecyclerView.Adapter<HistorySearchExpensesViewHolder>() {
+class HistorySearchExpensesAdapter(private val onClickCallback: ((String) -> Unit)? = null) :
+    RecyclerView.Adapter<HistorySearchExpensesViewHolder>() {
 
     private var historySearchStringList = emptyList<String>()
+
 
     override fun getItemCount(): Int = historySearchStringList.size
 
@@ -22,7 +24,7 @@ class HistorySearchExpensesAdapter : RecyclerView.Adapter<HistorySearchExpensesV
     )
 
     override fun onBindViewHolder(holder: HistorySearchExpensesViewHolder, position: Int) {
-        holder.bind(historySearchStringList[position])
+        holder.bind(historySearchStringList[position], onClickCallback)
     }
 
     fun setList(newList: List<String>) {

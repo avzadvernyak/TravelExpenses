@@ -13,7 +13,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.main_activity.*
+import kotlinx.android.synthetic.main.main_activity_with_appbar.*
 import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.mainApplication
@@ -61,8 +61,19 @@ class MainActivity : AppCompatActivity() {
 
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            mainAppBarLayout.setExpanded(true)
+            addExpenseFab.hide()
+            addExpensesExtendedFab.hide()
             when (destination.id) {
-                //R.id.homeExpensesFragment,
+                R.id.homeExpensesFragment -> {
+                    addExpensesExtendedFab.show()
+                    toolbar.visibility = View.VISIBLE
+
+                }
+                R.id.expenseFragment ->{
+                    addExpenseFab.show()
+                    toolbar.visibility = View.VISIBLE
+                }
                 R.id.cameraXFragment,
                 R.id.attachmentPhotoViewFragment,
                 R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility = View.GONE

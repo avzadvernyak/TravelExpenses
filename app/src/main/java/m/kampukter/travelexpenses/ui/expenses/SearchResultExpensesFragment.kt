@@ -1,9 +1,9 @@
 package m.kampukter.travelexpenses.ui.expenses
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,13 +14,14 @@ import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.ui.ClickEventDelegate
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import android.text.format.DateFormat
 
 
 class SearchResultExpensesFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
-    private lateinit var expensesAdapter: ExpensesAdapter
 
+    private lateinit var expensesAdapter: ExpensesAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,9 +37,6 @@ class SearchResultExpensesFragment : Fragment() {
         super.onStop()
     }
 
-
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -46,19 +44,19 @@ class SearchResultExpensesFragment : Fragment() {
         val clickEventDelegate: ClickEventDelegate<ExpensesWithRate> =
             object : ClickEventDelegate<ExpensesWithRate> {
                 override fun onClick(item: ExpensesWithRate) {
-                    //viewModel.setQueryExpensesId(item.id)
-                    //navController.navigate(R.id.toEditExpensesFragment)
+                    viewModel.setQueryExpensesId(item.id)
+                    navController.navigate(R.id.toEditExpensesFragment)
                 }
 
                 override fun onLongClick(item: ExpensesWithRate) {
-                    /*viewModel.setQueryExpensesId(item.id)
+                    viewModel.setQueryExpensesId(item.id)
                     val arg = resources.getString(
                         R.string.dialog_expenses_del_supporting_text,
                         DateFormat.format("dd/MM/yyyy HH:mm", item.dateTime).toString(),
                         item.sum, item.currency
                     )
                     val bundle = bundleOf("expenses" to arg)
-                    navController.navigate(R.id.toDelExpensesDialogFragment, bundle)*/
+                    navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
         expensesAdapter = ExpensesAdapter(clickEventDelegate, TYPE_HEADER_SEARCH_RESULT)
@@ -71,7 +69,6 @@ class SearchResultExpensesFragment : Fragment() {
             adapter = expensesAdapter
         }
         viewModel.expensesSearchResult.observe(viewLifecycleOwner, {
-            //Log.d("blabla", "---${it.size}")
             expensesAdapter.setList(it)
         })
     }
@@ -89,7 +86,9 @@ class SearchResultExpensesFragment : Fragment() {
             searchView.clearFocus()
         }
         searchView?.setOnQueryTextFocusChangeListener { _, isFocused ->
-            if (isFocused && viewModel.getSearchResultExpensesOpenActive()) findNavController().navigate(R.id.next_action)
+            if (isFocused && viewModel.getSearchResultExpensesOpenActive()) findNavController().navigate(
+                R.id.next_action
+            )
 
         }
         searchView?.setOnQueryTextListener(

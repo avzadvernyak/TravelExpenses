@@ -2,8 +2,6 @@ package m.kampukter.travelexpenses.ui.expenses
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -31,7 +29,10 @@ class SearchExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        historySearchExpensesAdapter = HistorySearchExpensesAdapter()
+        historySearchExpensesAdapter = HistorySearchExpensesAdapter{ searchString ->
+            viewModel.setSearchStringExpenses(searchString)
+            findNavController().navigate(R.id.toSearchResultExpensesFragment)
+        }
         with(historySearchRecyclerView){
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,
@@ -52,19 +53,6 @@ class SearchExpensesFragment : Fragment() {
 
         searchView?.isIconified = false
         searchView?.onActionViewExpanded()
-/*
-
-        val magId = resources.getIdentifier("android:id/search_mag_icon", null, null)
-        searchView?.let {
-            val magImage = it.findViewById<View>(magId) as ImageView
-            magImage.layoutParams = LinearLayout.LayoutParams(0, 0)
-        }
-*/
-
-
-        /*val searchHintIcon = activity?.findViewById<ImageView>(R.id.search_mag_icon)
-        searchHintIcon?.visibility = View.INVISIBLE*/
-
 
         viewModel.searchStringExpensesLiveData.observe(
             this,
@@ -78,13 +66,12 @@ class SearchExpensesFragment : Fragment() {
             object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     query?.let { viewModel.setSearchStringExpenses(it) }
-                    //Log.d("blabla","------onQueryTextSubmit")
                     findNavController().navigate(R.id.toSearchResultExpensesFragment)
                     return false
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    if (newText.isNullOrEmpty()) searchView?.queryHint = "Поиск в расходах"
+                    if (newText.isNullOrEmpty()) searchView.queryHint = "Поиск в расходах"
                     return false
                 }
             })

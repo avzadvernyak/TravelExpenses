@@ -3,7 +3,6 @@ package m.kampukter.travelexpenses.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
@@ -77,6 +77,7 @@ class HomeExpensesFragment : Fragment() {
         }
         viewModel.expensesWithRate.observe(viewLifecycleOwner, {
             expensesAdapter.setList(it)
+            //recyclerViewExpenses.layoutManager?.scrollToPosition(0)
         })
         viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
             if (!it) Snackbar.make(
@@ -86,25 +87,27 @@ class HomeExpensesFragment : Fragment() {
             )
                 .show()
         })
-        recyclerViewExpenses.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE
-                    && !addExpensesExtendedFab.isExtended
-                    && recyclerView.computeVerticalScrollOffset() == 0
-                ) {
-                    addExpensesExtendedFab.extend()
+        val addExpensesExtendedFab = activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpensesExtendedFab)
+        addExpensesExtendedFab?.let {
+            recyclerViewExpenses.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE
+                        && !addExpensesExtendedFab.isExtended
+                        && recyclerView.computeVerticalScrollOffset() == 0
+                    ) {
+                        addExpensesExtendedFab.extend()
+                    }
+                    super.onScrollStateChanged(recyclerView, newState)
                 }
-                super.onScrollStateChanged(recyclerView, newState)
-            }
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                Log.d("blabla", "$dx - $dy")
-                if (dy != 0 && addExpensesExtendedFab.isExtended) {
-                    addExpensesExtendedFab.shrink()
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dy != 0 && addExpensesExtendedFab.isExtended) {
+                        addExpensesExtendedFab.shrink()
+                    }
+                    super.onScrolled(recyclerView, dx + 16, dy + 16)
                 }
-                super.onScrolled(recyclerView, dx + 16, dy+16)
-            }
-        })
-        addExpensesExtendedFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
+            })
+            addExpensesExtendedFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
+        }
     }
 }

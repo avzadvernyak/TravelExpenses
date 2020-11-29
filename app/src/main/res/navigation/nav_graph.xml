@@ -82,6 +82,7 @@
         <action
                 android:id="@+id/toSearchResultExpensesFragment"
                 app:destination="@+id/searchResultExpensesFragment" />
+
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
@@ -90,7 +91,12 @@
             android:id="@+id/searchResultExpensesFragment"
             android:name="m.kampukter.travelexpenses.ui.expenses.SearchResultExpensesFragment"
             tools:layout="@layout/search_result_expenses_fragment">
-
+        <action
+                android:id="@+id/toEditExpensesFragment"
+                app:destination="@+id/editExpensesFragment" />
+        <action
+                android:id="@+id/toDelExpensesDialogFragment"
+                app:destination="@+id/delExpensesDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/searchExpensesFragment" />
