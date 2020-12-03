@@ -8,14 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.add_expenses_fragment.*
 import kotlinx.android.synthetic.main.sum_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class AddExpensesFragment : Fragment() {
-
 
     private val viewModel by sharedViewModel<MyViewModel>()
 
@@ -32,6 +30,7 @@ class AddExpensesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pager.adapter = object : FragmentStateAdapter(this) {
+
             override fun getItemCount(): Int = 2
 
             override fun createFragment(position: Int): Fragment {
@@ -40,6 +39,7 @@ class AddExpensesFragment : Fragment() {
                     else -> AddPlusExpensesFragment()
                 }
             }
+
         }
         TabLayoutMediator(tab_layout, pager) { tab, position ->
             tab.text = when (position) {

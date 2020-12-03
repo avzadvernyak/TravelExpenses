@@ -4,7 +4,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/addExpensesFragment">
     <ImageView
             android:id="@+id/photoImageView"
             android:layout_width="0dp"
@@ -16,7 +17,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:src="@drawable/ic_photo_24"
             android:contentDescription="@null" />
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addPhotoFab"
             android:layout_width="wrap_content"
@@ -37,6 +37,5 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

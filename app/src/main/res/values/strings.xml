@@ -90,6 +90,7 @@
     <string name="settings_backup_item_week">еженедельно</string>
     <string name="accuracy_value">%1$d m.</string>
     <string name="menu_gallery">Gallery</string>
+    <string name="new_record">Новая запись</string>
 
 
 </resources>

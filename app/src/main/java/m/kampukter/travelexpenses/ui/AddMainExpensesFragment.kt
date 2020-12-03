@@ -16,7 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
+import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.R
@@ -107,6 +109,12 @@ class AddMainExpensesFragment : Fragment() {
                 }
             })
         }
+        val delFab = activity?.findViewById<FloatingActionButton>(R.id.delPhotoFab)
+        val addFab = activity?.findViewById<FloatingActionButton>(R.id.addPhotoFab)
+        delFab?.hide()
+        addFab?.visibility = View.INVISIBLE
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

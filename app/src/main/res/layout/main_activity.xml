@@ -9,31 +9,96 @@
         android:layout_height="match_parent"
         tools:context=".ui.MainActivity">
 
-    <LinearLayout
-            android:id="@+id/mainLayout"
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/mainCoordinatorLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:fitsSystemWindows="true">
 
-        <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorMyToolbar"
-                android:elevation="4dp"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
 
-                />
-
-       <!-- <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/my_nav_host_fragment"
-                android:name="androidx.navigation.fragment.NavHostFragment"
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mainConstraintLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/nav_graph" />-->
-    </LinearLayout>
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/my_nav_host_fragment"
+                    android:name="androidx.navigation.fragment.NavHostFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:defaultNavHost="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:navGraph="@navigation/nav_graph" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/mainAppBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:elevation="0dp">
+
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewToolbarCardView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginVertical="2dp"
+                    android:elevation="4dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="12dp"
+                    app:cardUseCompatPadding="true">
+
+
+                <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@color/colorMyToolbar"
+                        android:contentInsetStart="0dp"
+                        android:contentInsetLeft="0dp"
+
+                        android:contentInsetRight="10dp"
+                        android:orientation="horizontal"
+                        app:contentInsetLeft="0dp"
+                        app:contentInsetRight="10dp"
+                        app:contentInsetStart="0dp"
+                        app:contentInsetStartWithNavigation="0dp"
+                        app:titleMarginStart="12dp"
+                        app:titleTextAppearance="@style/Toolbar.TitleText">
+
+                </androidx.appcompat.widget.Toolbar>
+            </androidx.cardview.widget.CardView>
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/addExpenseFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:contentDescription="@null"
+                android:text="@string/new_record"
+                app:backgroundTint="#FFFFFF"
+                app:icon="@drawable/ic_add" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/addExpensesExtendedFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:contentDescription="@null"
+                android:text="@string/new_record"
+                app:backgroundTint="#FFFFFF"
+                app:icon="@drawable/ic_add" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"

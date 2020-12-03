@@ -40,10 +40,10 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        // BS
+        /*// BS
         val bottomSheetBehavior = BottomSheetBehavior.from(map_bottom_sheet_layout)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        // end BS
+        // end BS*/
         val mapController = mapMapView.controller
 
         val mapItemizedOverlay = object : ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
@@ -55,10 +55,10 @@ class MapFragment : Fragment() {
 
             override fun onItemSingleTapUp(index: Int, item: OverlayItem?): Boolean {
                 Log.d("blabla", "SingleTapUp")
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                /*bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 titleTextView.text = "Информация"
                 field1TextView.text = item?.title
-                field2TextView.text = item?.snippet
+                field2TextView.text = item?.snippet*/
                 mapController.animateTo(item?.point)
                 return true
             }
@@ -77,7 +77,7 @@ class MapFragment : Fragment() {
         mapMapView.overlayManager.add(object : Overlay() {
 
             override fun onTouchEvent(event: MotionEvent?, mapView: MapView?): Boolean {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                //bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 return false
             }
         })
@@ -101,11 +101,10 @@ class MapFragment : Fragment() {
 
                         marker?.let { mapController.animateTo(it.position) }
 
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    /*    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                         titleTextView.text = itemExpenses.expense
                         field1TextView.text = itemExpenses.dateTime.toString()
-                        field2TextView.text = itemExpenses.note
-                        //marker?.icon = resources.getDrawable(R.drawable.center)
+                        field2TextView.text = itemExpenses.note*/
                         false
                     }
                     mapMapView.overlays.add(myMarker)

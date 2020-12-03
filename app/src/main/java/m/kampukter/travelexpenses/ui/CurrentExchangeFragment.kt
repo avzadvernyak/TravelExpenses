@@ -44,7 +44,7 @@ class CurrentExchangeFragment : Fragment() {
         viewModel.setDateForCurrencyExchange(null)
         viewModel.exchangeRateLiveDate.observe(
             viewLifecycleOwner,
-            Observer { resultCurrentExchangeRate ->
+            { resultCurrentExchangeRate ->
                 when (resultCurrentExchangeRate) {
                     is ResultCurrentExchangeRate.ErrorAPI -> {
                         progressBar?.visibility = View.GONE

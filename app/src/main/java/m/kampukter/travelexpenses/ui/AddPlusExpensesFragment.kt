@@ -1,8 +1,8 @@
 package m.kampukter.travelexpenses.ui
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.add_additional_data_expenses.*
+import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -34,21 +35,19 @@ class AddPlusExpensesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
-
             val tempExpenses = value.first
-
             if (tempExpenses?.imageUri != null) {
                 //Glide.with(view).load(tempExpenses.imageUri).into(photoImageView)
-                addPhotoFab.visibility = View.GONE
-                delPhotoFab.visibility = View.VISIBLE
-                delPhotoFab.setOnClickListener {
+                addPhotoFab?.hide()
+                delPhotoFab?.show()
+                delPhotoFab?.setOnClickListener {
                     viewModel.setBufferExpensesPhoto(null)
                     viewModel.deleteFile(File(URI(tempExpenses.imageUri)))
                 }
             } else {
-                addPhotoFab.visibility = View.VISIBLE
-                delPhotoFab.visibility = View.GONE
-                addPhotoFab.setOnClickListener {
+                addPhotoFab?.show()
+                delPhotoFab?.hide()
+                addPhotoFab?.setOnClickListener {
                     findNavController().navigate(R.id.toCameraXFragment)
                 }
             }
@@ -62,6 +61,7 @@ class AddPlusExpensesFragment : Fragment() {
         super.onResume()
         hideSystemKeyboard()
     }
+
 
     private fun hideSystemKeyboard() {
         val imm =

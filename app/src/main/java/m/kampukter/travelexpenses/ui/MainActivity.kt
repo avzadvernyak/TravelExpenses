@@ -12,8 +12,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.main_activity_with_appbar.*
+import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.mainApplication
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.main_activity_with_appbar)
+        setContentView(R.layout.main_activity)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -59,24 +60,38 @@ class MainActivity : AppCompatActivity() {
         // Set up Action Bar
         val navController = host.navController
 
-
         navController.addOnDestinationChangedListener { _, destination, _ ->
             mainAppBarLayout.setExpanded(true)
             addExpenseFab.hide()
             addExpensesExtendedFab.hide()
+            toolbar.setOnClickListener(null)
             when (destination.id) {
                 R.id.homeExpensesFragment -> {
+                    enableLayoutBehaviour()
                     addExpensesExtendedFab.show()
                     toolbar.visibility = View.VISIBLE
-
                 }
-                R.id.expenseFragment ->{
+                R.id.expenseFragment -> {
+                    enableLayoutBehaviour()
                     addExpenseFab.show()
                     toolbar.visibility = View.VISIBLE
                 }
+                R.id.currentExchangeFragment -> {
+                    enableLayoutBehaviour()
+                    toolbar.visibility = View.VISIBLE
+                }
+
                 R.id.cameraXFragment,
                 R.id.attachmentPhotoViewFragment,
                 R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility = View.GONE
+
+                R.id.mapExpensesFragment,
+                R.id.galleryFragment,
+                R.id.editExpensesFragment,
+                R.id.addExpensesFragment -> {
+                    disableLayoutBehaviour()
+                    toolbar.visibility = View.VISIBLE
+                }
                 else -> toolbar.visibility = View.VISIBLE
             }
         }
@@ -155,4 +170,18 @@ class MainActivity : AppCompatActivity() {
     private fun setupActionBar(navController: NavController, appBarConfig: AppBarConfiguration) {
         setupActionBarWithNavController(navController, appBarConfig)
     }
+
+    private fun enableLayoutBehaviour() {
+        val param = cardViewToolbarCardView.layoutParams as AppBarLayout.LayoutParams
+        param.scrollFlags = (AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+                or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS)
+        cardViewToolbarCardView.requestLayout()
+
+    }
+
+    private fun disableLayoutBehaviour() {
+        val param = cardViewToolbarCardView.layoutParams as AppBarLayout.LayoutParams
+        param.scrollFlags = 0
+    }
+
 }

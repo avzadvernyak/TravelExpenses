@@ -3,12 +3,13 @@ package m.kampukter.travelexpenses.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -31,18 +32,16 @@ class HomeExpensesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //return inflater.inflate(R.layout.home_expenses_fragment, container, false)
-        //return inflater.inflate(R.layout.home_fragment, container, false)
-
         return inflater.inflate(R.layout.expenses_fragment, container, false)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val navController = findNavController()
 
         val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
         toolbar?.title = "Поиск в расходах"
-        toolbar?.setOnClickListener { navController.navigate(R.id.toSearchExpensesFragment)  }
+        toolbar?.setOnClickListener { navController.navigate(R.id.toSearchExpensesFragment) }
 
         val imm =
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -87,7 +86,8 @@ class HomeExpensesFragment : Fragment() {
             )
                 .show()
         })
-        val addExpensesExtendedFab = activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpensesExtendedFab)
+        val addExpensesExtendedFab =
+            activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpensesExtendedFab)
         addExpensesExtendedFab?.let {
             recyclerViewExpenses.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -110,4 +110,22 @@ class HomeExpensesFragment : Fragment() {
             addExpensesExtendedFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
         }
     }
+
+  /*  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_expenses, menu)
+
+        val searchView = (menu.findItem(R.id.searchExpenses)?.actionView as? SearchView)
+
+        searchView?.isIconified = false
+        searchView?.onActionViewExpanded()
+        searchView?.queryHint = "Поиск в расходах"
+        searchView?.doOnLayout {
+            searchView.clearFocus()
+        }
+        searchView?.setOnQueryTextFocusChangeListener { _, isFocused ->
+            if (isFocused)
+                findNavController().navigate(R.id.toSearchExpensesFragment)
+        }
+
+    }*/
 }
