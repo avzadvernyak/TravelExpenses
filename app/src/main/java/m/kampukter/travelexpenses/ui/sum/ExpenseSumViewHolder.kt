@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.sum
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

@@ -11,10 +11,14 @@ class GalleryPageAdapter : RecyclerView.Adapter<GalleryViewHolder>() {
 
     private var mediaList = emptyList<ExpensesWithRate>()
 
+    var onClickCallback: ((Int) -> Unit)? = null
+
     override fun getItemCount(): Int = mediaList.size
 
-    override fun onBindViewHolder(holder: GalleryViewHolder, position: Int) =
-        holder.bind(mediaList[position])
+    override fun onBindViewHolder(holder: GalleryViewHolder, position: Int) {
+        holder.bind(mediaList[position], onClickCallback)
+    }
+
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -26,19 +30,21 @@ class GalleryPageAdapter : RecyclerView.Adapter<GalleryViewHolder>() {
     )
 
     fun setList(newMediaList: List<ExpensesWithRate>) {
+
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                mediaList[oldItemPosition].rate == newMediaList[newItemPosition].rate
+                mediaList[oldItemPosition].id == newMediaList[newItemPosition].id
 
             override fun getOldListSize(): Int = mediaList.size
 
             override fun getNewListSize(): Int = newMediaList.size
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                mediaList[oldItemPosition] == newMediaList[newItemPosition]
+                mediaList[oldItemPosition].imageUri == newMediaList[newItemPosition].imageUri
 
         })
         mediaList = newMediaList
         diff.dispatchUpdatesTo(this)
+
     }
 }

@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.sum
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.sum_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.ui.sum.SumCurrencyFragment
+import m.kampukter.travelexpenses.ui.sum.SumExpenseFragment
 
 class SumFragment : Fragment() {
     override fun onCreateView(

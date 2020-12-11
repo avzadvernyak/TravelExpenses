@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.net.Uri
 import android.os.Bundle
@@ -35,11 +35,11 @@ class AttachmentPhotoViewFragment : Fragment() {
                     .placeholder(R.drawable.ic_photo_24)
                     .into(attachmentImageView)
 
-                delFab.setOnClickListener {
+                delButton.setOnClickListener {
                     navController.navigate(R.id.delAttachmentPhotoDialogFragment)
                 }
             }
         })
-        backFab.setOnClickListener { navController.navigate(R.id.next_action) }
+        backButton.setOnClickListener { navController.navigate(R.id.next_action) }
     }
 }

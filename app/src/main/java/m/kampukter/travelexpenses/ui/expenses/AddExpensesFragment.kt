@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
 import android.os.Bundle
@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.sum_fragment.*
+import kotlinx.android.synthetic.main.add_expenses.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -22,12 +22,17 @@ class AddExpensesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.add_expenses, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.isSavingAllowed.observe(viewLifecycleOwner, { _isSavingAllowed ->
+            _isSavingAllowed?.let {
+                saveExpensesFAB.isEnabled = it
+            }
+        })
 
         pager.adapter = object : FragmentStateAdapter(this) {
 
@@ -47,21 +52,7 @@ class AddExpensesFragment : Fragment() {
                 else -> "Вложения"
             }
         }.attach()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.add_expenses, menu)
-
-        viewModel.isSavingAllowed.observe(viewLifecycleOwner, { _isSavingAllowed ->
-            _isSavingAllowed?.let { menu.findItem(R.id.saveExpenses).isEnabled = it }
-        })
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.saveExpenses) {
-
+        saveExpensesFAB.setOnClickListener {
             viewModel.saveNewExpenses()
             //сброс временной переменной
             viewModel.setBufferExpenses(null)
@@ -69,8 +60,6 @@ class AddExpensesFragment : Fragment() {
             hideSystemKeyboard()
             findNavController().navigate(R.id.next_action)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun hideSystemKeyboard() {

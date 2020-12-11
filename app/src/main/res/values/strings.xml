@@ -53,6 +53,7 @@
     <string name="dialog_cancel">Нет</string>
     <string name="dialog_save">Сохранить</string>
     <string name="dialog_title_del_photo">Удалить прикрепленное фото?</string>
+    <string name="dialog_title_del_photo_gallery">Удалить фото из галереи и записи?</string>
     <string name="dialog_location_access_required">"Получить разрешения на определение ваших координат? В случае отказа опция будет отключена"</string>
     <string name="dialog_camera_access_required">"Получить разрешения для работы с камерой? "</string>
     <string name="dialog_permission_required">"Получение разрешений"</string>

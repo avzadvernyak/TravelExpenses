@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
 import android.net.Uri
@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.edit_expenses_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.ui.MyArrayAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 

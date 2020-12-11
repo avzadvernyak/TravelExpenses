@@ -14,7 +14,7 @@
             android:id="@+id/mainCoordinatorLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
+           >
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,6 +39,7 @@
                 android:id="@+id/mainAppBarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
                 android:background="@android:color/transparent"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:elevation="0dp">

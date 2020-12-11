@@ -1,33 +1,39 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
+import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
-import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.data.MyLocation
 import m.kampukter.travelexpenses.mainApplication
+import m.kampukter.travelexpenses.ui.MyArrayAdapter
+import m.kampukter.travelexpenses.ui.STATUS_GPS_OFF
+import m.kampukter.travelexpenses.ui.STATUS_GPS_ON
+import m.kampukter.travelexpenses.ui.permissionsForLocation
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.*
+
 
 class AddMainExpensesFragment : Fragment() {
 
@@ -79,7 +85,7 @@ class AddMainExpensesFragment : Fragment() {
         /*
         Work with Location
         */
-        context?.let {   context->
+        context?.let { context ->
             fusedLocationClient =
                 LocationServices.getFusedLocationProviderClient(context.applicationContext)
             viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, { settings ->
@@ -109,12 +115,27 @@ class AddMainExpensesFragment : Fragment() {
                 }
             })
         }
-        val delFab = activity?.findViewById<FloatingActionButton>(R.id.delPhotoFab)
-        val addFab = activity?.findViewById<FloatingActionButton>(R.id.addPhotoFab)
-        delFab?.hide()
-        addFab?.visibility = View.INVISIBLE
 
-
+        /*
+        //Не совсем успешная попытка менять ФАБ в зависимости от взаиморасположения вьющек на экране
+        val saveFab = activity?.findViewById<ExtendedFloatingActionButton>(R.id.saveExpensesFAB)
+         val tabLayout = activity?.findViewById<TabLayout>(R.id.tab_layout)
+          addExpensesFragmentLayout.viewTreeObserver?.addOnGlobalLayoutListener {
+              Log.d("blabla", "addOnGlobalLayoutListener")
+              noteTextInputLayout?.bottom?.let {
+                  if (saveFab?.top != null && tabLayout?.height != null) {
+                      if (it > saveFab.top.minus(saveFab.marginBottom + tabLayout.height)) saveFab.shrink()
+                      else saveFab.extend()
+                  }
+              }
+          }*/
+        /*addExpensesFragmentLayout.viewTreeObserver?.addOnGlobalLayoutListener(object :
+           ViewTreeObserver.OnGlobalLayoutListener {
+           override fun onGlobalLayout() {
+               Log.d("blabla", "removeOnGlobalLayoutListener")
+               addExpensesFragmentLayout.viewTreeObserver?.removeOnGlobalLayoutListener(this)
+           }
+       })*/
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -127,6 +148,7 @@ class AddMainExpensesFragment : Fragment() {
                 MyArrayAdapter(it, android.R.layout.simple_list_item_1, mutableListOf())
             }
         currencyTextInputEdit?.setAdapter(myDropdownAdapter)
+
         sumTextInputEdit.setText("")
 
         viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
@@ -170,6 +192,11 @@ class AddMainExpensesFragment : Fragment() {
                     )
                 }
             } else {
+
+              /*  if (sumTextInputEdit.text.toString()
+                        .toDoubleOrNull() != tempExpenses.sum
+                ) sumTextInputEdit.setText(tempExpenses.sum.toString())*/
+
                 expenseTextInputEdit.setText(tempExpenses.expense)
                 if (noteTextInputEdit.text.toString() != tempExpenses.note) noteTextInputEdit.setText(
                     tempExpenses.note
@@ -187,7 +214,7 @@ class AddMainExpensesFragment : Fragment() {
                 if (inputString.length == 1 && inputString == ".") {
                     sumTextInputEdit.setText("0.")
                 } else {
-                    if (!inputString.isBlank()) viewModel.setBufferExpenses(
+                    if (inputString.isNotBlank()) viewModel.setBufferExpenses(
                         tempExpenses?.copy(sum = inputString.toDouble())
                     ) else viewModel.setBufferExpenses(tempExpenses?.copy(sum = 0.0))
                 }
@@ -221,6 +248,19 @@ class AddMainExpensesFragment : Fragment() {
         expenseTextInputEdit.setOnClickListener {
             navController.navigate(R.id.toChoiceExpenseForAddFragment)
         }
+
+        //Реализация изменения ФАБ в зависимости от взаиморасположения вьющек на экране
+        val saveFab = activity?.findViewById<ExtendedFloatingActionButton>(R.id.saveExpensesFAB)
+        val tabLayout = activity?.findViewById<TabLayout>(R.id.tab_layout)
+        saveFab?.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            noteTextInputLayout?.bottom?.let {
+                if (tabLayout?.height != null) {
+                    if (it > saveFab.top.minus(saveFab.marginBottom + tabLayout.height)) saveFab.shrink()
+                    else saveFab.extend()
+                }
+            }
+        }
+
     }
 
     override fun onPause() {
@@ -233,4 +273,5 @@ class AddMainExpensesFragment : Fragment() {
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
+
 }

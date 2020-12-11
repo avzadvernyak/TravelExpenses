@@ -8,7 +8,7 @@
             android:name="m.kampukter.travelexpenses.ui.HomeExpensesFragment"
             android:label="@string/nav_label_expenses"
             app:startDestination="@id/toAddExpensesFragment"
-            tools:layout="@layout/home_fragment">
+            tools:layout="@layout/expense_fragment">
 
         <action
                 android:id="@+id/toAddExpensesWithImageFragment"
@@ -58,7 +58,7 @@
     </dialog>
     <fragment
             android:id="@+id/addExpensesFragment"
-            android:name="m.kampukter.travelexpenses.ui.AddExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.AddExpensesFragment"
             android:label="@string/nav_label_add_expenses"
             tools:layout="@layout/add_expenses_fragment">
         <action
@@ -103,8 +103,7 @@
     </fragment>
     <fragment
             android:id="@+id/cameraXFragment"
-            android:name="m.kampukter.travelexpenses.ui.CameraXFragment"
-            >
+            android:name="m.kampukter.travelexpenses.ui.CameraXFragment">
         <action
                 android:id="@+id/toCameraPermissionsDialogFragment"
                 app:destination="@id/cameraPermissionsDialogFragment" />
@@ -114,8 +113,7 @@
     </fragment>
     <fragment
             android:id="@+id/takePhotoForEditFragment"
-            android:name="m.kampukter.travelexpenses.ui.TakePhotoForEditFragment"
-            >
+            android:name="m.kampukter.travelexpenses.ui.TakePhotoForEditFragment">
         <action
                 android:id="@+id/toCameraPermissionsDialogFragment"
                 app:destination="@id/cameraPermissionsDialogFragment" />
@@ -128,7 +126,7 @@
     </fragment>
     <fragment
             android:id="@+id/editExpensesFragment"
-            android:name="m.kampukter.travelexpenses.ui.EditExpensesFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.EditExpensesFragment"
             android:label="@string/nav_label_edit_expenses"
             tools:layout="@layout/edit_expenses_fragment">
         <action
@@ -144,23 +142,24 @@
     </fragment>
     <fragment
             android:id="@+id/attachmentPhotoViewFragment"
-            android:name="m.kampukter.travelexpenses.ui.AttachmentPhotoViewFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.AttachmentPhotoViewFragment"
             android:label="@string/nav_label_edit_expenses"
             tools:layout="@layout/edit_expenses_fragment">
         <action
                 android:id="@+id/next_action"
-                app:popUpTo="@id/editExpensesFragment"/>
+                app:popUpTo="@id/editExpensesFragment" />
 
     </fragment>
 
     <dialog
             android:id="@+id/delAttachmentPhotoDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.DelAttachmentPhotoDialogFragment">
+            android:name="m.kampukter.travelexpenses.ui.expenses.DelAttachmentPhotoDialogFragment">
 
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/editExpensesFragment" />
     </dialog>
+
     <dialog
             android:id="@+id/delExpensesDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.DelExpensesDialogFragment">
@@ -254,7 +253,7 @@
     </dialog>
     <fragment
             android:id="@+id/sumFragment"
-            android:name="m.kampukter.travelexpenses.ui.SumFragment"
+            android:name="m.kampukter.travelexpenses.ui.sum.SumFragment"
             android:label="@string/nav_label_sum"
             tools:layout="@layout/sum_fragment">
 
@@ -330,10 +329,23 @@
     <fragment
             android:id="@+id/galleryFragment"
             android:name="m.kampukter.travelexpenses.ui.gallery.GalleryFragment"
-            android:label="Галерея">
+            android:label="Галерея"
+            tools:layout="@layout/gallery_fragment">
+        <action
+                android:id="@+id/toDelPhotoFromGalleryDialogFragment"
+                app:destination="@+id/delPhotoFromGalleryDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
+
     </fragment>
+    <dialog
+            android:id="@+id/delPhotoFromGalleryDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.gallery.DelPhotoFromGalleryDialogFragment">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/galleryFragment" />
+    </dialog>
 
 </navigation>

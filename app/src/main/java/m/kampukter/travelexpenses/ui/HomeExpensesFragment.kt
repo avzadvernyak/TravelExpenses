@@ -3,13 +3,10 @@ package m.kampukter.travelexpenses.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
-import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +20,7 @@ import m.kampukter.travelexpenses.ui.expenses.TYPE_HEADER_ALL
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class HomeExpensesFragment : Fragment() {
+class   HomeExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     private lateinit var expensesAdapter: ExpensesAdapter
 
@@ -76,7 +73,6 @@ class HomeExpensesFragment : Fragment() {
         }
         viewModel.expensesWithRate.observe(viewLifecycleOwner, {
             expensesAdapter.setList(it)
-            //recyclerViewExpenses.layoutManager?.scrollToPosition(0)
         })
         viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
             if (!it) Snackbar.make(
@@ -107,25 +103,11 @@ class HomeExpensesFragment : Fragment() {
                     super.onScrolled(recyclerView, dx + 16, dy + 16)
                 }
             })
-            addExpensesExtendedFab.setOnClickListener { navController.navigate(R.id.toAddExpensesFragment) }
+            addExpensesExtendedFab.setOnClickListener {
+                viewModel.setBufferExpenses(null)
+                navController.navigate(R.id.toAddExpensesFragment)
+            }
         }
     }
 
-  /*  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_expenses, menu)
-
-        val searchView = (menu.findItem(R.id.searchExpenses)?.actionView as? SearchView)
-
-        searchView?.isIconified = false
-        searchView?.onActionViewExpanded()
-        searchView?.queryHint = "Поиск в расходах"
-        searchView?.doOnLayout {
-            searchView.clearFocus()
-        }
-        searchView?.setOnQueryTextFocusChangeListener { _, isFocused ->
-            if (isFocused)
-                findNavController().navigate(R.id.toSearchExpensesFragment)
-        }
-
-    }*/
 }

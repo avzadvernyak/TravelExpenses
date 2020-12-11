@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.camerax_fragment.*
+import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.CameraXService
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
@@ -50,6 +52,13 @@ class CameraXFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        with(activity as AppCompatActivity) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+            supportActionBar?.hide()
+            val param = mainAppBarLayout.layoutParams
+            param.height = 0
+            mainAppBarLayout.layoutParams = param
+        }
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         val cameraService = CameraXService(cameraExecutor)
@@ -70,6 +79,13 @@ class CameraXFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+        with(requireActivity() as AppCompatActivity) {
+            window.decorView.systemUiVisibility = View.VISIBLE
+            supportActionBar?.show()
+            val param = mainAppBarLayout.layoutParams
+            param.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            mainAppBarLayout.layoutParams = param
+        }
     }
 
 

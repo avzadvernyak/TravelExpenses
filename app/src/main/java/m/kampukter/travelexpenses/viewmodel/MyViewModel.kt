@@ -286,7 +286,7 @@ class MyViewModel(
                 lastExpenses = it
                 postValue(Pair(lastExpenses, currencyList))
                 isSavingAllowed.postValue(
-                    it != null && !it.currency.isBlank() && (it.sum != 0.0) && !it.note.isBlank() && !it.expense.isBlank()
+                    it != null && it.currency.isNotBlank() && (it.sum != 0.0) && it.note.isNotBlank() && it.expense.isNotBlank()
                 )
             }
             addSource(currencyTableList) {
@@ -403,8 +403,6 @@ class MyViewModel(
         }
     }
 
-    fun getMediaFiles() = fileSystemRepository.getMediaFiles()
-
 /*
 Search in Expenses
 */
@@ -419,11 +417,13 @@ Search in Expenses
     fun setSearchStringExpenses(lastSearchString: String) {
         searchStringExpenses.postValue(lastSearchString)
     }
+
     fun getHistorySearchStringExpenses() = expensesRepository.getHistorySearchStringExpenses()
 
     private var isSearchResultExpensesActive = false
-    fun setSearchResultExpensesOpenActive( value: Boolean) {
+    fun setSearchResultExpensesOpenActive(value: Boolean) {
         isSearchResultExpensesActive = value
     }
+
     fun getSearchResultExpensesOpenActive() = isSearchResultExpensesActive
 }

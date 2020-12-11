@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
 import android.os.Bundle
@@ -36,21 +36,21 @@ class AddPlusExpensesFragment : Fragment() {
 
         viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
             val tempExpenses = value.first
-            if (tempExpenses?.imageUri != null) {
-                //Glide.with(view).load(tempExpenses.imageUri).into(photoImageView)
-                addPhotoFab?.hide()
-                delPhotoFab?.show()
-                delPhotoFab?.setOnClickListener {
+            if (tempExpenses?.imageUri == null) imageToggleButton.visibility = View.INVISIBLE
+            else {
+                imageToggleButton.visibility = View.VISIBLE
+                delButton.setOnClickListener {
                     viewModel.setBufferExpensesPhoto(null)
                     viewModel.deleteFile(File(URI(tempExpenses.imageUri)))
                 }
-            } else {
-                addPhotoFab?.show()
-                delPhotoFab?.hide()
-                addPhotoFab?.setOnClickListener {
+            }
+
+            photoImageView.setOnClickListener {
+                if (tempExpenses?.imageUri == null) {
                     findNavController().navigate(R.id.toCameraXFragment)
                 }
             }
+
             Glide.with(view).load(tempExpenses?.imageUri).placeholder(R.drawable.ic_photo_24)
                 .into(photoImageView)
         })
