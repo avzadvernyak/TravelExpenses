@@ -15,13 +15,14 @@ import m.kampukter.travelexpenses.ui.ClickEventDelegate
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import android.text.format.DateFormat
+import m.kampukter.travelexpenses.data.ExpensesMainCollection
 
 
 class SearchResultExpensesFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
 
-    private lateinit var expensesAdapter: ExpensesAdapter
+    private lateinit var expensesAdapter: ExpensesNewAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,7 +60,7 @@ class SearchResultExpensesFragment : Fragment() {
                     navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
-        expensesAdapter = ExpensesAdapter(clickEventDelegate, TYPE_HEADER_SEARCH_RESULT)
+        expensesAdapter = ExpensesNewAdapter(clickEventDelegate)
         with(resultRecyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,
@@ -69,7 +70,10 @@ class SearchResultExpensesFragment : Fragment() {
             adapter = expensesAdapter
         }
         viewModel.expensesSearchResult.observe(viewLifecycleOwner, {
-            expensesAdapter.setList(it)
+            val expenses = mutableListOf<ExpensesMainCollection>()
+            expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.nav_label_search_result_expenses)))
+            it.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
+            expensesAdapter.setList(expenses)
         })
     }
 

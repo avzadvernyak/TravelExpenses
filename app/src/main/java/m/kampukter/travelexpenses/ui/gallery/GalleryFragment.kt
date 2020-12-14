@@ -83,10 +83,10 @@ class GalleryFragment : Fragment() {
                     }
                 }
                 ACTION_ZOOM_ON -> {
-                    if (!isFullScreen) photoPager.isUserInputEnabled = true
+                    if (!isFullScreen) photoPager?.isUserInputEnabled = true
                 }
                 ACTION_ZOOM_OFF -> {
-                    if (!isFullScreen) photoPager.isUserInputEnabled = false
+                    if (!isFullScreen) photoPager?.isUserInputEnabled = false
                 }
             }
 

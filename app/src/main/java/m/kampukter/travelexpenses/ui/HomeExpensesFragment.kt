@@ -14,15 +14,16 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.ExpensesMainCollection
 import m.kampukter.travelexpenses.data.ExpensesWithRate
-import m.kampukter.travelexpenses.ui.expenses.ExpensesAdapter
-import m.kampukter.travelexpenses.ui.expenses.TYPE_HEADER_ALL
+import m.kampukter.travelexpenses.ui.expenses.ExpensesNewAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class   HomeExpensesFragment : Fragment() {
+class HomeExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
-    private lateinit var expensesAdapter: ExpensesAdapter
+
+    private lateinit var expensesAdapter: ExpensesNewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,7 +63,7 @@ class   HomeExpensesFragment : Fragment() {
                     navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
-        expensesAdapter = ExpensesAdapter(clickEventDelegate, TYPE_HEADER_ALL)
+        expensesAdapter = ExpensesNewAdapter(clickEventDelegate)
         with(recyclerViewExpenses) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,
@@ -72,7 +73,12 @@ class   HomeExpensesFragment : Fragment() {
             adapter = expensesAdapter
         }
         viewModel.expensesWithRate.observe(viewLifecycleOwner, {
-            expensesAdapter.setList(it)
+
+            val expenses = mutableListOf<ExpensesMainCollection>()
+            expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.menu_expenses)))
+            it.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
+            expensesAdapter.setList(expenses)
+
         })
         viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
             if (!it) Snackbar.make(
