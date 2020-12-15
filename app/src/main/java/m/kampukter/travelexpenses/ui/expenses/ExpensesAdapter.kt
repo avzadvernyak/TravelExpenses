@@ -12,7 +12,7 @@ import m.kampukter.travelexpenses.ui.ClickEventDelegate
 private const val TYPE_HEADER: Int = 2
 private const val TYPE_LIST: Int = 1
 
-class ExpensesNewAdapter(private val clickEventDelegate: ClickEventDelegate<ExpensesWithRate>) :
+class ExpensesAdapter(private val clickEventDelegate: ClickEventDelegate<ExpensesWithRate>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var expenses = emptyList<ExpensesMainCollection>()
@@ -27,12 +27,12 @@ class ExpensesNewAdapter(private val clickEventDelegate: ClickEventDelegate<Expe
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (viewType) {
-            TYPE_HEADER -> ExpensesHeaderNewViewHolder(
+            TYPE_HEADER -> ExpensesHeaderViewHolder(
                 LayoutInflater
                     .from(parent.context)
                     .inflate(R.layout.expenses_title_item, parent, false)
             )
-            else -> ExpensesNewViewHolder(
+            else -> ExpensesViewHolder(
                 LayoutInflater
                     .from(parent.context)
                     .inflate(R.layout.expenses_item, parent, false),
@@ -42,8 +42,8 @@ class ExpensesNewAdapter(private val clickEventDelegate: ClickEventDelegate<Expe
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ExpensesNewViewHolder -> holder.bind(expenses[position])
-            is ExpensesHeaderNewViewHolder -> holder.bind(expenses[position])
+            is ExpensesViewHolder -> holder.bind(expenses[position])
+            is ExpensesHeaderViewHolder -> holder.bind(expenses[position])
         }
     }
 
@@ -62,7 +62,5 @@ class ExpensesNewAdapter(private val clickEventDelegate: ClickEventDelegate<Expe
         })
         expenses = newListExpenses
         diff.dispatchUpdatesTo(this)
-        /*expenses = newListExpenses
-        notifyDataSetChanged()*/
     }
 }

@@ -16,14 +16,14 @@ import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
 import m.kampukter.travelexpenses.data.ExpensesWithRate
-import m.kampukter.travelexpenses.ui.expenses.ExpensesNewAdapter
+import m.kampukter.travelexpenses.ui.expenses.ExpensesAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class HomeExpensesFragment : Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
 
-    private lateinit var expensesAdapter: ExpensesNewAdapter
+    private lateinit var expensesAdapter: ExpensesAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,7 +63,7 @@ class HomeExpensesFragment : Fragment() {
                     navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
-        expensesAdapter = ExpensesNewAdapter(clickEventDelegate)
+        expensesAdapter = ExpensesAdapter(clickEventDelegate)
         with(recyclerViewExpenses) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,

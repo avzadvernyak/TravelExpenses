@@ -22,7 +22,7 @@ class SearchResultExpensesFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
 
-    private lateinit var expensesAdapter: ExpensesNewAdapter
+    private lateinit var expensesAdapter: ExpensesAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -60,7 +60,7 @@ class SearchResultExpensesFragment : Fragment() {
                     navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
-        expensesAdapter = ExpensesNewAdapter(clickEventDelegate)
+        expensesAdapter = ExpensesAdapter(clickEventDelegate)
         with(resultRecyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,

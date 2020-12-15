@@ -4,9 +4,11 @@ import android.text.format.DateFormat
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expenses_item.view.*
+import kotlinx.android.synthetic.main.expenses_title_item.view.*
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
+import m.kampukter.travelexpenses.data.ExpensesMainCollection
 import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.ui.ClickEventDelegate
@@ -17,22 +19,24 @@ class ExpensesViewHolder(
     private val clickEventDelegate: ClickEventDelegate<ExpensesWithRate>
 ) : RecyclerView.ViewHolder(itemView) {
     private val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
-    fun bind(result: ExpensesWithRate) {
+    fun bind(item: ExpensesMainCollection) {
+
+        val data = (item as ExpensesMainCollection.Row).expenses
 
         with(itemView) {
 
             setOnClickListener {
-                clickEventDelegate.onClick(result)
+                clickEventDelegate.onClick(data)
             }
             setOnLongClickListener {
-                clickEventDelegate.onLongClick(result)
+                clickEventDelegate.onLongClick(data)
                 return@setOnLongClickListener true
             }
-            sumTextView.text = result.sum.toString()
-            expenseTextView.text = result.expense
-            currencyTextView.text = result.currency
-            noteTextView.text = result.note
-            dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", result.dateTime)
+            sumTextView.text = data.sum.toString()
+            expenseTextView.text = data.expense
+            currencyTextView.text = data.currency
+            noteTextView.text = data.note
+            dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", data.dateTime)
             val pattern = when (defaultProgramCurrency) {
                 // Гривна по умолчанию
                 DEFAULT_CURRENCY_CONST_UAH -> "######.## UAH"
@@ -42,9 +46,12 @@ class ExpensesViewHolder(
                 DEFAULT_CURRENCY_CONST_BYN -> "####.#### BYN"
                 else -> "######.##"
             }
-            result.rate?.let { rateTextView.text = DecimalFormat(pattern).format(result.sum * it) }
+            data.rate?.let {
+                rateTextView.text = DecimalFormat(pattern).format(data.sum * it)
+            }
             attachmentImageView.visibility =
-                if (result.imageUri == null) View.INVISIBLE else View.VISIBLE
+                if (data.imageUri == null) View.INVISIBLE else View.VISIBLE
         }
+
     }
 }
