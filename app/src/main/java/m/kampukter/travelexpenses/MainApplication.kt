@@ -16,6 +16,9 @@ import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.FSRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -114,6 +117,9 @@ class MainApplication : Application() {
     }
 
     private fun retrofitBuild(apiUrl: String): Retrofit {
+       /* val client = OkHttpClient.Builder()
+            .addInterceptor(ResponseInterceptor())
+            .build()*/
         return Retrofit.Builder()
             .baseUrl(apiUrl)
             .addConverterFactory(
@@ -124,6 +130,16 @@ class MainApplication : Application() {
             ).build()
     }
 
+  /*  class ResponseInterceptor : Interceptor {
+
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request()
+            val modifiedRequest = request.newBuilder().addHeader("Accept-Charset", "utf-8").build()
+            val response = chain.proceed(modifiedRequest)
+
+            return response.newBuilder().build()
+        }
+    }*/
 
     override fun onCreate() {
         super.onCreate()

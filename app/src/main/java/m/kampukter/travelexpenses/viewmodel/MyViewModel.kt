@@ -323,21 +323,86 @@ class MyViewModel(
         bufferForSaveExpense.postValue(expenses)
     }
 
+    /*
+    Exchange
+    */
+
+    private val queryInExchangeCurrentRate = MutableLiveData<String>()
+    val queryInExchangeLiveData: LiveData<String>
+        get() = queryInExchangeCurrentRate
+
+    fun setQueryInExchangeCurrentRate(query: String) {
+        queryInExchangeCurrentRate.postValue(query)
+    }
 
     private val triggerForCurrencyExchange = MutableLiveData<Boolean>()
-
-    fun setDateForCurrencyExchange(date: Date?) {
+    fun getExchangeCurrency() {
         triggerForCurrencyExchange.postValue(true)
-        if (date != null) expensesRepository.setFoundDate(date)
     }
 
-    val exchangeRateLiveDate = Transformations.switchMap(triggerForCurrencyExchange) {
-        viewModelScope.launch {
-            mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()?.getCurrentRate()
+    private val foundDateExchangeCurrency = MutableLiveData<Date>()
+    fun setDateForCurrencyExchange(date: Date) {
+        foundDateExchangeCurrency.postValue(date)
+    }
+
+    private val resultExchangeCurrentRateLiveData = expensesRepository.exchangeRateLiveDate
+    val exchangeRateLiveDate = MediatorLiveData<ResultCurrentExchangeRate>().apply {
+        var lastResultExchangeCurrentRate: ResultCurrentExchangeRate? = null
+        var lastQuery: String? = null
+        var lastFoundDate: Date? = null
+
+        fun filterExchangeCollection(query: String): List<ExchangeCurrentRate>? {
+            return (lastResultExchangeCurrentRate as? ResultCurrentExchangeRate.Success)?.exchangeCurrentRate?.filter { item ->
+                item.currencyName.indexOf(
+                    query,
+                    0,
+                    true
+                ) != -1 || item.currencyCode.indexOf(query, 0, true) != -1
+            }
         }
-        expensesRepository.exchangeRateLiveDate
 
+        fun getExchangeCurrency() {
+            viewModelScope.launch {
+                mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()
+                    ?.getCurrentRate()
+            }
+        }
+
+        addSource(triggerForCurrencyExchange) {
+            if (lastFoundDate == null) getExchangeCurrency()
+        }
+        addSource(foundDateExchangeCurrency) {
+            expensesRepository.setFindDate(it)
+            if (lastFoundDate != it) getExchangeCurrency()
+            lastFoundDate = it
+
+        }
+        addSource(resultExchangeCurrentRateLiveData) { result ->
+            lastResultExchangeCurrentRate = result
+            if (result is ResultCurrentExchangeRate.ErrorAPI) lastFoundDate = null
+            if (lastQuery.isNullOrEmpty()) postValue(result)
+            else {
+                lastQuery?.let {
+                    filterExchangeCollection(it)?.let { filter ->
+                        postValue(
+                            ResultCurrentExchangeRate.Success(filter)
+                        )
+                    }
+                }
+            }
+        }
+        addSource(queryInExchangeCurrentRate) { query ->
+            lastQuery = query
+            if (query.isNotEmpty()) {
+                query?.let { filterExchangeCollection(it) }?.let { filter ->
+                    postValue(
+                        ResultCurrentExchangeRate.Success(filter)
+                    )
+                }
+            } else postValue(lastResultExchangeCurrentRate)
+        }
     }
+
 
     // For map (osmdroid)
     private val paramMapViewMutableLiveData = MutableLiveData<Pair<Double, GeoPoint>>()

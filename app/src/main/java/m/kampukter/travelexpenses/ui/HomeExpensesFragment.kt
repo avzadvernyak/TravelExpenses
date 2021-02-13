@@ -3,7 +3,9 @@ package m.kampukter.travelexpenses.ui
 import android.content.Context
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
@@ -38,6 +40,7 @@ class HomeExpensesFragment : Fragment() {
         val navController = findNavController()
 
         val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
+
         toolbar?.title = "Поиск в расходах"
         toolbar?.setOnClickListener { navController.navigate(R.id.toSearchExpensesFragment) }
 

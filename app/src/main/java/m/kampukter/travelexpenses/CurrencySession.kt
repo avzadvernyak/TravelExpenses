@@ -53,12 +53,13 @@ class CurrencySession(private val currencyId: Int) : KoinComponent {
                 )
                 // Рубль по умолчению
                 DEFAULT_CURRENCY_CONST_RUB -> setProperty("currentAPIUrl", "http://www.cbr.ru/scripts/")
+                //DEFAULT_CURRENCY_CONST_RUB -> setProperty("currentAPIUrl", "http://www.orbis.in.ua/")
                 // Белорусский рубль по умолчению
                 DEFAULT_CURRENCY_CONST_BYN -> setProperty("currentAPIUrl", "https://www.nbrb.by/api/exrates/")
                 // для отладки
                 else -> setProperty("currentAPIUrl", "http://www.orbis.in.ua/")
             }
-            return createScope("apiScope", named("API"))
+            return getOrCreateScope("apiScope", named("API"))
         }
     }
 

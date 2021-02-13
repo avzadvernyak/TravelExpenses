@@ -189,12 +189,12 @@ class ExpensesRepository(
         exchangeRateMutableLiveDate.postValue(par)
     }
 
-    private var foundDate: Date = Calendar.getInstance().time
-    fun setFoundDate(date: Date) {
-        foundDate = date
+    private var findDate: Date = Calendar.getInstance().time
+    fun setFindDate(date: Date) {
+        findDate = date
     }
 
-    fun getFoundDate() = foundDate
+    fun getFoundDate() = findDate
 
     /*
     Search in Expenses

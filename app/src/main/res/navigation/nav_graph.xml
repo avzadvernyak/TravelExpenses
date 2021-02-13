@@ -39,8 +39,8 @@
                 android:id="@+id/toSumFragment"
                 app:destination="@+id/sumFragment" />
         <action
-                android:id="@+id/toCurrentExchangeFragment"
-                app:destination="@+id/currentExchangeFragment" />
+                android:id="@+id/toExchangeFragment"
+                app:destination="@+id/exchangeFragment" />
         <action
                 android:id="@+id/toExportFragment"
                 app:destination="@+id/exportFragment" />
@@ -162,7 +162,7 @@
 
     <dialog
             android:id="@+id/delExpensesDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.DelExpensesDialogFragment">
+            android:name="m.kampukter.travelexpenses.ui.expenses.DelExpensesDialogFragment">
 
         <action
                 android:id="@+id/next_action"
@@ -170,7 +170,7 @@
     </dialog>
     <dialog
             android:id="@+id/delAllExpensesDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.DelAllExpensesDialogFragment">
+            android:name="m.kampukter.travelexpenses.ui.expenses.DelAllExpensesDialogFragment">
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
@@ -227,14 +227,14 @@
     </dialog>
     <dialog
             android:id="@+id/addExpenseDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.AddExpenseDialogFragment">
+            android:name="m.kampukter.travelexpenses.ui.expense.AddExpenseDialogFragment">
         <action
                 android:id="@+id/toExpenseFragment"
                 app:popUpTo="@id/expenseFragment" />
     </dialog>
     <dialog
             android:id="@+id/editExpenseDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.EditExpenseDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.EditExpenseDialogFragment"
             android:label="@string/nav_label_edit_expense">
         <argument
                 android:name="expenseArg"
@@ -249,7 +249,7 @@
             android:name="m.kampukter.travelexpenses.ui.DatePickerDialogFragment">
         <action
                 android:id="@+id/next_action"
-                app:popUpTo="@id/currentExchangeFragment" />
+                app:popUpTo="@id/exchangeFragment" />
     </dialog>
     <fragment
             android:id="@+id/sumFragment"
@@ -263,10 +263,10 @@
     </fragment>
 
     <fragment
-            android:id="@+id/currentExchangeFragment"
-            android:name="m.kampukter.travelexpenses.ui.CurrentExchangeFragment"
+            android:id="@+id/exchangeFragment"
+            android:name="m.kampukter.travelexpenses.ui.ExchangeFragment"
             android:label="@string/nav_label_exchange"
-            tools:layout="@layout/current_exchange_fragment">
+            tools:layout="@layout/exchange_fragment">
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />

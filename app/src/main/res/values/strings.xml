@@ -62,6 +62,7 @@
     </string>
     <string name="dialog_expenses_del_title">Удалить запись?</string>
     <string name="dialog_expenses_del_record">Запись удалена</string>
+    <string name="dialog_exchange_is_empty">Ничего не найдено</string>
     <string name="hint_datetime_created">Запись создана</string>
     <string name="hint_sum">Сумма</string>
     <string name="hint_note">Примечание</string>
@@ -92,6 +93,7 @@
     <string name="accuracy_value">%1$d m.</string>
     <string name="menu_gallery">Gallery</string>
     <string name="new_record">Новая запись</string>
+    <string name="menu_search">Search</string>
 
 
 </resources>

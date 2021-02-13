@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expense
 
 import android.app.Dialog
 import android.os.Bundle

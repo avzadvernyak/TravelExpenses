@@ -15,8 +15,9 @@ class DatePickerDialogFragment : DialogFragment() {
 
     private var datePickerListener =
         DatePickerDialog.OnDateSetListener { _, p1, p2, p3 ->
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse("$p1-${p2 +1}-$p3")
-            viewModel.setDateForCurrencyExchange(date)
+            val date =
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse("$p1-${p2 + 1}-$p3")
+            date?.let { viewModel.setDateForCurrencyExchange(it) }
         }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

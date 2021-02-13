@@ -46,3 +46,11 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             "ALTER TABLE Expenses ADD COLUMN imageUri TEXT default null")
     }
 }
+val MIGRATION_2_3 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE Expenses ADD COLUMN expenses_profile TEXT default null")
+        database.execSQL(
+            "ALTER TABLE Expenses ADD COLUMN imageUri TEXT default null")
+    }
+}

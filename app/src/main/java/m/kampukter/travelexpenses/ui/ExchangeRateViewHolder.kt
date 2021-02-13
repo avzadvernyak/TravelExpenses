@@ -3,16 +3,16 @@ package m.kampukter.travelexpenses.ui
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.exchange_rate_item.view.*
-import m.kampukter.travelexpenses.data.CurrentExchangeRate
+import m.kampukter.travelexpenses.data.ExchangeCurrentRate
 import java.text.DecimalFormat
 
 class ExchangeRateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(currentExchangeRate: CurrentExchangeRate) {
+    fun bind(exchangeCurrentRate: ExchangeCurrentRate) {
         with(itemView) {
-            currencyCodeTextView.text = currentExchangeRate.currencyCode
-            currencyNameTextView.text = currentExchangeRate.currencyName
+            currencyCodeTextView.text = exchangeCurrentRate.currencyCode
+            currencyNameTextView.text = exchangeCurrentRate.currencyName
 
-            rateTextView.text = DecimalFormat("####0.0000").format(currentExchangeRate.rate)
+            rateTextView.text = DecimalFormat("####0.0000").format(exchangeCurrentRate.rate)
         }
     }
 

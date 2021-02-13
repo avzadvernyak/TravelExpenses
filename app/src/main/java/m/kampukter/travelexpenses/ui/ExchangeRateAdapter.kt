@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.CurrentExchangeRate
+import m.kampukter.travelexpenses.data.ExchangeCurrentRate
 
 class ExchangeRateAdapter : RecyclerView.Adapter<ExchangeRateViewHolder>() {
 
-    private var exchangeRateList = listOf<CurrentExchangeRate>()
+    private var exchangeRateList = listOf<ExchangeCurrentRate>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExchangeRateViewHolder {
         return ExchangeRateViewHolder(
@@ -24,7 +24,7 @@ class ExchangeRateAdapter : RecyclerView.Adapter<ExchangeRateViewHolder>() {
             holder.bind(exchangeRateList[position])
     }
 
-    fun setList(list: List<CurrentExchangeRate>) {
+    fun setList(list: List<ExchangeCurrentRate>) {
         this.exchangeRateList = list
         notifyDataSetChanged()
     }

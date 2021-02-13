@@ -9,10 +9,7 @@ import m.kampukter.travelexpenses.data.CBRDateConverter
 import m.kampukter.travelexpenses.data.CBRFloatConverter
 import m.kampukter.travelexpenses.data.CBRIntConverter
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
-import retrofit2.http.QueryName
+import retrofit2.http.*
 import java.util.*
 
 interface RateCurrencyAPI {
@@ -47,6 +44,7 @@ interface RateCurrencyAPI {
         @Query("date_req") date: String
     ): Response<ValCurs>
 
+    @Headers("Accept-Charset: utf-8")
     @GET("XML_daily_eng.asp")
     suspend fun getRateTodayCBR(
         @Query("date_req") date: String

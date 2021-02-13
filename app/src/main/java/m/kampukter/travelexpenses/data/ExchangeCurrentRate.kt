@@ -1,6 +1,6 @@
 package m.kampukter.travelexpenses.data
 
-data class CurrentExchangeRate (
+data class ExchangeCurrentRate (
     val currencyCode: String,
     val currencyName: String,
     val rate: Float,

@@ -5,7 +5,7 @@ import android.util.Log
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
-import m.kampukter.travelexpenses.data.CurrentExchangeRate
+import m.kampukter.travelexpenses.data.ExchangeCurrentRate
 import m.kampukter.travelexpenses.data.RateCurrency
 import m.kampukter.travelexpenses.data.ResultCurrentExchangeRate
 import m.kampukter.travelexpenses.data.dao.ExpensesDao
@@ -42,7 +42,7 @@ class RateCurrencyAPIRepository(
     }
 
     private suspend fun getRateNBU(date: Date): ResultCurrentExchangeRate {
-        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        val resultListRate = mutableListOf<ExchangeCurrentRate>()
         try {
             val response = rateCurrencyAPI.getRateTodayNbu(
                 DateFormat.format("yyyyMMdd", date).toString(),
@@ -51,7 +51,7 @@ class RateCurrencyAPIRepository(
             if (response.code() == 200) {
                 response.body()?.forEach {
                     resultListRate.add(
-                        CurrentExchangeRate(
+                        ExchangeCurrentRate(
                             currencyCode = it.cc,
                             currencyName = it.txt,
                             rate = it.rate,
@@ -77,14 +77,14 @@ class RateCurrencyAPIRepository(
 
         val foundDateString = DateFormat.format("dd/MM/yyyy", date).toString()
 
-        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        val resultListRate = mutableListOf<ExchangeCurrentRate>()
         try {
             val response = rateCurrencyAPI.getRateTodayCBR(foundDateString)
             if (response.code() == 200) {
                 val resDate = DateFormat.format("dd.MM.yyyy", response.body()?.date).toString()
                 response.body()?.valute?.forEach { _valute ->
                     resultListRate.add(
-                        CurrentExchangeRate(
+                        ExchangeCurrentRate(
                             currencyCode = _valute.charCode,
                             currencyName = _valute.name,
                             rate = _valute.value / _valute.nominal,
@@ -105,7 +105,7 @@ class RateCurrencyAPIRepository(
     }
 
     private suspend fun getRateNBRB(date: Date): ResultCurrentExchangeRate {
-        val resultListRate = mutableListOf<CurrentExchangeRate>()
+        val resultListRate = mutableListOf<ExchangeCurrentRate>()
         try {
             val response = rateCurrencyAPI.getRateTodayNBRB(
                 DateFormat.format("yyyy-MM-dd", date).toString(),
@@ -123,7 +123,7 @@ class RateCurrencyAPIRepository(
 
                 response.body()?.forEach {
                     resultListRate.add(
-                        CurrentExchangeRate(
+                        ExchangeCurrentRate(
                             currencyCode = it.Cur_Abbreviation,
                             currencyName = it.Cur_Name,
                             rate = it.Cur_OfficialRate / it.Cur_Scale,

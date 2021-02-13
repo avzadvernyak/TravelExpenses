@@ -8,7 +8,7 @@
                 android:title="@string/menu_expenses" />
 
         <item
-                android:id="@id/currentExchangeFragment"
+                android:id="@id/exchangeFragment"
                 android:icon="@drawable/ic_expenses"
                 android:title="@string/menu_exchange" />
         <item

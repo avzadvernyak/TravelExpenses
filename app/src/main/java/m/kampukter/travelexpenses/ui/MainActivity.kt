@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     addExpenseFab.show()
                     toolbar.visibility = View.VISIBLE
                 }
-                R.id.currentExchangeFragment -> {
+                R.id.exchangeFragment -> {
                     enableLayoutBehaviour()
                     toolbar.visibility = View.VISIBLE
                 }
@@ -116,11 +116,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Скрыть в меня Курсы так как не выбрана валюта
-            navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
+            navigation_view?.menu?.findItem(R.id.exchangeFragment)?.isVisible =
                 settings?.defCurrency != 0
         })
         NetworkLiveData.observe(this, {
-            navigation_view?.menu?.findItem(R.id.currentExchangeFragment)?.isVisible =
+            navigation_view?.menu?.findItem(R.id.exchangeFragment)?.isVisible =
                 it and (mainApplication.getActiveCurrencySession() != null)
             navigation_view?.menu?.findItem(R.id.mapExpensesFragment)?.isVisible = it
         })
