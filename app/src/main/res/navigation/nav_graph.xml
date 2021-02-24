@@ -329,7 +329,7 @@
     <fragment
             android:id="@+id/galleryFragment"
             android:name="m.kampukter.travelexpenses.ui.gallery.GalleryFragment"
-            android:label="Галерея"
+            android:label="@string/nav_label_gallery"
             tools:layout="@layout/gallery_fragment">
         <action
                 android:id="@+id/toDelPhotoFromGalleryDialogFragment"
@@ -347,5 +347,58 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/galleryFragment" />
     </dialog>
-
+    <!--   Folders Expenses    -->
+    <fragment
+            android:id="@+id/foldersFragment"
+            android:name="m.kampukter.travelexpenses.ui.folders.FoldersFragment"
+            android:label="@string/nav_label_folders"
+            tools:layout="@layout/folders_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+        <action
+                android:id="@+id/toFoldersAddFragment"
+                app:destination="@+id/foldersAddFragment" />
+        <action
+                android:id="@+id/toFoldersEditFragment"
+                app:destination="@+id/foldersEditFragment" />
+        <action
+                android:id="@+id/toDelFolderPhaseOneDialogFragment"
+                app:destination="@id/delFolderPhaseOneDialogFragment" />
+        <action
+                android:id="@+id/toDelFolderPhaseSecondDialogFragment"
+                app:destination="@id/delFolderPhaseSecondDialogFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/foldersAddFragment"
+            android:name="m.kampukter.travelexpenses.ui.folders.FoldersAddFragment"
+            android:label="@string/nav_label_add_new_folder"
+            tools:layout="@layout/folders_add_fragment">
+        <action
+                android:id="@+id/toFoldersFragment"
+                app:popUpTo="@id/foldersFragment" />
+    </fragment>
+    <dialog
+            android:id="@+id/delFolderPhaseOneDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.folders.FolderDeletePhaseOneDialogFragment">
+        <action
+                android:id="@+id/toFoldersFragment"
+                app:popUpTo="@id/foldersFragment" />
+    </dialog>
+    <dialog
+            android:id="@+id/delFolderPhaseSecondDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.folders.FolderDeletePhaseSecondDialogFragment">
+        <action
+                android:id="@+id/toFoldersFragment"
+                app:popUpTo="@id/foldersFragment" />
+    </dialog>
+    <fragment
+            android:id="@+id/foldersEditFragment"
+            android:name="m.kampukter.travelexpenses.ui.folders.FoldersEditFragment"
+            android:label="@string/nav_label_edit_new_folder"
+            tools:layout="@layout/folders_add_fragment">
+        <action
+                android:id="@+id/toFoldersFragment"
+                app:popUpTo="@id/foldersFragment" />
+    </fragment>
 </navigation>

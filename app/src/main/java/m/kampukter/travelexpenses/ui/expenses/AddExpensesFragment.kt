@@ -57,15 +57,13 @@ class AddExpensesFragment : Fragment() {
             //сброс временной переменной
             viewModel.setBufferExpenses(null)
 
-            hideSystemKeyboard()
+            (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                view.windowToken,
+                0
+            )
             findNavController().navigate(R.id.next_action)
         }
     }
 
-    private fun hideSystemKeyboard() {
-        val imm =
-            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
-    }
 
 }

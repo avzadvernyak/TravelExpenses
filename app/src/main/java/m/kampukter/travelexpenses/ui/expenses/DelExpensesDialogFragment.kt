@@ -14,7 +14,7 @@ class DelExpensesDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        return MaterialAlertDialogBuilder(requireContext()).setTitle(resources.getString(R.string.dialog_expenses_del_title))
+        return MaterialAlertDialogBuilder(requireContext()).setTitle(resources.getString(R.string.dialog_del_title))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
                 viewModel.expensesDeleteTrigger(true)
                 dialog.dismiss()

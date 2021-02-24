@@ -16,9 +16,6 @@ import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.FSRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Response
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -46,7 +43,7 @@ class MainApplication : Application() {
     private val module = module {
         single {
             Room.databaseBuilder(androidContext(), MyDatabase::class.java, "expenses.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(supportDb: SupportSQLiteDatabase) {
                         GlobalScope.launch(context = Dispatchers.IO) {
@@ -80,6 +77,13 @@ class MainApplication : Application() {
                                 )
                             )
                         }
+                        GlobalScope.launch(context = Dispatchers.IO) {
+                            get<MyDatabase>().foldersDao().insertAll(
+                                listOf(
+                                    Folders(shortName = "Расходы", description = "Папка расходов по умолчанию")
+                                )
+                            )
+                        }
                     }
                 }).build()
         }
@@ -92,6 +96,7 @@ class MainApplication : Application() {
                 get<MyDatabase>().currencyDao(),
                 get<MyDatabase>().settingsDao(),
                 get<MyDatabase>().expenseDao(),
+                get<MyDatabase>().foldersDao(),
                 get()
             )
         }
@@ -173,7 +178,8 @@ class MainApplication : Application() {
                     Settings(
                         userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
                         defCurrency = 0,
-                        backupPeriod = 0
+                        backupPeriod = 0,
+                        folder ="Расходы"
                     )
                 )
             }

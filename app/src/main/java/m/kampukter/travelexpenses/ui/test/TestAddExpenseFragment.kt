@@ -115,7 +115,9 @@ class TestAddExpenseFragment : Fragment() {
                                     expense = "",
                                     note = "",
                                     location = null,
-                                    imageUri = null
+                                    imageUri = null,
+                                    // тут текущая папка
+                                    folder = "Расходы"
                                 )
                             )
                         }

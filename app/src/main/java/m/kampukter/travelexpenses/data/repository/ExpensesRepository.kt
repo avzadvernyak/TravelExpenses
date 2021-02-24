@@ -21,14 +21,15 @@ class ExpensesRepository(
     private val currencyDao: CurrencyDao,
     private val settingsDao: SettingsDao,
     private val expenseDao: ExpenseDao,
+    private val foldersDao: FoldersDao,
     private val backupServer: BackupServer
 ) {
 
     private var idWorkRequest: UUID? = null
 
-    fun getAll(): LiveData<List<Expenses>> = expensesDao.getAll()
-    fun getAllExpensesWithRate() = expensesDao.getAllExpensesWithRate()
-
+    fun getAll(folder: String): LiveData<List<Expenses>> = expensesDao.getAll(folder)
+    fun getAllExpensesWithRate(folder: String) = expensesDao.getAllExpensesWithRate(folder)
+    fun getExpenses(folderName: String) = expensesDao.getExpenses(folderName)
 
     fun getRecordById(id: Long): LiveData<Expenses> = expensesDao.getExpensesById(id)
 
@@ -58,8 +59,8 @@ class ExpensesRepository(
         return result
     }
 
-    fun getExpensesSum(): LiveData<List<ReportSumView>> = expensesDao.getSumExpenses()
-    fun getCurrencySum(): LiveData<List<ReportSumView>> = expensesDao.getSumCurrency()
+    fun getExpensesSum(folder: String): LiveData<List<ReportSumView>> = expensesDao.getSumExpenses(folder)
+    fun getCurrencySum(folder: String): LiveData<List<ReportSumView>> = expensesDao.getSumCurrency(folder)
 
     // CurrencyDao
     fun getCurrencyAllLiveData(): LiveData<List<CurrencyTable>> = currencyDao.getAllLiveData()
@@ -209,5 +210,25 @@ class ExpensesRepository(
     }
 
     fun getHistorySearchStringExpenses() = historySearchStringExpenses
+
+    /*
+    Work with folders
+    */
+    //fun getAllFolders() = foldersDao.getAllLiveData()
+    fun getAllFolders() = foldersDao.getAllExtendedView()
+    fun searchFolderById(folderId: String) = foldersDao.search(folderId)
+    suspend fun addFolder(folder: Folders) = foldersDao.addFolder(folder)
+
+    suspend fun deleteFolder(folderName: String, isDelete: Boolean): Long {
+        var numberRecords = 0L
+        if (isDelete) foldersDao.deleteFolderByName(folderName)
+        else numberRecords = expensesDao.getFoldersCount(folderName)
+        return numberRecords
+    }
+    /*
+    * Для изменения Folder
+    */
+    suspend fun updateFolder(newFolderName: String, oldFolderName: String) =
+        foldersDao.updateRecord(newFolderName, oldFolderName)
 
 }

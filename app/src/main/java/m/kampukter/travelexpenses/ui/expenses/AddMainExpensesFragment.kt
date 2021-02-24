@@ -115,27 +115,6 @@ class AddMainExpensesFragment : Fragment() {
                 }
             })
         }
-
-        /*
-        //Не совсем успешная попытка менять ФАБ в зависимости от взаиморасположения вьющек на экране
-        val saveFab = activity?.findViewById<ExtendedFloatingActionButton>(R.id.saveExpensesFAB)
-         val tabLayout = activity?.findViewById<TabLayout>(R.id.tab_layout)
-          addExpensesFragmentLayout.viewTreeObserver?.addOnGlobalLayoutListener {
-              Log.d("blabla", "addOnGlobalLayoutListener")
-              noteTextInputLayout?.bottom?.let {
-                  if (saveFab?.top != null && tabLayout?.height != null) {
-                      if (it > saveFab.top.minus(saveFab.marginBottom + tabLayout.height)) saveFab.shrink()
-                      else saveFab.extend()
-                  }
-              }
-          }*/
-        /*addExpensesFragmentLayout.viewTreeObserver?.addOnGlobalLayoutListener(object :
-           ViewTreeObserver.OnGlobalLayoutListener {
-           override fun onGlobalLayout() {
-               Log.d("blabla", "removeOnGlobalLayoutListener")
-               addExpensesFragmentLayout.viewTreeObserver?.removeOnGlobalLayoutListener(this)
-           }
-       })*/
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -187,15 +166,17 @@ class AddMainExpensesFragment : Fragment() {
                             expense = "",
                             note = "",
                             location = null,
-                            imageUri = null
+                            imageUri = null,
+                            // тут текущая папка выберется в VM
+                            folder = ""
                         )
                     )
                 }
             } else {
 
-              /*  if (sumTextInputEdit.text.toString()
-                        .toDoubleOrNull() != tempExpenses.sum
-                ) sumTextInputEdit.setText(tempExpenses.sum.toString())*/
+                /*  if (sumTextInputEdit.text.toString()
+                          .toDoubleOrNull() != tempExpenses.sum
+                  ) sumTextInputEdit.setText(tempExpenses.sum.toString())*/
 
                 expenseTextInputEdit.setText(tempExpenses.expense)
                 if (noteTextInputEdit.text.toString() != tempExpenses.note) noteTextInputEdit.setText(
@@ -242,7 +223,10 @@ class AddMainExpensesFragment : Fragment() {
         })
         currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
             if (p1) {
-                hideSystemKeyboard()
+                (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                    view?.windowToken,
+                    0
+                )
             }
         }
         expenseTextInputEdit.setOnClickListener {
@@ -267,11 +251,4 @@ class AddMainExpensesFragment : Fragment() {
         super.onPause()
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
-
-    private fun hideSystemKeyboard() {
-        val imm =
-            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
-    }
-
 }

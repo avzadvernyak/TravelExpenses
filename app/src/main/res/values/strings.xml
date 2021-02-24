@@ -60,19 +60,22 @@
     <string name="dialog_expenses_del_supporting_text">От %1$s \nна сумму %2$8.2f  %3$s</string>
     <string name="dialog_expenses_del_all_message">Все записи с расходами будут безвозвратно потеряны.Для их сохранения в другом месте воспользуйтесь Экспортом.
     </string>
-    <string name="dialog_expenses_del_title">Удалить запись?</string>
+    <string name="dialog_del_title">Удалить запись?</string>
     <string name="dialog_expenses_del_record">Запись удалена</string>
     <string name="dialog_exchange_is_empty">Ничего не найдено</string>
     <string name="hint_datetime_created">Запись создана</string>
     <string name="hint_sum">Сумма</string>
     <string name="hint_note">Примечание</string>
     <string name="add_record_title">Добавить запись</string>
+    <string name="fields_add_title">Создать папку расходов</string>
     <string name="oneUah">за 1 UAH на</string>
     <string name="oneRub">за 1 RUB на</string>
     <string name="oneByn">за 1 BYN на</string>
     <string name="noCurrency">Не выбрана валюта по умолчанию</string>
     <string name="hint_expense">Статья расходов</string>
     <string name="hint_currency">Валюта</string>
+    <string name="hint_folderName">Имя</string>
+    <string name="hint_folderDescription">Описание</string>
 
     <string name="reload">Повторить</string>
     <string name="errorAPI">Ошибка связи с банком. \nПопробуйте позже.</string>
@@ -94,6 +97,10 @@
     <string name="menu_gallery">Gallery</string>
     <string name="new_record">Новая запись</string>
     <string name="menu_search">Search</string>
+    <string name="nav_label_gallery">Галерея</string>
+    <string name="nav_label_folders">Папки расходов</string>
+    <string name="nav_label_add_new_folder">Новая папка</string>
+    <string name="nav_label_edit_new_folder">Редактирование папки</string>
 
 
 </resources>

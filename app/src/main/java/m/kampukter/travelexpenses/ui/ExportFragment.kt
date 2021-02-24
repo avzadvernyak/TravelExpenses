@@ -26,6 +26,7 @@ class ExportFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel.getExpensesCSV(true)
         viewModel.expensesCSVForExport.observe(viewLifecycleOwner, { expensesCSV ->
             if (expensesCSV.isNullOrEmpty()) {

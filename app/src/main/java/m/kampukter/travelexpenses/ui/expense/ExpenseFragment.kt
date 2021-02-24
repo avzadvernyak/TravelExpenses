@@ -40,7 +40,7 @@ class ExpenseFragment : Fragment() {
         with(recyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,
-                androidx.recyclerview.widget.RecyclerView.VERTICAL,
+                RecyclerView.VERTICAL,
                 false
             )
             adapter = expenseAdapter

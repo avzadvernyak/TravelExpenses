@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.new_expense_edit_field.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.ui.MaterialDialogFragment
+import m.kampukter.travelexpenses.ui.expense.MaterialDialogFragment
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 

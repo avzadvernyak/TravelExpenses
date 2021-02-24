@@ -19,11 +19,253 @@ class MyViewModel(
     private val fileSystemRepository: FSRepository
 ) : ViewModel() {
 
+    val savedSettings = expensesRepository.getSettingsLiveData()
+
+    /*
+    Begin
+    Folders Expenses
+   */
+
+    private val getAllFolders = expensesRepository.getAllFolders()
+    val currentFolder = Transformations.switchMap(savedSettings) {
+        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            if (it != null) emitSource(expensesRepository.searchFolderById(it.folder))
+        }
+    }
+    private val isSaveNewFolder = MutableLiveData<Boolean>()
+    fun saveNewFolder() {
+        isSaveNewFolder.postValue(true)
+    }
+
+    private val newFolderName = MutableLiveData<String>()
+    fun setNewFolderName(name: String) {
+        newFolderName.postValue(name)
+    }
+
+    private val newFolderDescription = MutableLiveData<String>()
+    fun setNewFolderDescription(description: String) {
+        newFolderDescription.postValue(description)
+    }
+
+    private val inputShortNameErrorMutableLiveData = MutableLiveData<String>()
+    val inputShortNameError: LiveData<String>
+        get() = inputShortNameErrorMutableLiveData
+
+    val isFolderSavingAllowed = MediatorLiveData<Boolean>().apply {
+        var lastNewFolder = Folders("", null)
+        var lastListName = listOf<String>()
+        fun update() {
+            val isFoldersIsCorrect = !lastListName.contains(lastNewFolder.shortName) &&
+                    lastNewFolder.shortName.isNotBlank()
+            postValue(isFoldersIsCorrect)
+            inputShortNameErrorMutableLiveData.postValue(
+                when {
+                    lastNewFolder.shortName.isBlank() -> "Заполните поле"
+                    lastListName.contains(lastNewFolder.shortName) -> "Такое имя уже есть"
+                    else -> null
+                }
+            )
+
+        }
+        addSource(getAllFolders) { listFolders ->
+            lastListName = listFolders.map { it.shortName }
+            update()
+        }
+        //Add new
+        addSource(isSaveNewFolder) {
+            val isFoldersIsCorrect = !lastListName.contains(lastNewFolder.shortName) &&
+                    lastNewFolder.shortName.isNotBlank()
+            if (it && isFoldersIsCorrect) viewModelScope.launch {
+                lastListName.contains(lastNewFolder.shortName)
+                expensesRepository.addFolder(lastNewFolder)
+            }
+        }
+
+        addSource(newFolderName) {
+            if (it != null) {
+                lastNewFolder = lastNewFolder.copy(shortName = it)
+                update()
+            }
+        }
+        addSource(newFolderDescription) {
+            if (it != null) {
+                lastNewFolder = lastNewFolder.copy(description = it)
+                update()
+            }
+        }
+    }
+
+
+    val folderCandidates = MediatorLiveData<List<FoldersExtendedView>>().apply {
+        var lastCurrentFolder: FoldersExtendedView? = null
+        var lastListFolders = listOf<FoldersExtendedView>()
+
+        fun update() {
+            if (lastCurrentFolder != null && lastListFolders.isNotEmpty()) lastCurrentFolder?.let { folder ->
+                postValue(lastListFolders.filter { it.shortName != folder.shortName })
+            }
+        }
+
+        addSource(getAllFolders) {
+            if (it != null) {
+                lastListFolders = it
+                update()
+            }
+        }
+        addSource(currentFolder) {
+            if (it != null) {
+                lastCurrentFolder = it
+                update()
+            }
+        }
+
+    }
+
+    private val editFolderName = MutableLiveData<String>()
+    fun setEditFolderName(name: String) {
+        editFolderName.postValue(name)
+    }
+
+    private val editFolderDescription = MutableLiveData<String>()
+    fun setEditFolderDescription(description: String) {
+        editFolderDescription.postValue(description)
+    }
+
+    private val updateFolderTrigger = MutableLiveData<Boolean>()
+    fun setUpdateFolderTrigger() {
+        updateFolderTrigger.postValue(true)
+    }
+
+    val editFolderErrorMsg = MediatorLiveData<String?>().apply {
+
+        var lastListName = listOf<String>()
+        var lastCurrentFolder: FoldersExtendedView? = null
+        var oldFolderName: String? = null
+
+        fun update() {
+            lastCurrentFolder?.let { folderName ->
+                postValue(
+                    when {
+                        folderName.shortName.isBlank() -> "Заполните поле"
+                        lastListName.contains(folderName.shortName) -> "Такое имя уже есть"
+                        else -> null
+                    }
+                )
+            }
+        }
+        addSource(folderCandidates) { listFolders ->
+            lastListName = listFolders.map { it.shortName }
+            update()
+        }
+
+        addSource(currentFolder) {
+            if (it != null) {
+                lastCurrentFolder = it
+                oldFolderName = it.shortName
+            }
+        }
+        addSource(editFolderName) {
+            if (it != null) {
+                lastCurrentFolder = lastCurrentFolder?.copy(shortName = it)
+                update()
+            }
+        }
+        addSource(editFolderDescription) {
+            if (it != null) {
+                lastCurrentFolder = lastCurrentFolder?.copy(description = it)
+                lastCurrentFolder?.let { folderExtendedView ->
+                    val folder =
+                        Folders(folderExtendedView.shortName, folderExtendedView.description)
+                    viewModelScope.launch { expensesRepository.addFolder(folder) }
+                }
+            }
+        }
+        addSource(updateFolderTrigger) {
+            oldFolderName?.let { oldName ->
+                lastCurrentFolder?.let { folderName ->
+                    val isCorrect = when {
+                        folderName.shortName.isBlank() -> false
+                        lastListName.contains(folderName.shortName) -> false
+                        else -> true
+                    }
+                    if (isCorrect) viewModelScope.launch {
+                        expensesRepository.updateFolder(folderName.shortName, oldName)
+                    }
+                }
+            }
+        }
+    }
+
+    private val folderDelTrigger = MutableLiveData<Boolean>()
+    fun deleteFolderName(folderName: String) {
+        folderDeleteName.postValue(folderName)
+    }
+
+    private val folderDeleteName = MutableLiveData<String>()
+    fun deleteFolderTrigger(isDelete: Boolean) {
+        folderDelTrigger.postValue(isDelete)
+    }
+
+    val folderDeletionResult: LiveData<FolderDeletionResult> =
+        MediatorLiveData<FolderDeletionResult>().apply {
+            var lastFolderName: String? = null
+            var lastFolderTrigger: Boolean? = null
+            fun reset() {
+                folderDelTrigger.postValue(null)
+                folderDeleteName.postValue(null)
+                postValue(null)
+            }
+
+            fun update() {
+                val folderName = lastFolderName
+                val folderTrigger = lastFolderTrigger
+
+                if (folderName == null || folderTrigger == null) return
+
+                viewModelScope.launch {
+                    if (folderTrigger) {
+                        expensesRepository.deleteFolder(folderName, true)
+                        postValue(FolderDeletionResult.Success)
+                        delay(1000)
+                        reset()
+                    } else {
+                        val numberRec = expensesRepository.deleteFolder(
+                            folderName,
+                            folderTrigger
+                        )
+                        if (numberRec == 0L) {
+                            expensesRepository.deleteFolder(folderName, true)
+                            postValue(FolderDeletionResult.Success)
+                            delay(1000)
+                            reset()
+                        } else postValue(FolderDeletionResult.Warning(folderName, numberRec))
+                    }
+                }
+            }
+            addSource(folderDeleteName) {
+                lastFolderName = it
+                update()
+            }
+            addSource(folderDelTrigger) {
+                lastFolderTrigger = it
+                update()
+            }
+        }
+    /*
+    End
+    Folders Expenses
+    */
+
     /*
     * получение итогов по статьям и по валютам
     */
-    fun getExpensesSum() = expensesRepository.getExpensesSum()
-    fun getCurrencySum() = expensesRepository.getCurrencySum()
+    fun getExpensesSum() = Transformations.switchMap(currentFolder) { folder ->
+        expensesRepository.getExpensesSum(folder.shortName)
+    }
+
+    fun getCurrencySum() = Transformations.switchMap(currentFolder) { folder ->
+        expensesRepository.getCurrencySum(folder.shortName)
+    }
 
     /*
     * получение строки в CSV из коллекции Expenses для экспорта
@@ -52,8 +294,11 @@ class MyViewModel(
     }
 
 
-    val expenses: LiveData<List<Expenses>> = expensesRepository.getAll()
-    val expensesWithRate = expensesRepository.getAllExpensesWithRate()
+    val expenses: LiveData<List<Expenses>> =
+        Transformations.switchMap(currentFolder) { folder -> expensesRepository.getAll(folder.shortName) }
+    val expensesWithRate = Transformations.switchMap(currentFolder) { folder ->
+        expensesRepository.getAllExpensesWithRate(folder.shortName)
+    }
 
 
     private val expensesFindId = MutableLiveData<Long>()
@@ -195,21 +440,24 @@ class MyViewModel(
         expenseUpdateTrigger.postValue(expenseNewName)
     }
 
-
     fun deleteRate() {
         viewModelScope.launch { expensesRepository.deleteRate() }
     }
-
 
     fun saveSettings(settings: Settings) {
         viewModelScope.launch { expensesRepository.insertSettings(settings) }
     }
 
-    val savedSettings = expensesRepository.getSettingsLiveData()
-
     private val settingStatusGPS = MutableLiveData<Int>()
     fun setSettingStatusGPS(status: Int) {
         settingStatusGPS.postValue(status)
+    }
+
+    fun setSettingNewFolder(folder: String) {
+        viewModelScope.launch {
+            val settings = expensesRepository.getSettings()
+            if (settings != null) expensesRepository.insertSettings(settings.copy(folder = folder))
+        }
     }
 
     val savedSettingsLiveData = MediatorLiveData<Settings>().apply {
@@ -219,6 +467,7 @@ class MyViewModel(
             postValue(it)
         }
         addSource(settingStatusGPS) { statusGps ->
+
             lastSettings?.let {
                 viewModelScope.launch {
                     expensesRepository.insertSettings(
@@ -246,6 +495,10 @@ class MyViewModel(
         Transformations.switchMap(idProgram) { name ->
             expensesRepository.restoreBackupLiveData(name)
         }
+
+    val expensesInFolder =
+        Transformations.switchMap(currentFolder) { folder -> expensesRepository.getExpenses(folder.shortName) }
+
     val expenseMediatorLiveData = MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
         var currentExpenses: Expenses? = null
         var currencyList: List<CurrencyTable> = emptyList()
@@ -282,6 +535,7 @@ class MyViewModel(
         MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
             var lastExpenses: Expenses? = null
             var currencyList: List<CurrencyTable> = emptyList()
+            var lastCurrentFolder: String? = null
             addSource(bufferForSaveExpense) {
                 lastExpenses = it
                 postValue(Pair(lastExpenses, currencyList))
@@ -294,15 +548,18 @@ class MyViewModel(
                 postValue(Pair(lastExpenses, currencyList))
             }
             addSource(isSaveNewExpenses) {
+
                 if (it) lastExpenses?.let { _expenses ->
-                    viewModelScope.launch {
-                        expensesRepository.addExpenses(_expenses)
+                    lastCurrentFolder?.let { folder ->
+                        viewModelScope.launch {
+                            expensesRepository.addExpenses(_expenses.copy(folder = folder))
 
-                        //установка сохраняемой валюты как по умолчанию
-                        expensesRepository.resetDef()
-                        expensesRepository.setDefCurrency(_expenses.currency)
+                            //установка сохраняемой валюты как по умолчанию
+                            expensesRepository.resetDef()
+                            expensesRepository.setDefCurrency(_expenses.currency)
 
-                        isSaveNewExpenses.postValue(false)
+                            isSaveNewExpenses.postValue(false)
+                        }
                     }
                 }
 
@@ -316,6 +573,10 @@ class MyViewModel(
             addSource(bufferForSaveExpensePhoto) {
                 lastExpenses = lastExpenses?.copy(imageUri = it)
                 postValue(Pair(lastExpenses, currencyList))
+            }
+            addSource(currentFolder) {
+                if (it != null) lastCurrentFolder = it.shortName
+
             }
         }
 
@@ -491,4 +752,7 @@ Search in Expenses
     }
 
     fun getSearchResultExpensesOpenActive() = isSearchResultExpensesActive
+
+
 }
+

@@ -75,10 +75,22 @@ class HomeExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
-        viewModel.expensesWithRate.observe(viewLifecycleOwner, {
+        var nameCurrentFolder: String? = null
+        viewModel.currentFolder.observe(viewLifecycleOwner, {
+            nameCurrentFolder = it.shortName
+        })
 
+        //viewModel.expensesWithRate.observe(viewLifecycleOwner, {
+        viewModel.expensesInFolder.observe(viewLifecycleOwner, {
             val expenses = mutableListOf<ExpensesMainCollection>()
+
+            if (nameCurrentFolder != null) nameCurrentFolder?.let { name ->
+                expenses.add(ExpensesMainCollection.Header(name))
+            } else expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.menu_expenses)))
+            /*
+            val folder =
             expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.menu_expenses)))
+            */
             it.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
             expensesAdapter.setList(expenses)
 

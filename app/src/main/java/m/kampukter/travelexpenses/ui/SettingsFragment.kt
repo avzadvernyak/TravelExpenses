@@ -27,7 +27,7 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
+        super.onViewCreated(view, savedInstanceState)
         controlBackupRadioGroup.visibility = View.INVISIBLE
         viewModel.savedSettings.observe(viewLifecycleOwner, Observer { settings ->
             if (settings != null) {

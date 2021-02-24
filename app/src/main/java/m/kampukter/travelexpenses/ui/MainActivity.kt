@@ -19,6 +19,7 @@ import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
+import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val STATUS_GPS_ON = 1
@@ -67,11 +68,17 @@ class MainActivity : AppCompatActivity() {
             toolbar.setOnClickListener(null)
             when (destination.id) {
                 R.id.homeExpensesFragment -> {
+                    toolbar.visibility = View.VISIBLE
                     enableLayoutBehaviour()
                     addExpensesExtendedFab.show()
-                    toolbar.visibility = View.VISIBLE
+
                 }
                 R.id.expenseFragment -> {
+                    enableLayoutBehaviour()
+                    addExpenseFab.show()
+                    toolbar.visibility = View.VISIBLE
+                }
+                R.id.foldersFragment -> {
                     enableLayoutBehaviour()
                     addExpenseFab.show()
                     toolbar.visibility = View.VISIBLE
@@ -85,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.attachmentPhotoViewFragment,
                 R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility = View.GONE
 
+                R.id.foldersAddFragment,
                 R.id.mapExpensesFragment,
                 R.id.galleryFragment,
                 R.id.editExpensesFragment,
