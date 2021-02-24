@@ -1,6 +1,7 @@
 package m.kampukter.travelexpenses.ui.expenses
 
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expenses_item.view.*
@@ -9,27 +10,26 @@ import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
-import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.ui.ClickEventDelegate
 import java.text.DecimalFormat
 
 class ExpensesViewHolder(
     itemView: View,
-    private val clickEventDelegate: ClickEventDelegate<ExpensesWithRate>
+    private val clickEventDelegate: ClickEventDelegate<ExpensesMainCollection>
 ) : RecyclerView.ViewHolder(itemView) {
     private val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
-    fun bind(item: ExpensesMainCollection) {
+    fun bind(item: ExpensesMainCollection, isSelected: Boolean) {
 
         val data = (item as ExpensesMainCollection.Row).expenses
 
         with(itemView) {
-
+            setSelected(isSelected)
             setOnClickListener {
-                clickEventDelegate.onClick(data)
+                clickEventDelegate.onClick(item)
             }
             setOnLongClickListener {
-                clickEventDelegate.onLongClick(data)
+                clickEventDelegate.onLongClick(item)
                 return@setOnLongClickListener true
             }
             sumTextView.text = data.sum.toString()

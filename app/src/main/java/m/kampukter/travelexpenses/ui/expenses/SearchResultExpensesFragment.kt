@@ -60,7 +60,7 @@ class SearchResultExpensesFragment : Fragment() {
                     navController.navigate(R.id.toDelExpensesDialogFragment, bundle)
                 }
             }
-        expensesAdapter = ExpensesAdapter(clickEventDelegate)
+        expensesAdapter = ExpensesAdapter(view.context)
         with(resultRecyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
                 context,

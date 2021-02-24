@@ -60,8 +60,8 @@
     <string name="dialog_expenses_del_supporting_text">От %1$s \nна сумму %2$8.2f  %3$s</string>
     <string name="dialog_expenses_del_all_message">Все записи с расходами будут безвозвратно потеряны.Для их сохранения в другом месте воспользуйтесь Экспортом.
     </string>
-    <string name="dialog_del_title">Удалить запись?</string>
-    <string name="dialog_expenses_del_record">Запись удалена</string>
+    <string name="dialog_del_title">Удалить?</string>
+    <string name="dialog_expenses_del_record">Удалено</string>
     <string name="dialog_exchange_is_empty">Ничего не найдено</string>
     <string name="hint_datetime_created">Запись создана</string>
     <string name="hint_sum">Сумма</string>
@@ -101,6 +101,9 @@
     <string name="nav_label_folders">Папки расходов</string>
     <string name="nav_label_add_new_folder">Новая папка</string>
     <string name="nav_label_edit_new_folder">Редактирование папки</string>
+    <string name="expenses_am_action_move">Перенести</string>
+    <string name="expenses_am_action_del">Удалить</string>
+    <string name="expenses_am_title_count">Выбрано: %1$d</string>
 
 
 </resources>

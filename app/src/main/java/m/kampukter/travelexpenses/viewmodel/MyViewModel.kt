@@ -1,5 +1,6 @@
 package m.kampukter.travelexpenses.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -314,23 +315,32 @@ class MyViewModel(
         expensesRepository.setDefCurrency(query)
     }
 
+    private val selectedExpensesMutableLiveData = MutableLiveData<List<ExpensesMainCollection>>()
+    val selectedExpensesLiveData: LiveData<List<ExpensesMainCollection>>
+        get() = selectedExpensesMutableLiveData
+
+    fun setSelectedExpenses(selectedExpenses: List<ExpensesMainCollection>) {
+        selectedExpensesMutableLiveData.postValue(selectedExpenses)
+    }
+
     private val expensesDeleteTrigger = MutableLiveData<Boolean>()
     val expensesDeleteStatusMediatorLiveData = MediatorLiveData<Boolean>().apply {
-        var expenses: Expenses? = null
+        var lastSelectedExpenses = setOf<Long>()
         addSource(expensesDeleteTrigger) {
-            if (it != null) {
-                if (it) {
-                    expenses?.let { _expenses ->
-                        viewModelScope.launch {
-                            expensesRepository.deleteExpensesById(_expenses.id)
-                        }
-                        postValue(true)
+            if (it) {
+                if (lastSelectedExpenses.isNotEmpty())
+                    viewModelScope.launch {
+                        expensesRepository.deleteIdList(lastSelectedExpenses)
                     }
-                }
+                postValue(true)
+                selectedExpensesMutableLiveData.postValue(listOf())
             }
+
         }
-        addSource(expensesById) { _expenses ->
-            if (_expenses != null) expenses = _expenses
+        addSource(selectedExpensesMutableLiveData) { selectedExpenses ->
+            if (selectedExpenses != null)
+                lastSelectedExpenses =
+                    selectedExpenses.map { (it as ExpensesMainCollection.Row).id }.toSet()
         }
     }
 

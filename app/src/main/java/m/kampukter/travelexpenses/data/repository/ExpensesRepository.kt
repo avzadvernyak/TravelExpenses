@@ -42,6 +42,10 @@ class ExpensesRepository(
         expensesDao.deleteExpensesById(selectedId)
     }
 
+    suspend fun deleteIdList(selectedListId: Set<Long>) {
+        expensesDao.deleteIdList(selectedListId)
+    }
+
     suspend fun deleteAll() {
         expensesDao.deleteAll()
     }

@@ -99,4 +99,7 @@ interface ExpensesDao {
            """
     )
     fun getExpenses(folder: String): LiveData<List<ExpensesWithRate>>
+
+    @Query("delete from expenses WHERE expenses.id IN (:selected)")
+    suspend fun deleteIdList(selected: Set<Long>)
 }
