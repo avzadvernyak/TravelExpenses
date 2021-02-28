@@ -45,6 +45,9 @@ class ExpensesRepository(
     suspend fun deleteIdList(selectedListId: Set<Long>) {
         expensesDao.deleteIdList(selectedListId)
     }
+    suspend fun moveIdList(selectedListId: Set<Long>, newFolder: String) {
+        expensesDao.moveIdList(selectedListId, newFolder)
+    }
 
     suspend fun deleteAll() {
         expensesDao.deleteAll()
@@ -205,12 +208,12 @@ class ExpensesRepository(
     Search in Expenses
     */
     private val historySearchStringExpenses = mutableListOf<String>()
-    fun getSearchExpensesWithRate(searchString: String): LiveData<List<ExpensesWithRate>> {
+    fun getSearchExpensesWithRate(searchString: String, folder: String):LiveData<List<ExpensesWithRate>> {
         if (searchString.isNotBlank() && !historySearchStringExpenses.contains(searchString)) historySearchStringExpenses.add(
             searchString
         )
 
-        return expensesDao.getSearchExpensesWithRate("%$searchString%")
+        return expensesDao.getSearchExpensesWithRate("%$searchString%", folder)
     }
 
     fun getHistorySearchStringExpenses() = historySearchStringExpenses

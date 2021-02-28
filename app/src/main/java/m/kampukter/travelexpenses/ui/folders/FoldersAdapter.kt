@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses.ui.folders
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +29,6 @@ class FoldersAdapter(private val clickEventDelegate: ClickEventDelegate<FoldersE
 
     fun setList(list: List<FoldersExtendedView>) {
         this.profileList = list
-        Log.d("blabla","$list")
         notifyDataSetChanged()
     }
 }

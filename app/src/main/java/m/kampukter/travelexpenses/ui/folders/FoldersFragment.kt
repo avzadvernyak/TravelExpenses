@@ -2,7 +2,6 @@ package m.kampukter.travelexpenses.ui.folders
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,7 +78,6 @@ class FoldersFragment : Fragment() {
                 }
 
                 override fun onLongClick(item: FoldersExtendedView) {
-                    Log.d("blabla", "fragment ${item.shortName}")
                     viewModel.deleteFolderName(item.shortName)
                     val bundle = bundleOf("folderPhaseOne" to item.shortName)
                     navController.navigate(R.id.toDelFolderPhaseOneDialogFragment, bundle)

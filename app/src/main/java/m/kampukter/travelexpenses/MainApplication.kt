@@ -135,17 +135,6 @@ class MainApplication : Application() {
             ).build()
     }
 
-  /*  class ResponseInterceptor : Interceptor {
-
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
-            val modifiedRequest = request.newBuilder().addHeader("Accept-Charset", "utf-8").build()
-            val response = chain.proceed(modifiedRequest)
-
-            return response.newBuilder().build()
-        }
-    }*/
-
     override fun onCreate() {
         super.onCreate()
 

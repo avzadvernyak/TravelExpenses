@@ -27,6 +27,9 @@
                 android:id="@+id/toDelExpensesDialogFragment"
                 app:destination="@+id/delExpensesDialogFragment" />
         <action
+                android:id="@+id/toExpensesMoveFragment"
+                app:destination="@+id/expensesMoveFragment" />
+        <action
                 android:id="@+id/toDelAllExpensesDialogFragment"
                 app:destination="@+id/delAllExpensesDialogFragment" />
         <action
@@ -98,6 +101,9 @@
                 android:id="@+id/toDelExpensesDialogFragment"
                 app:destination="@+id/delExpensesDialogFragment" />
         <action
+                android:id="@+id/toExpensesMoveDialogFragment"
+                app:destination="@+id/expensesMoveDialogFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/searchExpensesFragment" />
     </fragment>
@@ -168,6 +174,24 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </dialog>
+   <!-- <dialog
+            android:id="@+id/expensesMoveDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesMoveDialogFragment">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </dialog>-->
+    <fragment
+            android:id="@+id/expensesMoveFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesMoveFragment"
+            android:label="@string/nav_label_move_expenses"
+            tools:layout="@layout/expenses_move_fragment">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+    </fragment>
     <dialog
             android:id="@+id/delAllExpensesDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.expenses.DelAllExpensesDialogFragment">

@@ -100,6 +100,9 @@ class MainActivity : AppCompatActivity() {
                     disableLayoutBehaviour()
                     toolbar.visibility = View.VISIBLE
                 }
+                /*R.id.expensesMoveFragment -> {
+                    toolbar.visibility = View.VISIBLE
+                }*/
                 else -> toolbar.visibility = View.VISIBLE
             }
         }

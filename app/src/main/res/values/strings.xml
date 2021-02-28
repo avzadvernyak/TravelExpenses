@@ -27,6 +27,7 @@
     <string name="nav_label_about">О программе</string>
     <string name="nav_label_add_expenses">Новая запись</string>
     <string name="nav_label_edit_expenses">Редактировать</string>
+    <string name="nav_label_move_expenses">Переместить в</string>
     <string name="nav_label_settings">Настройки</string>
     <string name="nav_label_expense">Статьи</string>
     <string name="nav_label_edit_expense">Редактировать статью</string>
@@ -62,6 +63,7 @@
     </string>
     <string name="dialog_del_title">Удалить?</string>
     <string name="dialog_expenses_del_record">Удалено</string>
+    <string name="dialog_expenses_move_record">Перенесено</string>
     <string name="dialog_exchange_is_empty">Ничего не найдено</string>
     <string name="hint_datetime_created">Запись создана</string>
     <string name="hint_sum">Сумма</string>
@@ -98,12 +100,13 @@
     <string name="new_record">Новая запись</string>
     <string name="menu_search">Search</string>
     <string name="nav_label_gallery">Галерея</string>
-    <string name="nav_label_folders">Папки расходов</string>
+    <string name="nav_label_folders">Выбор текущей папки</string>
     <string name="nav_label_add_new_folder">Новая папка</string>
     <string name="nav_label_edit_new_folder">Редактирование папки</string>
+    <string name="expenses_am_action_share">Поделиться</string>
     <string name="expenses_am_action_move">Перенести</string>
     <string name="expenses_am_action_del">Удалить</string>
     <string name="expenses_am_title_count">Выбрано: %1$d</string>
-
+    <string name="msg_sent_to">%1$s \n%2$s \n%3$8.2f %4$s \n%5$s;\n"</string>
 
 </resources>

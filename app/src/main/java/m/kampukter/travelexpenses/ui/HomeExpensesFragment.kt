@@ -1,7 +1,10 @@
 package m.kampukter.travelexpenses.ui
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -13,10 +16,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
+import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.ui.expenses.ExpensesAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -33,12 +36,16 @@ class HomeExpensesFragment : Fragment() {
 
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            viewModel.setSelectedExpenses(expensesAdapter.getSelectedItems())
             when (item?.itemId) {
                 R.id.action_move -> {
-
+                    navController.navigate(R.id.toExpensesMoveFragment)
+                    mode?.finish()
+                }
+                R.id.action_share -> {
+                    viewModel.expensesShareTrigger(true)
                 }
                 R.id.action_delete -> {
-                    viewModel.setSelectedExpenses(expensesAdapter.getSelectedItems())
                     navController.navigate(R.id.toDelExpensesDialogFragment)
                 }
             }
@@ -125,13 +132,20 @@ class HomeExpensesFragment : Fragment() {
         viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
             actionMode?.finish()
             expensesAdapter.endSelection()
-            Snackbar.make(
-                view,
-                getString(R.string.dialog_expenses_del_record),
-                Snackbar.LENGTH_SHORT
-            )
-                .show()
         })
+        viewModel.expensesMoveStatusMediatorLiveData.observe(viewLifecycleOwner, {
+            actionMode?.finish()
+            expensesAdapter.endSelection()
+        })
+
+        viewModel.expensesShareResultMediatorLiveData.observe(viewLifecycleOwner, {
+            if (it.second.isNotEmpty() && it.first) {
+                actionMode?.finish()
+                expensesAdapter.endSelection()
+                sharedExpenses(it.second)
+            }
+        })
+
 
         val addExpensesExtendedFab =
             activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpensesExtendedFab)
@@ -162,6 +176,67 @@ class HomeExpensesFragment : Fragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.setSelectedExpenses(expensesAdapter.getSelectedItems())
+        expensesAdapter.let { viewModel.setSelectedExpenses(it.getSelectedItems()) }
+    }
+
+    private fun sharedExpenses(expensesList: List<ExpensesWithRate>) {
+        viewModel.expensesShareTrigger(false)
+        if (expensesList.size == 1) {
+            if (expensesList[0].imageUri != null) sharedExpensesImageIntent(expensesList[0])
+            else {
+                val messageText = getString(
+                    R.string.msg_sent_to,
+                    expensesList[0].expense,
+                    expensesList[0].note,
+                    expensesList[0].sum,
+                    expensesList[0].currency,
+                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString()
+                )
+                sharedExpensesTextIntent(messageText)
+            }
+        } else {
+            var messageText = ""
+            expensesList.forEach {
+                messageText += getString(
+                    R.string.msg_sent_to,
+                    it.expense,
+                    it.note,
+                    it.sum,
+                    it.currency,
+                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString()
+                )
+            }
+            sharedExpensesTextIntent(messageText)
+        }
+    }
+
+    private fun sharedExpensesImageIntent(expenses: ExpensesWithRate) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            val date =
+                DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime).toString()
+            putExtra(
+                Intent.EXTRA_TEXT, getString(
+                    R.string.msg_sent_to,
+                    expenses.expense,
+                    expenses.note,
+                    expenses.sum,
+                    expenses.currency,
+                    date
+                )
+            )
+            putExtra(Intent.EXTRA_STREAM, Uri.parse(expenses.imageUri))
+            type = "image/*"
+        }
+        startActivity(Intent.createChooser(sendIntent, "Share photo"))
+    }
+
+    private fun sharedExpensesTextIntent(messageText: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, messageText)
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(sendIntent, "Share expenses"))
     }
 }

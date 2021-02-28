@@ -40,13 +40,13 @@ interface ExpensesDao {
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString
+            where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder = :folder 
             group by expenses.dateTime
             order by expenses.dateTime desc  
            
            """
     )
-    fun getSearchExpensesWithRate( searchString: String): LiveData<List<ExpensesWithRate>>
+    fun getSearchExpensesWithRate( searchString: String, folder: String): LiveData<List<ExpensesWithRate>>
 
 
     @Query("delete from expenses WHERE expenses.id = :selectedId")
@@ -102,4 +102,7 @@ interface ExpensesDao {
 
     @Query("delete from expenses WHERE expenses.id IN (:selected)")
     suspend fun deleteIdList(selected: Set<Long>)
+
+    @Query("update expenses set folder = :newFolder WHERE expenses.id IN (:selected)")
+    suspend fun moveIdList(selected: Set<Long>, newFolder: String)
 }

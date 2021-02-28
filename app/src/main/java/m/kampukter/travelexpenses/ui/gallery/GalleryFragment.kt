@@ -112,6 +112,21 @@ class GalleryFragment : Fragment() {
                             shareButton.id -> {
                                 val sendIntent: Intent = Intent().apply {
                                     action = Intent.ACTION_SEND
+                                    val date = DateFormat.format(
+                                        "dd/MM/yyyy HH:mm",
+                                        collection[position].dateTime
+                                    ).toString()
+                                    putExtra(
+                                        Intent.EXTRA_TEXT,
+                                        getString(
+                                            R.string.msg_sent_to,
+                                            collection[position].expense,
+                                            collection[position].note,
+                                            collection[position].sum,
+                                            collection[position].currency,
+                                           date
+                                        )
+                                    )
                                     putExtra(
                                         Intent.EXTRA_STREAM,
                                         Uri.parse(collection[position].imageUri)
