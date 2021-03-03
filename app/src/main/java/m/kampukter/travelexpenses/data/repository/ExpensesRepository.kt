@@ -235,7 +235,9 @@ class ExpensesRepository(
     /*
     * Для изменения Folder
     */
-    suspend fun updateFolder(newFolderName: String, oldFolderName: String) =
-        foldersDao.updateRecord(newFolderName, oldFolderName)
+    suspend fun updateFolderShortName(newFolderName: String, oldFolderName: String) =
+        foldersDao.updateShortName(newFolderName, oldFolderName)
+    suspend fun updateFolderDescription(id: String, description: String) =
+        foldersDao.updateDescription(id, description)
 
 }

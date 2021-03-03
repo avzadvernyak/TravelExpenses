@@ -1,6 +1,7 @@
 package m.kampukter.travelexpenses.ui.expenses
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,12 +32,13 @@ class ExpensesMoveFragment : Fragment() {
 
         val navController = findNavController()
 
+        val ids = arguments?.getLongArray("Ids")
+
         val clickEventDelegate: ClickEventDelegate<FoldersExtendedView> =
             object : ClickEventDelegate<FoldersExtendedView> {
                 override fun onClick(item: FoldersExtendedView) {
-                    viewModel.expensesMoveTrigger(item.shortName)
+                    ids?.let { viewModel.moveSelectedExpenses( it.toSet(), item.shortName)}
                     navController.navigateUp()
-                    //findNavController().navigate(R.id.next_action)
                 }
 
                 override fun onLongClick(item: FoldersExtendedView) {}

@@ -30,7 +30,10 @@ interface FoldersDao {
     suspend fun deleteFolderByName(selectedFolder: String)
 
     @Query("update folders set shortName = :newFolderName where shortName = :oldFolderName ")
-    suspend fun updateRecord(newFolderName: String, oldFolderName: String): Int
+    suspend fun updateShortName(newFolderName: String, oldFolderName: String): Int
+
+    @Query("update folders set description = :description where shortName = :id ")
+    suspend fun updateDescription(id: String, description: String): Int
 
     @Query("select shortName, description, (select count(*) from expenses where expenses.folder = folders.shortName) as countRecords from folders")
     fun getAllExtendedView(): LiveData<List<FoldersExtendedView>>

@@ -22,7 +22,7 @@ class ExpensesMoveDialogFragment : DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle("Переместить в")
             .setItems(items) { dialog, which ->
-                viewModel.expensesMoveTrigger(items[which])
+                //viewModel.expensesMoveTrigger(items[which])
             }
             .create()
 

@@ -24,8 +24,8 @@
                 android:id="@+id/toEditExpensesFragment"
                 app:destination="@+id/editExpensesFragment" />
         <action
-                android:id="@+id/toDelExpensesDialogFragment"
-                app:destination="@+id/delExpensesDialogFragment" />
+                android:id="@+id/toExpensesDelDialogFragment"
+                app:destination="@+id/expensesDelDialogFragment" />
         <action
                 android:id="@+id/toExpensesMoveFragment"
                 app:destination="@+id/expensesMoveFragment" />
@@ -98,8 +98,8 @@
                 android:id="@+id/toEditExpensesFragment"
                 app:destination="@+id/editExpensesFragment" />
         <action
-                android:id="@+id/toDelExpensesDialogFragment"
-                app:destination="@+id/delExpensesDialogFragment" />
+                android:id="@+id/toExpensesDelDialogFragment"
+                app:destination="@+id/expensesDelDialogFragment" />
         <action
                 android:id="@+id/toExpensesMoveDialogFragment"
                 app:destination="@+id/expensesMoveDialogFragment" />
@@ -167,8 +167,8 @@
     </dialog>
 
     <dialog
-            android:id="@+id/delExpensesDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expenses.DelExpensesDialogFragment">
+            android:id="@+id/expensesDelDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesDelDialogFragment">
 
         <action
                 android:id="@+id/next_action"

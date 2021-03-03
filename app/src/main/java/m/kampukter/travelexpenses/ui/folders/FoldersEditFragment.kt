@@ -36,14 +36,30 @@ class FoldersEditFragment : Fragment() {
         folderShortNameTextInputEdit.filters = filterArray
         folderShortNameTextInputEdit.filterTouchesWhenObscured
 
-        folderDescriptionTextInputEdit.onFocusChangeListener =
-            View.OnFocusChangeListener { _, p1 ->
-                if (!p1) viewModel.setEditFolderDescription(folderDescriptionTextInputEdit.text.toString())
+        folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val shortName = folderShortNameTextInputEdit.text.toString()
+                viewModel.updateFolderDescription( shortName, p0.toString())
             }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
         folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.updateFolderShortName( p0.toString())
+            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
+        viewModel.editFolderMsg.observe(viewLifecycleOwner,{
+            folderShortNameTextInputEdit.error = it
+        })
+        /*folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 viewModel.setEditFolderName(p0.toString())
             }
+
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
@@ -52,16 +68,18 @@ class FoldersEditFragment : Fragment() {
                 if (!p1) viewModel.setUpdateFolderTrigger()
             }
 
+
         viewModel.editFolderErrorMsg.observe(viewLifecycleOwner, {
             folderShortNameTextInputEdit.error = it
-        })
+        })*/
+
         viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
             folder?.let {
-                folderShortNameTextInputEdit.setText(it.shortName)
-                folderDescriptionTextInputEdit.setText(it.description)
+                if (folderShortNameTextInputEdit.text.toString() != it.shortName)
+                    folderShortNameTextInputEdit.setText(it.shortName)
+                if (folderDescriptionTextInputEdit.text.toString() != it.description)
+                    folderDescriptionTextInputEdit.setText(it.description)
             }
         })
-
-
     }
 }

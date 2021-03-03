@@ -5,11 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -30,26 +30,29 @@ class HomeExpensesFragment : Fragment() {
 
     private lateinit var navController: NavController
 
-    private lateinit var expensesAdapter: ExpensesAdapter
+    private var expensesAdapter: ExpensesAdapter? = null
 
     private var actionMode: ActionMode? = null
 
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            viewModel.setSelectedExpenses(expensesAdapter.getSelectedItems())
-            when (item?.itemId) {
-                R.id.action_move -> {
-                    navController.navigate(R.id.toExpensesMoveFragment)
-                    mode?.finish()
+            expensesAdapter?.let { adapter ->
+                val list = adapter.getSelectedItems()
+                val bundle = bundleOf("Ids" to list.map { (it as ExpensesMainCollection.Row).id }
+                    .toLongArray())
+                when (item?.itemId) {
+                    R.id.action_move -> {
+                        navController.navigate(R.id.toExpensesMoveFragment, bundle)
+                    }
+                    R.id.action_share -> {
+                        sharedExpenses(list.map { (it as ExpensesMainCollection.Row).expenses })
+                    }
+                    R.id.action_delete -> {
+                        navController.navigate(R.id.toExpensesDelDialogFragment, bundle)
+                    }
                 }
-                R.id.action_share -> {
-                    viewModel.expensesShareTrigger(true)
-                }
-                R.id.action_delete -> {
-                    navController.navigate(R.id.toDelExpensesDialogFragment)
-                }
+                mode?.finish()
             }
-            mode?.finish()
             return true
         }
 
@@ -65,7 +68,7 @@ class HomeExpensesFragment : Fragment() {
 
         override fun onDestroyActionMode(mode: ActionMode?) {
             actionMode = null
-            expensesAdapter.endSelection()
+            expensesAdapter?.endSelection()
         }
     }
 
@@ -99,11 +102,11 @@ class HomeExpensesFragment : Fragment() {
                     actionMode?.title = getString(R.string.expenses_am_title_count, count)
                     if (count == 0) {
                         actionMode?.finish()
-                        expensesAdapter.endSelection()
+                        this.endSelection()
                     }
                 }
-                viewModel.selectedExpensesLiveData.observe(viewLifecycleOwner, {
-                    expensesAdapter.setSelection(it)
+                viewModel.savedStateHomeFragmentLiveData.observe(viewLifecycleOwner, {
+                    this.setSelection(it)
                 })
             }
         with(recyclerViewExpenses) {
@@ -126,26 +129,9 @@ class HomeExpensesFragment : Fragment() {
                 expenses.add(ExpensesMainCollection.Header(name))
             } else expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.menu_expenses)))
             it.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
-            expensesAdapter.setList(expenses)
+            expensesAdapter?.setList(expenses)
 
         })
-        viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
-            actionMode?.finish()
-            expensesAdapter.endSelection()
-        })
-        viewModel.expensesMoveStatusMediatorLiveData.observe(viewLifecycleOwner, {
-            actionMode?.finish()
-            expensesAdapter.endSelection()
-        })
-
-        viewModel.expensesShareResultMediatorLiveData.observe(viewLifecycleOwner, {
-            if (it.second.isNotEmpty() && it.first) {
-                actionMode?.finish()
-                expensesAdapter.endSelection()
-                sharedExpenses(it.second)
-            }
-        })
-
 
         val addExpensesExtendedFab =
             activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpensesExtendedFab)
@@ -176,11 +162,10 @@ class HomeExpensesFragment : Fragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        expensesAdapter.let { viewModel.setSelectedExpenses(it.getSelectedItems()) }
+        expensesAdapter?.let { viewModel.setSavedStateHomeFragment(it.getSelectedItems()) }
     }
 
     private fun sharedExpenses(expensesList: List<ExpensesWithRate>) {
-        viewModel.expensesShareTrigger(false)
         if (expensesList.size == 1) {
             if (expensesList[0].imageUri != null) sharedExpensesImageIntent(expensesList[0])
             else {
