@@ -39,7 +39,7 @@ class FoldersEditFragment : Fragment() {
         folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val shortName = folderShortNameTextInputEdit.text.toString()
-                viewModel.updateFolderDescription( shortName, p0.toString())
+                viewModel.updateFolderDescription(shortName, p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -47,31 +47,22 @@ class FoldersEditFragment : Fragment() {
         })
         folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.updateFolderShortName( p0.toString())
-            }
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun afterTextChanged(p0: Editable?) {}
-        })
-        viewModel.editFolderMsg.observe(viewLifecycleOwner,{
-            folderShortNameTextInputEdit.error = it
-        })
-        /*folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.setEditFolderName(p0.toString())
+                viewModel.updateFolderShortName(p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
-        folderShortNameTextInputEdit.onFocusChangeListener =
-            View.OnFocusChangeListener { _, p1 ->
-                if (!p1) viewModel.setUpdateFolderTrigger()
+        viewModel.editFolderMsg.observe(viewLifecycleOwner, { msg ->
+            msg?.let {
+                folderShortNameTextInputEdit.error = when (it) {
+                    FolderNameValidateMsg.FOLDER_NAME_OK -> null
+                    FolderNameValidateMsg.FOLDER_NAME_DUPLICATE -> getString(R.string.folder_name_validate_msg_duplicate)
+                    FolderNameValidateMsg.FOLDER_NAME_EMPTY -> getString(R.string.folder_name_validate_msg_empty)
+                }
             }
 
-
-        viewModel.editFolderErrorMsg.observe(viewLifecycleOwner, {
-            folderShortNameTextInputEdit.error = it
-        })*/
+        })
 
         viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
             folder?.let {

@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -11,6 +10,7 @@ import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.FSRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
 import m.kampukter.travelexpenses.mainApplication
+import m.kampukter.travelexpenses.ui.folders.FolderNameValidateMsg
 import org.osmdroid.util.GeoPoint
 import java.io.File
 import java.util.*
@@ -49,11 +49,11 @@ class MyViewModel(
         newFolderDescription.postValue(description)
     }
 
-    private val inputShortNameErrorMutableLiveData = MutableLiveData<String>()
-    val inputShortNameError: LiveData<String>
+    private val inputShortNameErrorMutableLiveData = MutableLiveData<FolderNameValidateMsg>()
+    val inputShortNameError: LiveData<FolderNameValidateMsg>
         get() = inputShortNameErrorMutableLiveData
 
-    val isFolderSavingAllowed = MediatorLiveData<Boolean>().apply {
+    val isFolderSavingAllowed: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
         var lastNewFolder = Folders("", null)
         var lastListName = listOf<String>()
         fun update() {
@@ -62,9 +62,9 @@ class MyViewModel(
             postValue(isFoldersIsCorrect)
             inputShortNameErrorMutableLiveData.postValue(
                 when {
-                    lastNewFolder.shortName.isBlank() -> "Заполните поле"
-                    lastListName.contains(lastNewFolder.shortName) -> "Такое имя уже есть"
-                    else -> null
+                    lastNewFolder.shortName.isBlank() -> FolderNameValidateMsg.FOLDER_NAME_EMPTY
+                    lastListName.contains(lastNewFolder.shortName) -> FolderNameValidateMsg.FOLDER_NAME_DUPLICATE
+                    else -> FolderNameValidateMsg.FOLDER_NAME_OK
                 }
             )
 
@@ -98,7 +98,7 @@ class MyViewModel(
     }
 
 
-    val folderCandidates = MediatorLiveData<List<FoldersExtendedView>>().apply {
+    val folderCandidates: LiveData<List<FoldersExtendedView>> = MediatorLiveData<List<FoldersExtendedView>>().apply {
         var lastCurrentFolder: FoldersExtendedView? = null
         var lastListFolders = listOf<FoldersExtendedView>()
 
@@ -123,80 +123,6 @@ class MyViewModel(
 
     }
 
-    private val editFolderName = MutableLiveData<String>()
-    fun setEditFolderName(name: String) {
-        editFolderName.postValue(name)
-    }
-
-    private val editFolderDescription = MutableLiveData<String>()
-    fun setEditFolderDescription(description: String) {
-        editFolderDescription.postValue(description)
-    }
-
-    private val updateFolderTrigger = MutableLiveData<Boolean>()
-    fun setUpdateFolderTrigger() {
-        updateFolderTrigger.postValue(true)
-    }
-
-    val editFolderErrorMsg = MediatorLiveData<String?>().apply {
-
-        var lastListName = listOf<String>()
-        var lastCurrentFolder: FoldersExtendedView? = null
-        var oldFolderName: String? = null
-
-        fun update() {
-            lastCurrentFolder?.let { folderName ->
-                postValue(
-                    when {
-                        folderName.shortName.isBlank() -> "Заполните поле"
-                        lastListName.contains(folderName.shortName) -> "Такое имя уже есть"
-                        else -> null
-                    }
-                )
-            }
-        }
-        addSource(folderCandidates) { listFolders ->
-            lastListName = listFolders.map { it.shortName }
-            update()
-        }
-
-        addSource(currentFolder) {
-            if (it != null) {
-                lastCurrentFolder = it
-                oldFolderName = it.shortName
-            }
-        }
-        addSource(editFolderName) {
-            if (it != null) {
-                lastCurrentFolder = lastCurrentFolder?.copy(shortName = it)
-                update()
-            }
-        }
-        addSource(editFolderDescription) {
-            if (it != null) {
-                lastCurrentFolder = lastCurrentFolder?.copy(description = it)
-                lastCurrentFolder?.let { folderExtendedView ->
-                    val folder =
-                        Folders(folderExtendedView.shortName, folderExtendedView.description)
-                    viewModelScope.launch { expensesRepository.addFolder(folder) }
-                }
-            }
-        }
-        addSource(updateFolderTrigger) {
-            oldFolderName?.let { oldName ->
-                lastCurrentFolder?.let { folderName ->
-                    val isCorrect = when {
-                        folderName.shortName.isBlank() -> false
-                        lastListName.contains(folderName.shortName) -> false
-                        else -> true
-                    }
-                    if (isCorrect) viewModelScope.launch {
-                        expensesRepository.updateFolderShortName(folderName.shortName, oldName)
-                    }
-                }
-            }
-        }
-    }
     private val updateFolderName = MutableLiveData<String>()
     fun updateFolderShortName(newValue: String) {
         updateFolderName.postValue(newValue)
@@ -208,46 +134,42 @@ class MyViewModel(
         }
     }
 
-    val editFolderMsg = MediatorLiveData<String?>().apply {
+    val editFolderMsg: LiveData<FolderNameValidateMsg> = MediatorLiveData<FolderNameValidateMsg>().apply {
         var lastCandidates = listOf<String>()
         var lastOldName: String? = null
         var lastNewName: String? = null
         fun update() {
-            Log.d("blabla","--$lastCandidates $lastOldName $lastNewName")
             if (lastOldName != lastNewName) {
                 lastNewName?.let { newName ->
                     postValue(when {
-                        newName.isBlank() -> "Заполните поле"
-                        lastCandidates.contains(newName) -> "Такое имя уже есть"
+                        newName.isBlank() ->  FolderNameValidateMsg.FOLDER_NAME_EMPTY
+                        lastCandidates.contains(newName) -> FolderNameValidateMsg.FOLDER_NAME_DUPLICATE
                         else -> {
                             lastOldName?.let { oldName ->
                                 viewModelScope.launch {
                                     expensesRepository.updateFolderShortName(newName, oldName)
                                 }
                             }
-                            null
+                            FolderNameValidateMsg.FOLDER_NAME_OK
                         }
                     }
                     )
                 }
-            } else postValue( null )
+            } else postValue( FolderNameValidateMsg.FOLDER_NAME_OK )
         }
         addSource(updateFolderName) {
-            Log.d("blabla","updateFolderName")
             if (it != null) {
                 lastNewName = it
                 update()
             }
         }
         addSource(currentFolder) {
-            Log.d("blabla","currentFolder")
             if (it != null) {
                 lastOldName = it.shortName
                 update()
             }
         }
         addSource(folderCandidates) { listFolders ->
-            Log.d("blabla","folderCandidates")
             lastCandidates = listFolders.map { it.shortName }
             update()
         }
@@ -491,7 +413,7 @@ class MyViewModel(
 
     // Update Expense
     private val expenseUpdateTrigger = MutableLiveData<String>()
-    val expenseUpdateMediator = MediatorLiveData<Int>().apply {
+    val expenseUpdateMediator: LiveData<Int> = MediatorLiveData<Int>().apply {
         var oldExpenseName: String? = null
         addSource(expenseUpdateTrigger) {
             if (it != null) oldExpenseName?.let { oldName ->
@@ -531,7 +453,7 @@ class MyViewModel(
         }
     }
 
-    val savedSettingsLiveData = MediatorLiveData<Settings>().apply {
+    val savedSettingsLiveData: LiveData<Settings> = MediatorLiveData<Settings>().apply {
         var lastSettings: Settings? = null
         addSource(savedSettings) {
             if (it != null) lastSettings = it
@@ -574,7 +496,7 @@ class MyViewModel(
             )
         }
 
-    val expenseMediatorLiveData =
+    val expenseMediatorLiveData: LiveData<Pair<Expenses?, List<CurrencyTable>?>> =
         MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
             var currentExpenses: Expenses? = null
             var currencyList: List<CurrencyTable> = emptyList()
@@ -607,7 +529,7 @@ class MyViewModel(
 
 
     private val bufferForSaveExpense = MutableLiveData<Expenses?>()
-    val bufferExpensesMediatorLiveData =
+    val bufferExpensesMediatorLiveData : LiveData<Pair<Expenses?, List<CurrencyTable>?>> =
         MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
             var lastExpenses: Expenses? = null
             var currencyList: List<CurrencyTable> = emptyList()
@@ -683,7 +605,7 @@ class MyViewModel(
     }
 
     private val resultExchangeCurrentRateLiveData = expensesRepository.exchangeRateLiveDate
-    val exchangeRateLiveDate = MediatorLiveData<ResultCurrentExchangeRate>().apply {
+    val exchangeRateLiveDate: LiveData<ResultCurrentExchangeRate> = MediatorLiveData<ResultCurrentExchangeRate>().apply {
         var lastResultExchangeCurrentRate: ResultCurrentExchangeRate? = null
         var lastQuery: String? = null
         var lastFoundDate: Date? = null
@@ -752,7 +674,7 @@ class MyViewModel(
 
 
     private val filterForExpensesMap = MutableLiveData<FilterForExpensesMap>()
-    val expensesForMapMutableLiveData =
+    val expensesForMapMutableLiveData: LiveData<Pair<List<Expenses>, FilterForExpensesMap?>> =
         MediatorLiveData<Pair<List<Expenses>, FilterForExpensesMap?>>().apply {
             var lastExpenses = listOf<Expenses>()
             var lastFilterForExpensesMap: FilterForExpensesMap? = null
@@ -811,7 +733,7 @@ Search in Expenses
 
     private val searchStringExpenses = MutableLiveData<String>().apply { postValue(null) }
 
-    private val expensesSearch = MediatorLiveData<Pair<String, String>>().apply {
+    private val expensesSearch: LiveData<Pair<String, String>> = MediatorLiveData<Pair<String, String>>().apply {
         var lastSearchStringExpenses: String? = null
         var lastCurrentFolderName: String? = null
         fun update() {

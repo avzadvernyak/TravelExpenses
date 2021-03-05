@@ -41,8 +41,15 @@ class FoldersAddFragment : Fragment() {
         folderShortNameTextInputEdit.filters = filterArray
         folderShortNameTextInputEdit.filterTouchesWhenObscured
 
-        viewModel.inputShortNameError.observe(viewLifecycleOwner, {
-            folderShortNameTextInputEdit.error = it
+        viewModel.inputShortNameError.observe(viewLifecycleOwner, { msg ->
+            msg?.let {
+                folderShortNameTextInputEdit.error = when(it){
+                    FolderNameValidateMsg.FOLDER_NAME_OK -> null
+                    FolderNameValidateMsg.FOLDER_NAME_DUPLICATE -> getString(R.string.folder_name_validate_msg_duplicate)
+                    FolderNameValidateMsg.FOLDER_NAME_EMPTY -> getString(R.string.folder_name_validate_msg_empty)
+                }
+            }
+
         })
 
 
