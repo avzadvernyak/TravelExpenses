@@ -43,7 +43,7 @@ class MainApplication : Application() {
     private val module = module {
         single {
             Room.databaseBuilder(androidContext(), MyDatabase::class.java, "expenses.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(supportDb: SupportSQLiteDatabase) {
                         GlobalScope.launch(context = Dispatchers.IO) {
@@ -147,7 +147,7 @@ class MainApplication : Application() {
             modules(module)
         }
         // Delete Invalid Photo Files
-        getKoin().get<MyViewModel>().deleteInvalidFiles()
+       // getKoin().get<MyViewModel>().deleteInvalidFiles()
 
         GlobalScope.launch(context = Dispatchers.IO) {
 
@@ -168,7 +168,7 @@ class MainApplication : Application() {
                         userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
                         defCurrency = 0,
                         backupPeriod = 0,
-                        folder ="Расходы"
+                        folder_id  = 0L
                     )
                 )
             }

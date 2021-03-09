@@ -168,7 +168,7 @@ class AddMainExpensesFragment : Fragment() {
                             location = null,
                             imageUri = null,
                             // тут текущая папка выберется в VM
-                            folder = ""
+                            folder_id = 0L
                         )
                     )
                 }

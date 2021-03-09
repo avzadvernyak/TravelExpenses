@@ -15,8 +15,8 @@ interface ExpensesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(expanses: Expenses): Long
 
-    @Query("select * from expenses where expenses.folder = :folder")
-    fun getAll(folder:String): LiveData<List<Expenses>>
+    @Query("select * from expenses where expenses.folder_id = :folderId")
+    fun getAll( folderId: Long ): LiveData<List<Expenses>>
 
     @Query("select * from expenses")
     suspend fun getAllExpenses(): List<Expenses>
@@ -27,12 +27,12 @@ interface ExpensesDao {
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder = :folder 
+            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
            """
     )
-    fun getAllExpensesWithRate(folder: String): LiveData<List<ExpensesWithRate>>
+    fun getAllExpensesWithRate( folderId: Long ): LiveData<List<ExpensesWithRate>>
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
@@ -40,13 +40,13 @@ interface ExpensesDao {
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder = :folder 
+            where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
            
            """
     )
-    fun getSearchExpensesWithRate( searchString: String, folder: String): LiveData<List<ExpensesWithRate>>
+    fun getSearchExpensesWithRate( searchString: String, folderId: Long): LiveData<List<ExpensesWithRate>>
 
 
     @Query("delete from expenses WHERE expenses.id = :selectedId")
@@ -58,26 +58,26 @@ interface ExpensesDao {
     @Query("select count(expense) from expenses where expense = :name")
     suspend fun getExpensesCount(name: String): Long
 
-    @Query("select count(folder) from expenses where folder = :name")
-    suspend fun getFoldersCount(name: String): Long
+    @Query("select count(folder_id) from expenses where folder_id = :folderId")
+    suspend fun getFoldersCount(folderId: Long): Long
 
     @Query(
         """ select sum(sum) AS sum, expense AS name, currency_field AS note 
             from expenses 
-            where expenses.folder = :folder
+            where expenses.folder_id = :folder_id
             group by  expense,currency_field    
             """
     )
-    fun getSumExpenses(folder: String): LiveData<List<ReportSumView>>
+    fun getSumExpenses(folder_id: Long): LiveData<List<ReportSumView>>
 
     @Query(
         """ select sum(sum) AS sum, currency_field AS name, null AS note 
             from expenses
-            where expenses.folder = :folder
+            where expenses.folder_id = :folder_id
             group by  currency_field 
             """
     )
-    fun getSumCurrency(folder: String): LiveData<List<ReportSumView>>
+    fun getSumCurrency(folder_id: Long): LiveData<List<ReportSumView>>
 
     @Query(
         """select currency_field, Date(dateTime) as dateRate 
@@ -92,17 +92,17 @@ interface ExpensesDao {
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder = :folder 
+            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
             
            """
     )
-    fun getExpenses(folder: String): LiveData<List<ExpensesWithRate>>
+    fun getExpenses(folderId: Long): LiveData<List<ExpensesWithRate>>
 
     @Query("delete from expenses WHERE expenses.id IN (:selected)")
     suspend fun deleteIdList(selected: Set<Long>)
 
-    @Query("update expenses set folder = :newFolder WHERE expenses.id IN (:selected)")
-    suspend fun moveIdList(selected: Set<Long>, newFolder: String)
+    @Query("update expenses set folder_id = :newFolderId WHERE expenses.id IN (:selected)")
+    suspend fun moveIdList(selected: Set<Long>, newFolderId: Long)
 }

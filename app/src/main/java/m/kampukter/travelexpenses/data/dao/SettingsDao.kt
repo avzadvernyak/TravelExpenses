@@ -17,4 +17,7 @@ interface SettingsDao {
 
     @Query("select * from settings LIMIT 1")
     fun getSettingsLiveData(): LiveData<Settings?>
+
+    @Query("select * from settings LIMIT 1")
+    suspend fun getAllSettings(): Settings
 }

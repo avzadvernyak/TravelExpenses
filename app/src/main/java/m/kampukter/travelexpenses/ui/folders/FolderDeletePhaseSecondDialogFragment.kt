@@ -17,7 +17,7 @@ class FolderDeletePhaseSecondDialogFragment: DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getString(R.string.dialog_del_title))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
-                viewModel.deleteFolderTrigger(true)
+                //viewModel.deleteFolderTrigger(true)
                 dialog.dismiss()
             }
             .setNegativeButton(resources.getString(R.string.dialog_cancel)) { dialog, _ ->

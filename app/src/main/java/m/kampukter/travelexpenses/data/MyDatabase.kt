@@ -8,7 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import m.kampukter.travelexpenses.data.dao.*
 
 @Database(
-    version = 4, exportSchema = false, entities = [
+    version = 5, exportSchema = false, entities = [
         Expenses::class, Expense::class, CurrencyTable::class, RateCurrency::class,
         Settings::class, Folders::class
     ]
@@ -84,5 +84,50 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
         database.execSQL("DROP TABLE settings")
         database.execSQL("ALTER TABLE UpdatedTableSettings RENAME TO settings")
+    }
+}
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // Updated Folders
+        database.execSQL("CREATE TABLE UpdatedTableFolders (id INTEGER NOT NULL PRIMARY KEY, shortName TEXT NOT NULL, description TEXT)")
+        database.execSQL("INSERT OR REPLACE INTO UpdatedTableFolders( shortName, description) SELECT shortName, description FROM folders")
+        database.execSQL("DROP TABLE folders")
+        database.execSQL("ALTER TABLE UpdatedTableFolders RENAME TO folders")
+
+        // Updated Expenses
+        database.execSQL(
+            "CREATE TABLE UpdatedTableExpenses (id INTEGER PRIMARY KEY NOT NULL, dateTime TEXT NOT NULL, expense TEXT NOT NULL," +
+                    " sum REAL NOT NULL, currency_field TEXT NOT NULL, note TEXT NOT NULL, location TEXT, imageUri TEXT, folder_id INTEGER NOT NULL, " +
+                    "FOREIGN KEY (expense) REFERENCES expense(name) ON UPDATE CASCADE ON DELETE CASCADE," +
+                    "FOREIGN KEY (currency_field) REFERENCES currency(name) ON UPDATE NO ACTION ON DELETE NO ACTION ," +
+                    "FOREIGN KEY (folder_id) REFERENCES folders(id) ON UPDATE NO ACTION ON DELETE CASCADE)"
+        )
+        database.execSQL(
+            " INSERT OR REPLACE INTO UpdatedTableExpenses(id, dateTime, expense, sum, currency_field , note ," +
+                    "location, imageUri, folder_id) " +
+                    "SELECT id, dateTime, expense, sum, currency_field , note ,location, imageUri," +
+                    "(select id from folders where folders.shortName = expenses.folder) as folder_id  FROM expenses "
+        )
+        database.execSQL("DROP TABLE expenses")
+        database.execSQL("ALTER TABLE UpdatedTableExpenses RENAME TO expenses")
+        database.execSQL("CREATE INDEX IF NOT EXISTS idx_currency_field ON expenses(currency_field)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS idx_expense ON expenses(expense)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS idx_folder ON expenses(folder_id)")
+
+        // Updated Settings
+        database.execSQL(
+            "CREATE TABLE UpdatedTableSettings (userName TEXT PRIMARY KEY NOT NULL, defCurrency INTEGER NOT NULL, " +
+                    " backupPeriod INTEGER NOT NULL, statusGPS INTEGER NOT NULL, folder_id INTEGER NOT NULL, " +
+                    "FOREIGN KEY (folder_id) REFERENCES folders(id) ON UPDATE NO ACTION ON DELETE NO ACTION )"
+        )
+        database.execSQL(
+            " INSERT OR REPLACE INTO UpdatedTableSettings(userName, defCurrency, backupPeriod, statusGPS, folder_id) " +
+                    "SELECT userName, defCurrency, backupPeriod, statusGPS,"+
+                    "(select id from folders where folders.shortName = settings.folder) as folder_id FROM settings "
+        )
+        database.execSQL("DROP TABLE settings")
+        database.execSQL("ALTER TABLE UpdatedTableSettings RENAME TO settings")
+
+
     }
 }

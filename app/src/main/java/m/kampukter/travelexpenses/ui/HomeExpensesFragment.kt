@@ -118,6 +118,7 @@ class HomeExpensesFragment : Fragment() {
             adapter = expensesAdapter
         }
         var nameCurrentFolder: String? = null
+
         viewModel.currentFolder.observe(viewLifecycleOwner, {
             nameCurrentFolder = it.shortName
         })

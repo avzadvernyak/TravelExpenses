@@ -18,8 +18,8 @@ class FolderDeletePhaseOneDialogFragment: DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getString(R.string.dialog_del_title))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
-                viewModel.deleteFolderTrigger(false)
-                findNavController().navigate(R.id.toFoldersFragment)
+                //viewModel.deleteFolderTrigger(false)
+                //findNavController().navigate(R.id.toFoldersFragment)
                 dialog.dismiss()
             }
             .setMessage(arguments?.getString("folderPhaseOne"))

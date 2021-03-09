@@ -39,7 +39,7 @@ class FoldersEditFragment : Fragment() {
         folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val shortName = folderShortNameTextInputEdit.text.toString()
-                viewModel.updateFolderDescription(shortName, p0.toString())
+                //viewModel.updateFolderDescription(shortName, p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -47,13 +47,13 @@ class FoldersEditFragment : Fragment() {
         })
         folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.updateFolderShortName(p0.toString())
+                //viewModel.updateFolderShortName(p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
-        viewModel.editFolderMsg.observe(viewLifecycleOwner, { msg ->
+        /*viewModel.editFolderMsg.observe(viewLifecycleOwner, { msg ->
             msg?.let {
                 folderShortNameTextInputEdit.error = when (it) {
                     FolderNameValidateMsg.FOLDER_NAME_OK -> null
@@ -62,15 +62,15 @@ class FoldersEditFragment : Fragment() {
                 }
             }
 
-        })
+        })*/
 
-        viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
+        /*viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
             folder?.let {
                 if (folderShortNameTextInputEdit.text.toString() != it.shortName)
                     folderShortNameTextInputEdit.setText(it.shortName)
                 if (folderDescriptionTextInputEdit.text.toString() != it.description)
                     folderDescriptionTextInputEdit.setText(it.description)
             }
-        })
+        })*/
     }
 }

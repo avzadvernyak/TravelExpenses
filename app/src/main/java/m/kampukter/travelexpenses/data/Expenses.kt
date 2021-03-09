@@ -17,15 +17,14 @@ import java.util.*
         childColumns = arrayOf("currency_field")
     ), ForeignKey(
         entity = Folders::class,
-        parentColumns = arrayOf("shortName"),
-        childColumns = arrayOf("folder"),
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.CASCADE
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("folder_id"),
+        onDelete = ForeignKey.CASCADE
     )
     ],
     indices = [(Index(value = ["currency_field"], name = "idx_currency_field")),
         (Index(value = ["expense"], name = "idx_expense")),
-        (Index(value = ["folder"], name = "idx_folder"))
+        (Index(value = ["folder_id"], name = "idx_folder"))
     ]
 )
 
@@ -43,6 +42,6 @@ data class Expenses(
     @TypeConverters(MyTypeConverter::class)
     val location: MyLocation?,
     val imageUri: String?,
-    val folder: String
+    val folder_id: Long
 )
 

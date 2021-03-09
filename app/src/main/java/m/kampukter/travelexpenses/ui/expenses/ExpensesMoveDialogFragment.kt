@@ -16,9 +16,9 @@ class ExpensesMoveDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         var items = arrayOf<String>()
 
-        viewModel.folderCandidates.value?.let { list ->
+        /*viewModel.folderCandidates.value?.let { list ->
             items = list.map { it.shortName }.toTypedArray()
-        }
+        }*/
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle("Переместить в")
             .setItems(items) { dialog, which ->

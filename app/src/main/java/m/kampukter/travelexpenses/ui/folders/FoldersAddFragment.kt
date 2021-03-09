@@ -31,9 +31,9 @@ class FoldersAddFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         saveNewFolderFAB.isEnabled = false
-        viewModel.isFolderSavingAllowed.observe(viewLifecycleOwner, { _isFolderSavingAllowed ->
+        /*viewModel.isFolderSavingAllowed.observe(viewLifecycleOwner, { _isFolderSavingAllowed ->
             _isFolderSavingAllowed.let { saveNewFolderFAB.isEnabled = it }
-        })
+        })*/
 
         // Set filter folderShortNameTextInputEdit len string max 8
         val filterArray = arrayOfNulls<InputFilter>(1)
@@ -41,7 +41,7 @@ class FoldersAddFragment : Fragment() {
         folderShortNameTextInputEdit.filters = filterArray
         folderShortNameTextInputEdit.filterTouchesWhenObscured
 
-        viewModel.inputShortNameError.observe(viewLifecycleOwner, { msg ->
+       /* viewModel.inputShortNameError.observe(viewLifecycleOwner, { msg ->
             msg?.let {
                 folderShortNameTextInputEdit.error = when(it){
                     FolderNameValidateMsg.FOLDER_NAME_OK -> null
@@ -50,19 +50,19 @@ class FoldersAddFragment : Fragment() {
                 }
             }
 
-        })
+        })*/
 
 
         folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.setNewFolderName(p0.toString())
+                //viewModel.setNewFolderName(p0.toString())
             }
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
         folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.setNewFolderDescription(p0.toString())
+                //viewModel.setNewFolderDescription(p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -70,7 +70,7 @@ class FoldersAddFragment : Fragment() {
         })
 
         saveNewFolderFAB.setOnClickListener {
-            viewModel.saveNewFolder()
+            //viewModel.saveNewFolder()
             findNavController().navigate(R.id.toFoldersFragment)
         }
     }

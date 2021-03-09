@@ -48,10 +48,11 @@ class ExpenseFragment : Fragment() {
         viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
             expenseAdapter.setItems(expenseList)
         })
-        expenseAdapter.onClickCallback = { expense ->
-
-            viewModel.setQueryExpense(expense.name)
-            navController.navigate(R.id.toEditExpenseDialogFragment)
+        expenseAdapter.onClickCallback = {
+        // Надо переделать
+        // expense ->
+           /* viewModel.setQueryExpense(expense.name)
+            navController.navigate(R.id.toEditExpenseDialogFragment)*/
         }
         expenseAdapter.onLongClickCallback = { expense ->
             viewModel.deleteExpenseName(expense.name)

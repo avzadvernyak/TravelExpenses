@@ -44,12 +44,12 @@ class FoldersFragment : Fragment() {
             0
         )
 
-        viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
+        /*viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
             shortNameFolderTextView.text = folder?.shortName
             descriptionFolderTextView.text = folder?.description
-        })
+        })*/
 
-        viewModel.folderDeletionResult.observe(viewLifecycleOwner, { result ->
+        /*viewModel.folderDeletionResult.observe(viewLifecycleOwner, { result ->
             when (result) {
                 is FolderDeletionResult.Warning -> {
                     val bundle = bundleOf(
@@ -68,17 +68,17 @@ class FoldersFragment : Fragment() {
                 ).show()
 
             }
-        })
+        })*/
 
         val clickEventDelegate: ClickEventDelegate<FoldersExtendedView> =
             object : ClickEventDelegate<FoldersExtendedView> {
                 override fun onClick(item: FoldersExtendedView) {
 
-                    viewModel.setSettingNewFolder(item.shortName)
+                    //viewModel.setSettingNewFolder(item.shortName)
                 }
 
                 override fun onLongClick(item: FoldersExtendedView) {
-                    viewModel.deleteFolderName(item.shortName)
+                    //viewModel.deleteFolderName(item.shortName)
                     val bundle = bundleOf("folderPhaseOne" to item.shortName)
                     navController.navigate(R.id.toDelFolderPhaseOneDialogFragment, bundle)
                 }
@@ -92,9 +92,9 @@ class FoldersFragment : Fragment() {
             )
             adapter = foldersAdapter
         }
-        viewModel.folderCandidates.observe(viewLifecycleOwner, { listFolders ->
+      /*  viewModel.folderCandidates.observe(viewLifecycleOwner, { listFolders ->
             foldersAdapter.setList(listFolders)
-        })
+        })*/
 
         val addFAB = activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpenseFab)
         addFAB?.setOnClickListener {
