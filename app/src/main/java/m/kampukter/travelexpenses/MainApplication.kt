@@ -80,7 +80,17 @@ class MainApplication : Application() {
                         GlobalScope.launch(context = Dispatchers.IO) {
                             get<MyDatabase>().foldersDao().insertAll(
                                 listOf(
-                                    Folders(shortName = "Расходы", description = "Папка расходов по умолчанию")
+                                    Folders( id = 1L ,shortName = "Расходы", description = "Папка расходов по умолчанию")
+                                )
+                            )
+                        }
+                        GlobalScope.launch(context = Dispatchers.IO) {
+                            get<MyDatabase>().settingsDao().insert(
+                                Settings(
+                                    userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
+                                    defCurrency = 0,
+                                    backupPeriod = 0,
+                                    folder_id  = 1L
                                 )
                             )
                         }
@@ -122,9 +132,6 @@ class MainApplication : Application() {
     }
 
     private fun retrofitBuild(apiUrl: String): Retrofit {
-       /* val client = OkHttpClient.Builder()
-            .addInterceptor(ResponseInterceptor())
-            .build()*/
         return Retrofit.Builder()
             .baseUrl(apiUrl)
             .addConverterFactory(
@@ -162,7 +169,7 @@ class MainApplication : Application() {
                     3 -> getKoin().get<MyViewModel>().startBackup(Periodic.WeekBackup)
                     else -> getKoin().get<MyViewModel>().stopBackup()
                 }
-            } else {
+            } /*else {
                 getKoin().get<ExpensesRepository>().insertSettings(
                     Settings(
                         userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
@@ -171,7 +178,7 @@ class MainApplication : Application() {
                         folder_id  = 0L
                     )
                 )
-            }
+            }*/
         }
     }
 

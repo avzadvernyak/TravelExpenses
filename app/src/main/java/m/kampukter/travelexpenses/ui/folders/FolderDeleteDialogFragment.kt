@@ -9,7 +9,8 @@ import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class FolderDeletePhaseSecondDialogFragment: DialogFragment() {
+class FolderDeleteDialogFragment: DialogFragment() {
+
     private val viewModel by sharedViewModel<MyViewModel>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -17,15 +18,12 @@ class FolderDeletePhaseSecondDialogFragment: DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getString(R.string.dialog_del_title))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { dialog, _ ->
-                //viewModel.deleteFolderTrigger(true)
-                dialog.dismiss()
-            }
-            .setNegativeButton(resources.getString(R.string.dialog_cancel)) { dialog, _ ->
+                //viewModel.deleteFolderTrigger(false)
+                arguments?.getLong("folderId")?.let{ viewModel.deleteFolderId(it) }
                 findNavController().navigate(R.id.toFoldersFragment)
                 dialog.dismiss()
             }
-
-            .setMessage(arguments?.getString("folderPhaseSecond"))
+            .setMessage(arguments?.getString("folderMessage"))
             .create()
 
     }

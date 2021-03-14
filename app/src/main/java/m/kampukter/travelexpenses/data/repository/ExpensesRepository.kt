@@ -4,13 +4,11 @@ import android.text.format.DateFormat
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.liveData
 import androidx.work.*
-import com.google.android.gms.tasks.Tasks.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.dao.*
@@ -18,7 +16,7 @@ import m.kampukter.travelexpenses.data.dto.BackupServer
 import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.workers.BackupWorker
 import java.util.*
-import kotlin.contracts.contract
+
 
 class ExpensesRepository(
     private val expensesDao: ExpensesDao,
@@ -30,60 +28,24 @@ class ExpensesRepository(
     private val backupServer: BackupServer
 ) {
 
-
     private var idWorkRequest: UUID? = null
 
-    private lateinit var currentFolder: Folders
-    private val currentFolderMutableLiveData = MutableLiveData<Folders>()
-    val currentFolderLiveData: LiveData<Folders>
-        get() = currentFolderMutableLiveData
+    private val currentSettingsFlow: Flow<Settings> = settingsDao.getAllSettings()
 
-    init {
-        getCurrentFolder()
+    val currentFolderFlow: Flow<Folders> = currentSettingsFlow.flatMapLatest { value ->
+        foldersDao.searchById(value.folder_id)
     }
 
-    private fun getCurrentFolder(){
-        GlobalScope.launch(context = Dispatchers.IO) {
-            settingsDao.getSettings()?.let { savedSettings ->
-                currentFolder = foldersDao.searchById(savedSettings.folder_id)
-                currentFolderMutableLiveData.postValue(currentFolder)
-            }
-        }
+    fun getExpensesFlow(): Flow<List<ExpensesWithRate>> = currentSettingsFlow.flatMapLatest {
+        expensesDao.getExpensesFlow(it.folder_id)
     }
 
-    fun getAll(): LiveData<List<Expenses>> = expensesDao.getAll(currentFolder.id)
+    fun getAll(): Flow<List<Expenses>> =
+        currentSettingsFlow.flatMapLatest { expensesDao.getAll(it.folder_id) }
 
-    /*private fun getFolder() =  GlobalScope.async {
-        settingsDao.getAllSettings().folder_id
-    }
+    fun getAllExpensesWithRate(): Flow<List<ExpensesWithRate>> =
+        currentSettingsFlow.flatMapLatest { expensesDao.getAllExpensesWithRate(it.folder_id) }
 
-    fun getAll(): LiveData<List<Expenses>> = liveData {
-        val id = getFolder()
-        val retvalue = expensesDao.getAll(id.await())
-
-        emitSource(retvalue)
-    }*/
-
-    /*fun getAll(): LiveData<List<Expenses>> = liveData {
-
-        val folder = settingsDao.getAllSettings()
-        emitSource( expensesDao.getAll(folder.folder_id))
-    }*/
-
-
-    //fun getAll(): LiveData<List<Expenses>> = expensesDao.getAll( getCurrentIdFolder() )
-
-    /*{
-        val result = MutableLiveData<List<Expenses>>()
-
-        GlobalScope.launch(context = Dispatchers.IO) {
-            val idFolder = settingsDao.getAllSettings().folder_id
-            result.postValue(expensesDao.getAll(idFolder))}
-        return result
-    }*/
-
-    fun getAllExpensesWithRate() = expensesDao.getAllExpensesWithRate(currentFolder.id)
-    fun getExpenses() = expensesDao.getExpenses(currentFolder.id)
 
     fun getRecordById(id: Long): LiveData<Expenses> = expensesDao.getExpensesById(id)
 
@@ -121,11 +83,13 @@ class ExpensesRepository(
         return result
     }
 
-    fun getExpensesSum(): LiveData<List<ReportSumView>> =
-        expensesDao.getSumExpenses(currentFolder.id)
+    fun getExpensesSum(): Flow<List<ReportSumView>> = currentSettingsFlow.flatMapLatest {
+        expensesDao.getSumExpenses(it.folder_id)
+    }
 
-    fun getCurrencySum(): LiveData<List<ReportSumView>> =
-        expensesDao.getSumCurrency(currentFolder.id)
+    fun getCurrencySum(): Flow<List<ReportSumView>> = currentSettingsFlow.flatMapLatest {
+        expensesDao.getSumCurrency(it.folder_id)
+    }
 
     // CurrencyDao
     fun getCurrencyAllLiveData(): LiveData<List<CurrencyTable>> = currencyDao.getAllLiveData()
@@ -150,8 +114,13 @@ class ExpensesRepository(
     suspend fun getSettings() = settingsDao.getSettings()
     suspend fun insertSettings(settings: Settings) {
         settingsDao.insert(settings)
-        getCurrentFolder()
+        //getCurrentFolder()
     }
+
+    fun updateFolderInSettings(folderId: Long) =
+        GlobalScope.launch(context = Dispatchers.IO) {
+            settingsDao.updateFolderId(settingsDao.getUserName(), folderId)
+        }
 
     fun getSettingsLiveData() = settingsDao.getSettingsLiveData()
 
@@ -223,7 +192,8 @@ class ExpensesRepository(
         }
     }
 
-    fun restoreBackupLiveData(idProgram: String) = backupServer.getRestoreBackupLiveData(idProgram)
+    fun restoreBackupLiveData(idProgram: String) =
+        backupServer.getRestoreBackupLiveData(idProgram)
 
     // Из ExpenseRepository
     fun getExpenseAllLiveData(): LiveData<List<Expense>> = expenseDao.getAllLiveData()
@@ -273,12 +243,17 @@ class ExpensesRepository(
     fun getSearchExpensesWithRate(
         searchString: String,
         folder: String
-    ): LiveData<List<ExpensesWithRate>> {
+    ): Flow<List<ExpensesWithRate>> {
         if (searchString.isNotBlank() && !historySearchStringExpenses.contains(searchString)) historySearchStringExpenses.add(
             searchString
         )
 
-        return expensesDao.getSearchExpensesWithRate("%$searchString%", currentFolder.id)
+        return currentSettingsFlow.flatMapLatest {
+            expensesDao.getSearchExpensesWithRate(
+                "%$searchString%",
+                it.folder_id
+            )
+        }
     }
 
     fun getHistorySearchStringExpenses() = historySearchStringExpenses
@@ -286,25 +261,19 @@ class ExpensesRepository(
     /*
     Work with folders
     */
-    //fun getAllFolders() = foldersDao.getAllExtendedView()
-    //fun searchFolderById(folderId: String) = foldersDao.search(folderId)
-    //suspend fun addFolder(folder: Folders) = foldersDao.addFolder(folder)
+    fun getAllFolders() = foldersDao.getAllExtendedViewFlow()
 
-    /*
-    suspend fun deleteFolder(folderName: String, isDelete: Boolean): Long {
-        var numberRecords = 0L
-        if (isDelete) foldersDao.deleteFolderByName(folderName)
-        else numberRecords = expensesDao.getFoldersCount(folderName)
-        return numberRecords
-    }
-    */
+    //fun searchFolderById(folderId: String) = foldersDao.search(folderId)
+    suspend fun addFolder(folder: Folders) = foldersDao.addFolder(folder)
 
     /*
     * Для изменения Folder
     */
-    /*suspend fun updateFolderShortName(newFolderName: String, oldFolderName: String) =
-        foldersDao.updateShortName(newFolderName, oldFolderName)
-    suspend fun updateFolderDescription(id: String, description: String) =
-        foldersDao.updateDescription(id, description)*/
+    suspend fun deleteFolder(folderId: Long) {
+        foldersDao.deleteFolderByName(folderId)
+    }
 
+    suspend fun updateFolder(folder: Folders) {
+        foldersDao.update( folder )
+    }
 }

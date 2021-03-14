@@ -117,21 +117,13 @@ class HomeExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
-        var nameCurrentFolder: String? = null
 
-        viewModel.currentFolder.observe(viewLifecycleOwner, {
-            nameCurrentFolder = it.shortName
-        })
-
-        viewModel.expensesInFolder.observe(viewLifecycleOwner, {
+        viewModel.expensesInFolder.observe(viewLifecycleOwner, { (currentFolder, expensesInFolder) ->
             val expenses = mutableListOf<ExpensesMainCollection>()
 
-            if (nameCurrentFolder != null) nameCurrentFolder?.let { name ->
-                expenses.add(ExpensesMainCollection.Header(name))
-            } else expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.menu_expenses)))
-            it.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
+            expenses.add(ExpensesMainCollection.Header(currentFolder.shortName))
+            expensesInFolder.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
             expensesAdapter?.setList(expenses)
-
         })
 
         val addExpensesExtendedFab =

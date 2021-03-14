@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.folders_add_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import kotlin.properties.Delegates
 
 class FoldersEditFragment : Fragment() {
 
@@ -36,10 +37,30 @@ class FoldersEditFragment : Fragment() {
         folderShortNameTextInputEdit.filters = filterArray
         folderShortNameTextInputEdit.filterTouchesWhenObscured
 
+        viewModel.currentFolder.observe(viewLifecycleOwner) {
+            if (folderShortNameTextInputEdit.text.toString() != it.shortName) {
+                folderShortNameTextInputEdit.setText(it.shortName)
+            }
+            if (folderDescriptionTextInputEdit.text.toString() != it.description) {
+                folderDescriptionTextInputEdit.setText(it.description)
+            }
+        }
+        viewModel.editFolderLiveData.observe(viewLifecycleOwner) { (currentFolder, candidate, folders) ->
+            folderShortNameTextInputEdit.error = when {
+                folders.map { it.shortName }
+                    .contains(candidate.shortName) -> getString(R.string.folder_name_validate_msg_duplicate)
+                candidate.shortName.isBlank() -> getString(R.string.folder_name_validate_msg_empty)
+                else -> {
+                    if (currentFolder != candidate) viewModel.updateFolder(candidate)
+
+                    null
+                }
+            }
+        }
         folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val shortName = folderShortNameTextInputEdit.text.toString()
-                //viewModel.updateFolderDescription(shortName, p0.toString())
+                viewModel.setFolderDescriptionForUpd(p0.toString())
+
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -47,30 +68,11 @@ class FoldersEditFragment : Fragment() {
         })
         folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //viewModel.updateFolderShortName(p0.toString())
+                viewModel.setFolderNameForUpd(p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
-        /*viewModel.editFolderMsg.observe(viewLifecycleOwner, { msg ->
-            msg?.let {
-                folderShortNameTextInputEdit.error = when (it) {
-                    FolderNameValidateMsg.FOLDER_NAME_OK -> null
-                    FolderNameValidateMsg.FOLDER_NAME_DUPLICATE -> getString(R.string.folder_name_validate_msg_duplicate)
-                    FolderNameValidateMsg.FOLDER_NAME_EMPTY -> getString(R.string.folder_name_validate_msg_empty)
-                }
-            }
-
-        })*/
-
-        /*viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
-            folder?.let {
-                if (folderShortNameTextInputEdit.text.toString() != it.shortName)
-                    folderShortNameTextInputEdit.setText(it.shortName)
-                if (folderDescriptionTextInputEdit.text.toString() != it.description)
-                    folderDescriptionTextInputEdit.setText(it.description)
-            }
-        })*/
     }
 }

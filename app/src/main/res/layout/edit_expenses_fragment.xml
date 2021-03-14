@@ -62,6 +62,7 @@
             android:id="@+id/currencyTextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:hint="@string/hint_currency"
             app:layout_constraintBottom_toBottomOf="@+id/sumTextInputLayout"

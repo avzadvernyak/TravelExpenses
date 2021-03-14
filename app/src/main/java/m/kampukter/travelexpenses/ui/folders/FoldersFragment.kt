@@ -9,12 +9,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.folders_fragment.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.FolderDeletionResult
 import m.kampukter.travelexpenses.data.FoldersExtendedView
 import m.kampukter.travelexpenses.ui.ClickEventDelegate
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
@@ -44,57 +43,46 @@ class FoldersFragment : Fragment() {
             0
         )
 
-        /*viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
+        viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
             shortNameFolderTextView.text = folder?.shortName
             descriptionFolderTextView.text = folder?.description
-        })*/
 
-        /*viewModel.folderDeletionResult.observe(viewLifecycleOwner, { result ->
-            when (result) {
-                is FolderDeletionResult.Warning -> {
-                    val bundle = bundleOf(
-                        "folderPhaseSecond" to resources.getString(
-                            R.string.expense_del_warning,
-                            result.folderName,
-                            result.countRecords
-                        )
-                    )
-                    navController.navigate(R.id.toDelFolderPhaseSecondDialogFragment, bundle)
-                }
-                is FolderDeletionResult.Success -> Snackbar.make(
-                    view,
-                    "Success",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-
-            }
-        })*/
+        })
 
         val clickEventDelegate: ClickEventDelegate<FoldersExtendedView> =
             object : ClickEventDelegate<FoldersExtendedView> {
-                override fun onClick(item: FoldersExtendedView) {
 
-                    //viewModel.setSettingNewFolder(item.shortName)
+                override fun onClick(item: FoldersExtendedView) {
+                    viewModel.setSettingNewFolder(item.id)
                 }
 
                 override fun onLongClick(item: FoldersExtendedView) {
-                    //viewModel.deleteFolderName(item.shortName)
-                    val bundle = bundleOf("folderPhaseOne" to item.shortName)
-                    navController.navigate(R.id.toDelFolderPhaseOneDialogFragment, bundle)
+                    val message = if (item.countRecords > 0) {
+                        resources.getString(
+                            R.string.expense_del_warning,
+                            item.shortName,
+                            item.countRecords
+                        )
+                    } else item.shortName
+                    val bundle = bundleOf(
+                        "folderMessage" to message,
+                        "folderId" to item.id
+                    )
+                    navController.navigate(R.id.toDelFolderDialogFragment, bundle)
                 }
             }
         foldersAdapter = FoldersAdapter(clickEventDelegate)
         with(foldersRecyclerView) {
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
+            layoutManager = LinearLayoutManager(
                 context,
                 RecyclerView.VERTICAL,
                 false
             )
             adapter = foldersAdapter
         }
-      /*  viewModel.folderCandidates.observe(viewLifecycleOwner, { listFolders ->
+        viewModel.folderCandidates.observe(viewLifecycleOwner, { listFolders ->
             foldersAdapter.setList(listFolders)
-        })*/
+        })
 
         val addFAB = activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpenseFab)
         addFAB?.setOnClickListener {

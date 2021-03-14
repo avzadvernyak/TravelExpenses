@@ -12,8 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.folders_add_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.Folders
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import java.util.*
 
 
 class FoldersAddFragment : Fragment() {
@@ -30,39 +32,53 @@ class FoldersAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        saveNewFolderFAB.isEnabled = false
-        /*viewModel.isFolderSavingAllowed.observe(viewLifecycleOwner, { _isFolderSavingAllowed ->
-            _isFolderSavingAllowed.let { saveNewFolderFAB.isEnabled = it }
-        })*/
 
-        // Set filter folderShortNameTextInputEdit len string max 8
+        // Set filter folderShortNameTextInputEdit len string max 20
         val filterArray = arrayOfNulls<InputFilter>(1)
         filterArray[0] = LengthFilter(20)
         folderShortNameTextInputEdit.filters = filterArray
         folderShortNameTextInputEdit.filterTouchesWhenObscured
 
-       /* viewModel.inputShortNameError.observe(viewLifecycleOwner, { msg ->
-            msg?.let {
-                folderShortNameTextInputEdit.error = when(it){
-                    FolderNameValidateMsg.FOLDER_NAME_OK -> null
-                    FolderNameValidateMsg.FOLDER_NAME_DUPLICATE -> getString(R.string.folder_name_validate_msg_duplicate)
-                    FolderNameValidateMsg.FOLDER_NAME_EMPTY -> getString(R.string.folder_name_validate_msg_empty)
+        folderShortNameTextInputEdit.setText(
+            getString(
+                R.string.expenses,
+                UUID.randomUUID().toString()
+            )
+        )
+
+        viewModel.lastFolderLiveData.observe(viewLifecycleOwner) { (candidate, folders) ->
+            if (folderShortNameTextInputEdit.text.toString() != candidate.shortName) {
+                folderShortNameTextInputEdit.setText(candidate.shortName)
+                folderDescriptionTextInputEdit.setText(candidate.description)
+            }
+            folderShortNameTextInputEdit.error = when {
+                candidate.shortName.isBlank() -> {
+                    saveNewFolderFAB.isEnabled = false
+                    getString(R.string.folder_name_validate_msg_empty)
+                }
+                folders.map { it.shortName }.contains(candidate.shortName) -> {
+                    saveNewFolderFAB.isEnabled = false
+                    getString(R.string.folder_name_validate_msg_duplicate)
+                }
+                else -> {
+                    saveNewFolderFAB.isEnabled = true
+                    null
                 }
             }
 
-        })*/
-
+        }
 
         folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //viewModel.setNewFolderName(p0.toString())
+                viewModel.setNewFolderName(p0.toString())
             }
+
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
         folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //viewModel.setNewFolderDescription(p0.toString())
+                viewModel.setNewFolderDescription(p0.toString())
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -70,7 +86,12 @@ class FoldersAddFragment : Fragment() {
         })
 
         saveNewFolderFAB.setOnClickListener {
-            //viewModel.saveNewFolder()
+            viewModel.saveNewFolder(
+                Folders(
+                    shortName = folderShortNameTextInputEdit.text.toString(),
+                    description = folderDescriptionTextInputEdit.text.toString()
+                )
+            )
             findNavController().navigate(R.id.toFoldersFragment)
         }
     }

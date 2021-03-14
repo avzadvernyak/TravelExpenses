@@ -37,8 +37,8 @@ class ExpensesMoveFragment : Fragment() {
         val clickEventDelegate: ClickEventDelegate<FoldersExtendedView> =
             object : ClickEventDelegate<FoldersExtendedView> {
                 override fun onClick(item: FoldersExtendedView) {
-                   /* ids?.let { viewModel.moveSelectedExpenses( it.toSet(), item.shortName)}
-                    navController.navigateUp()*/
+                    ids?.let { viewModel.moveSelectedExpenses( it.toSet(), item.id)}
+                    navController.navigateUp()
                 }
 
                 override fun onLongClick(item: FoldersExtendedView) {}
@@ -52,8 +52,8 @@ class ExpensesMoveFragment : Fragment() {
             )
             adapter = foldersAdapter
         }
-       /* viewModel.folderCandidates.observe(viewLifecycleOwner, { listFolders ->
+        viewModel.folderCandidates.observe(viewLifecycleOwner, { listFolders ->
             foldersAdapter.setList(listFolders)
-        })*/
+        })
     }
 }

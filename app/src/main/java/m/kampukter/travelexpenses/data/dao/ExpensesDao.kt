@@ -2,6 +2,7 @@ package m.kampukter.travelexpenses.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.data.InfoForRate
@@ -16,7 +17,7 @@ interface ExpensesDao {
     suspend fun insert(expanses: Expenses): Long
 
     @Query("select * from expenses where expenses.folder_id = :folderId")
-    fun getAll( folderId: Long ): LiveData<List<Expenses>>
+    fun getAll( folderId: Long ): Flow<List<Expenses>>
 
     @Query("select * from expenses")
     suspend fun getAllExpenses(): List<Expenses>
@@ -32,7 +33,7 @@ interface ExpensesDao {
             order by expenses.dateTime desc  
            """
     )
-    fun getAllExpensesWithRate( folderId: Long ): LiveData<List<ExpensesWithRate>>
+    fun getAllExpensesWithRate( folderId: Long ): Flow<List<ExpensesWithRate>>
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
@@ -46,7 +47,7 @@ interface ExpensesDao {
            
            """
     )
-    fun getSearchExpensesWithRate( searchString: String, folderId: Long): LiveData<List<ExpensesWithRate>>
+    fun getSearchExpensesWithRate( searchString: String, folderId: Long): Flow<List<ExpensesWithRate>>
 
 
     @Query("delete from expenses WHERE expenses.id = :selectedId")
@@ -68,7 +69,7 @@ interface ExpensesDao {
             group by  expense,currency_field    
             """
     )
-    fun getSumExpenses(folder_id: Long): LiveData<List<ReportSumView>>
+    fun getSumExpenses(folder_id: Long): Flow<List<ReportSumView>>
 
     @Query(
         """ select sum(sum) AS sum, currency_field AS name, null AS note 
@@ -77,7 +78,7 @@ interface ExpensesDao {
             group by  currency_field 
             """
     )
-    fun getSumCurrency(folder_id: Long): LiveData<List<ReportSumView>>
+    fun getSumCurrency(folder_id: Long): Flow<List<ReportSumView>>
 
     @Query(
         """select currency_field, Date(dateTime) as dateRate 
@@ -105,4 +106,18 @@ interface ExpensesDao {
 
     @Query("update expenses set folder_id = :newFolderId WHERE expenses.id IN (:selected)")
     suspend fun moveIdList(selected: Set<Long>, newFolderId: Long)
+
+    @Query(
+        """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
+                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
+                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
+            from expenses
+            LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
+            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder_id = :folderId 
+            group by expenses.dateTime
+            order by expenses.dateTime desc  
+            
+           """
+    )
+    fun getExpensesFlow(folderId: Long): Flow<List<ExpensesWithRate>>
 }
