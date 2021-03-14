@@ -163,7 +163,7 @@ class AddMainExpensesFragment : Fragment() {
                             dateTime = Calendar.getInstance().time,
                             sum = 0.0,
                             currency = currency,
-                            expense = "",
+                            expense_id = 0L,
                             note = "",
                             location = null,
                             imageUri = null,
@@ -178,7 +178,7 @@ class AddMainExpensesFragment : Fragment() {
                           .toDoubleOrNull() != tempExpenses.sum
                   ) sumTextInputEdit.setText(tempExpenses.sum.toString())*/
 
-                expenseTextInputEdit.setText(tempExpenses.expense)
+                expenseTextInputEdit.setText(tempExpenses.expense_id.toString())
                 if (noteTextInputEdit.text.toString() != tempExpenses.note) noteTextInputEdit.setText(
                     tempExpenses.note
                 )

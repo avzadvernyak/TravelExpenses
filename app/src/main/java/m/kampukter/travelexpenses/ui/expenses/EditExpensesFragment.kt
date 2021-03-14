@@ -55,7 +55,7 @@ class EditExpensesFragment : Fragment() {
 
                 sumTextInputEdit.setText(expenses.sum.toString())
                 dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
-                expenseTextInputEdit.setText(expenses.expense)
+                expenseTextInputEdit.setText(expenses.expense_id.toString())
                 noteTextInputEdit.setText(expenses.note)
                 noteTextInputEdit.onFocusChangeListener =
                     View.OnFocusChangeListener { _, p1 ->

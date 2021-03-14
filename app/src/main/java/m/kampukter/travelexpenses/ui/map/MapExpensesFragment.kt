@@ -128,7 +128,7 @@ class MapExpensesFragment : Fragment() {
                         //Log.d("blabla"," ***** ${myMarker.alpha}")
 
                         myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        myMarker.snippet = itemExpenses.expense
+                        myMarker.snippet = itemExpenses.expense_id.toString()
                         myMarker.subDescription = itemExpenses.note
 
                         mapMapView.overlays.add(myMarker)

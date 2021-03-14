@@ -3,10 +3,7 @@ package m.kampukter.travelexpenses.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import m.kampukter.travelexpenses.data.Expenses
-import m.kampukter.travelexpenses.data.ExpensesWithRate
-import m.kampukter.travelexpenses.data.InfoForRate
-import m.kampukter.travelexpenses.data.ReportSumView
+import m.kampukter.travelexpenses.data.*
 
 @Dao
 interface ExpensesDao {
@@ -24,7 +21,7 @@ interface ExpensesDao {
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
+                            expenses.expense_id as expense_id, expenses.note as note, expenses.sum as sum, 
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
@@ -37,17 +34,18 @@ interface ExpensesDao {
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
+                            expenses.expense_id as expense_id, expense.name as expense, expenses.note as note, expenses.sum as sum, 
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
+            LEFT JOIN expense ON expenses.expense_id = expense.name 
             where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
            
            """
     )
-    fun getSearchExpensesWithRate( searchString: String, folderId: Long): Flow<List<ExpensesWithRate>>
+    fun getSearchExpenses(searchString: String, folderId: Long): Flow<List<ExpensesExtendedView>>
 
 
     @Query("delete from expenses WHERE expenses.id = :selectedId")
@@ -56,17 +54,17 @@ interface ExpensesDao {
     @Query("select * from expenses where id = :id")
     fun getExpensesById(id: Long): LiveData<Expenses>
 
-    @Query("select count(expense) from expenses where expense = :name")
+    @Query("select count(expense_id) from expenses where expense_id = :name")
     suspend fun getExpensesCount(name: String): Long
 
     @Query("select count(folder_id) from expenses where folder_id = :folderId")
     suspend fun getFoldersCount(folderId: Long): Long
 
     @Query(
-        """ select sum(sum) AS sum, expense AS name, currency_field AS note 
+        """ select sum(sum) AS sum, expense_id AS name, currency_field AS note 
             from expenses 
             where expenses.folder_id = :folder_id
-            group by  expense,currency_field    
+            group by  expense_id,currency_field    
             """
     )
     fun getSumExpenses(folder_id: Long): Flow<List<ReportSumView>>
@@ -89,7 +87,7 @@ interface ExpensesDao {
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
+                            expenses.expense_id as expense_id, expenses.note as note, expenses.sum as sum, 
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
@@ -109,7 +107,7 @@ interface ExpensesDao {
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
+                            expenses.expense_id as expense_id, expenses.note as note, expenses.sum as sum, 
                               rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
@@ -120,4 +118,19 @@ interface ExpensesDao {
            """
     )
     fun getExpensesFlow(folderId: Long): Flow<List<ExpensesWithRate>>
+
+    @Query(
+        """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
+                            expenses.expense_id as expense_id, expense.name as expense, expenses.note as note, expenses.sum as sum, 
+                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
+            from expenses
+            LEFT JOIN expense ON expenses.expense_id = expense.name 
+            LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
+            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder_id = :folderId 
+            group by expenses.dateTime
+            order by expenses.dateTime desc  
+            
+           """
+    )
+    fun getExpensesView(folderId: Long): Flow<List<ExpensesExtendedView>>
 }

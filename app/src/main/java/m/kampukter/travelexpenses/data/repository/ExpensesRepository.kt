@@ -36,9 +36,12 @@ class ExpensesRepository(
         foldersDao.searchById(value.folder_id)
     }
 
-    fun getExpensesFlow(): Flow<List<ExpensesWithRate>> = currentSettingsFlow.flatMapLatest {
-        expensesDao.getExpensesFlow(it.folder_id)
+    fun getExpensesFlow(): Flow<List<ExpensesExtendedView>> = currentSettingsFlow.flatMapLatest {
+        expensesDao.getExpensesView(it.folder_id)
     }
+    /*fun getExpensesFlow(): Flow<List<ExpensesWithRate>> = currentSettingsFlow.flatMapLatest {
+        expensesDao.getExpensesFlow(it.folder_id)
+    }*/
 
     fun getAll(): Flow<List<Expenses>> =
         currentSettingsFlow.flatMapLatest { expensesDao.getAll(it.folder_id) }
@@ -77,7 +80,7 @@ class ExpensesRepository(
             resultString = resultString + DateFormat.format(
                 "dd/MM/yyyy HH:mm",
                 it.dateTime
-            ) + "," + it.expense + "," + it.sum + "," + it.currency + "," + it.note + "\n"
+            ) + "," + it.expense_id + "," + it.sum + "," + it.currency + "," + it.note + "\n"
         }
         result.postValue(resultString)
         return result
@@ -240,16 +243,16 @@ class ExpensesRepository(
     Search in Expenses
     */
     private val historySearchStringExpenses = mutableListOf<String>()
-    fun getSearchExpensesWithRate(
+    fun getSearchExpenses(
         searchString: String,
         folder: String
-    ): Flow<List<ExpensesWithRate>> {
+    ): Flow<List<ExpensesExtendedView>> {
         if (searchString.isNotBlank() && !historySearchStringExpenses.contains(searchString)) historySearchStringExpenses.add(
             searchString
         )
 
         return currentSettingsFlow.flatMapLatest {
-            expensesDao.getSearchExpensesWithRate(
+            expensesDao.getSearchExpenses(
                 "%$searchString%",
                 it.folder_id
             )

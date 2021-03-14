@@ -7,10 +7,9 @@ import java.util.*
     tableName = "expenses",
     foreignKeys = [ForeignKey(
         entity = Expense::class,
-        parentColumns = arrayOf("name"),
-        childColumns = arrayOf("expense"),
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.CASCADE
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("expense_id"),
+        onDelete = ForeignKey.CASCADE
     ), ForeignKey(
         entity = CurrencyTable::class,
         parentColumns = arrayOf("name"),
@@ -23,7 +22,7 @@ import java.util.*
     )
     ],
     indices = [(Index(value = ["currency_field"], name = "idx_currency_field")),
-        (Index(value = ["expense"], name = "idx_expense")),
+        (Index(value = ["expense_id"], name = "idx_expense")),
         (Index(value = ["folder_id"], name = "idx_folder"))
     ]
 )
@@ -34,7 +33,7 @@ data class Expenses(
     val id: Long = 0L,
     @ColumnInfo(name = "dateTime")
     val dateTime: Date,
-    val expense: String,
+    val expense_id: Long,
     val sum: Double,
     @ColumnInfo(name = "currency_field")
     val currency: String,

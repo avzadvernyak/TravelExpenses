@@ -201,10 +201,10 @@ class MyViewModel(
         viewModelScope.launch { expensesRepository.addExpenses(expenses) }
     }
 
-    val expensesInFolder: LiveData<Pair<Folders, List<ExpensesWithRate>>> =
-        MediatorLiveData<Pair<Folders, List<ExpensesWithRate>>>().apply {
+    val expensesInFolder: LiveData<Pair<Folders, List<ExpensesExtendedView>>> =
+        MediatorLiveData<Pair<Folders, List<ExpensesExtendedView>>>().apply {
             var lastCurrentFolder: Folders? = null
-            var lastExpenses: List<ExpensesWithRate>? = null
+            var lastExpenses: List<ExpensesExtendedView>? = null
             fun update() {
                 val currentFolder = lastCurrentFolder ?: return
                 val expenses = lastExpenses ?: return
@@ -479,9 +479,9 @@ class MyViewModel(
             addSource(bufferForSaveExpense) {
                 lastExpenses = it
                 postValue(Pair(lastExpenses, currencyList))
-                isSavingAllowed.postValue(
+               /* isSavingAllowed.postValue(
                     it != null && it.currency.isNotBlank() && (it.sum != 0.0) && it.note.isNotBlank() && it.expense.isNotBlank()
-                )
+                )*/
             }
             addSource(currencyTableList) {
                 if (it != null) currencyList = it
@@ -642,13 +642,13 @@ Exchange
                         )
                     }
 
-                    is FilterForExpensesMap.ExpenseFilter ->
-                        postValue(
+                    is FilterForExpensesMap.ExpenseFilter ->{}
+                       /* postValue(
                             Pair(
                                 lastExpenses.filter { it.expense == filter.expenseName },
                                 lastFilterForExpensesMap
                             )
-                        )
+                        )*/
 
                 }
             }
@@ -698,7 +698,7 @@ Search in Expenses
             }
         }
     val expensesSearchResult = Transformations.switchMap(expensesSearch) { (query, folder) ->
-        expensesRepository.getSearchExpensesWithRate( query, folder)
+        expensesRepository.getSearchExpenses( query, folder)
             .asLiveData()
     }
     val searchStringExpensesLiveData: LiveData<String>

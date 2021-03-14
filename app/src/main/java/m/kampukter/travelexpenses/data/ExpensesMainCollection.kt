@@ -2,7 +2,7 @@ package m.kampukter.travelexpenses.data
 
 sealed class ExpensesMainCollection( val id: Long, val contentHash: Int) {
     data class Header(val title: String) : ExpensesMainCollection(Long.MAX_VALUE , title.hashCode())
-    data class Row(val expenses: ExpensesWithRate) : ExpensesMainCollection( expenses.id,expenses.hashCode() )
+    data class Row(val expenses: ExpensesExtendedView) : ExpensesMainCollection( expenses.id,expenses.hashCode() )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

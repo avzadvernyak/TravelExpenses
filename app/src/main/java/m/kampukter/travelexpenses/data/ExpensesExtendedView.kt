@@ -2,14 +2,15 @@ package m.kampukter.travelexpenses.data
 
 import java.util.*
 
-class ExpensesWithRate(
+data class ExpensesExtendedView(
     val id: Long = 0L,
     val dateTime: Date,
     val expense_id: Long,
-    val sum: Float,
+    val expense: String,
+    val sum: Double,
     val currency: String,
     val note: String,
-    val rate: Float?,
-    val exchangeDate: String?,
-    val imageUri: String?
+    val location: MyLocation?,
+    val imageUri: String?,
+    val rate: Float?
 )

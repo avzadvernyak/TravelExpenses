@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
 import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.ui.expenses.ExpensesAdapter
@@ -158,13 +159,13 @@ class HomeExpensesFragment : Fragment() {
         expensesAdapter?.let { viewModel.setSavedStateHomeFragment(it.getSelectedItems()) }
     }
 
-    private fun sharedExpenses(expensesList: List<ExpensesWithRate>) {
+    private fun sharedExpenses(expensesList: List<ExpensesExtendedView>) {
         if (expensesList.size == 1) {
             if (expensesList[0].imageUri != null) sharedExpensesImageIntent(expensesList[0])
             else {
                 val messageText = getString(
                     R.string.msg_sent_to,
-                    expensesList[0].expense,
+                    expensesList[0].expense_id.toString(),
                     expensesList[0].note,
                     expensesList[0].sum,
                     expensesList[0].currency,
@@ -177,7 +178,7 @@ class HomeExpensesFragment : Fragment() {
             expensesList.forEach {
                 messageText += getString(
                     R.string.msg_sent_to,
-                    it.expense,
+                    it.expense_id.toString(),
                     it.note,
                     it.sum,
                     it.currency,
@@ -188,7 +189,7 @@ class HomeExpensesFragment : Fragment() {
         }
     }
 
-    private fun sharedExpensesImageIntent(expenses: ExpensesWithRate) {
+    private fun sharedExpensesImageIntent(expenses: ExpensesExtendedView) {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             val date =
@@ -196,7 +197,7 @@ class HomeExpensesFragment : Fragment() {
             putExtra(
                 Intent.EXTRA_TEXT, getString(
                     R.string.msg_sent_to,
-                    expenses.expense,
+                    expenses.expense_id.toString(),
                     expenses.note,
                     expenses.sum,
                     expenses.currency,

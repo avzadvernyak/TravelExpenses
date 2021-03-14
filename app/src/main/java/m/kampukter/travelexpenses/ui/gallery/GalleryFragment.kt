@@ -120,7 +120,7 @@ class GalleryFragment : Fragment() {
                                         Intent.EXTRA_TEXT,
                                         getString(
                                             R.string.msg_sent_to,
-                                            collection[position].expense,
+                                            collection[position].expense_id.toString(),
                                             collection[position].note,
                                             collection[position].sum,
                                             collection[position].currency,
@@ -156,7 +156,7 @@ class GalleryFragment : Fragment() {
 
     private fun bottomSheetInit(item: ExpensesWithRate) {
         sumTextView.text = item.sum.toString()
-        expenseTextView.text = item.expense
+        expenseTextView.text = item.expense_id.toString()
         currencyTextView.text = item.currency
         noteTextView.text = item.note
         dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", item.dateTime)
