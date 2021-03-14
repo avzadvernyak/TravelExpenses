@@ -141,17 +141,17 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
 
         // Updated Expenses
         database.execSQL(
-            "CREATE TABLE UpdatedTableExpenses (id INTEGER PRIMARY KEY NOT NULL, dateTime TEXT NOT NULL, expense_id INTEGER NOT NULL," +
-                    " sum REAL NOT NULL, currency_field TEXT NOT NULL, note TEXT NOT NULL, location TEXT, imageUri TEXT, folder_id INTEGER NOT NULL, " +
-                    "FOREIGN KEY (expense_id) REFERENCES expense(id) ON UPDATE NO ACTION ON DELETE CASCADE," +
-                    "FOREIGN KEY (currency_field) REFERENCES currency(name) ON UPDATE NO ACTION ON DELETE NO ACTION ," +
-                    "FOREIGN KEY (folder_id) REFERENCES folders(id) ON UPDATE NO ACTION ON DELETE CASCADE)"
+            """CREATE TABLE UpdatedTableExpenses (id INTEGER PRIMARY KEY NOT NULL, dateTime TEXT NOT NULL, expense_id INTEGER NOT NULL,
+                    sum REAL NOT NULL, currency_field TEXT NOT NULL, note TEXT NOT NULL, location TEXT, imageUri TEXT, folder_id INTEGER NOT NULL, 
+                    FOREIGN KEY (expense_id) REFERENCES expense(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+                    FOREIGN KEY (currency_field) REFERENCES currency(name) ON UPDATE NO ACTION ON DELETE NO ACTION ,
+                    FOREIGN KEY (folder_id) REFERENCES folders(id) ON UPDATE NO ACTION ON DELETE CASCADE)"""
         )
         database.execSQL(
-            " INSERT OR REPLACE INTO UpdatedTableExpenses(id, dateTime, expense_id, sum, currency_field , note ," +
-                    "location, imageUri, folder_id) " +
-                    "SELECT expenses.id, dateTime, sum, currency_field , note ,location, imageUri, folder_id," +
-                    "(select expense.id from expense where expense.name = expenses.expense) as expense_id  FROM expenses "
+            """ INSERT OR REPLACE INTO UpdatedTableExpenses(id, dateTime, expense_id, sum, currency_field , note ,
+                    location, imageUri, folder_id) 
+                    SELECT expenses.id as id, dateTime, sum, currency_field , expenses.note as note ,location, imageUri, folder_id,
+                    (select expense.id from expense where expense.name = expenses.expense) as expense_id  FROM expenses """
         )
         database.execSQL("DROP TABLE expenses")
         database.execSQL("ALTER TABLE UpdatedTableExpenses RENAME TO expenses")
