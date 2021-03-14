@@ -150,8 +150,8 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         database.execSQL(
             " INSERT OR REPLACE INTO UpdatedTableExpenses(id, dateTime, expense_id, sum, currency_field , note ," +
                     "location, imageUri, folder_id) " +
-                    "SELECT id, dateTime, sum, currency_field , note ,location, imageUri, folder_id," +
-                    "(select id from expense where expense.name = expenses.expense) as expense_id  FROM expenses "
+                    "SELECT expenses.id, dateTime, sum, currency_field , note ,location, imageUri, folder_id," +
+                    "(select expense.id from expense where expense.name = expenses.expense) as expense_id  FROM expenses "
         )
         database.execSQL("DROP TABLE expenses")
         database.execSQL("ALTER TABLE UpdatedTableExpenses RENAME TO expenses")
