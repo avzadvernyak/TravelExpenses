@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
@@ -17,7 +18,7 @@ import kotlinx.android.synthetic.main.gallery_fragment.*
 import kotlinx.android.synthetic.main.gallery_item.*
 import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.*
-import m.kampukter.travelexpenses.data.ExpensesWithRate
+import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.text.DecimalFormat
@@ -91,9 +92,8 @@ class GalleryFragment : Fragment() {
             }
 
         }
-
-        viewModel.expensesWithRate.observe(viewLifecycleOwner, { list ->
-            val collection = list.filter { it.imageUri != null }
+        viewModel.expensesInFolder.observe(viewLifecycleOwner) { (_, expenses) ->
+            val collection = expenses.filter { it.imageUri != null }
             pageAdapter.setList(collection)
             photoPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -106,8 +106,8 @@ class GalleryFragment : Fragment() {
                                 imageInGalleryToggleButton.visibility = View.INVISIBLE
                             }
                             delButton.id -> {
-                                viewModel.setQueryExpensesId(collection[position].id)
-                                navController.navigate(R.id.delPhotoFromGalleryDialogFragment)
+                                val bundle = bundleOf("expensesIdDelImage" to collection[position].id )
+                                navController.navigate(R.id.delPhotoFromGalleryDialogFragment, bundle)
                             }
                             shareButton.id -> {
                                 val sendIntent: Intent = Intent().apply {
@@ -120,11 +120,11 @@ class GalleryFragment : Fragment() {
                                         Intent.EXTRA_TEXT,
                                         getString(
                                             R.string.msg_sent_to,
-                                            collection[position].expense_id.toString(),
+                                            collection[position].expense,
                                             collection[position].note,
                                             collection[position].sum,
                                             collection[position].currency,
-                                           date
+                                            date
                                         )
                                     )
                                     putExtra(
@@ -138,9 +138,8 @@ class GalleryFragment : Fragment() {
                         }
                     }
                 }
-
             })
-        })
+        }
     }
 
     override fun onDestroy() {
@@ -154,7 +153,7 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun bottomSheetInit(item: ExpensesWithRate) {
+    private fun bottomSheetInit(item: ExpensesExtendedView) {
         sumTextView.text = item.sum.toString()
         expenseTextView.text = item.expense_id.toString()
         currencyTextView.text = item.currency

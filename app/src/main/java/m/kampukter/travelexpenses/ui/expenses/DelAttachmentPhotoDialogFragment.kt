@@ -16,13 +16,8 @@ class DelAttachmentPhotoDialogFragment : DialogFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_title_del_photo))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { _, _ ->
-                viewModel.expenseMediatorLiveData.observe(this,{
-                    it.first?.let { expenses ->
-                        viewModel.addExpenses(expenses.copy(imageUri = null))
-                        findNavController().navigate(R.id.next_action)
-                    }
-                })
-
+                viewModel.updateExpensesImageUri(null)
+                findNavController().navigate(R.id.next_action)
             }
             .create()
 

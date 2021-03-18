@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui
+package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.camerax_fragment.*
 import m.kampukter.travelexpenses.CameraXService
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.ui.permissionsForCamera
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.concurrent.ExecutorService
@@ -53,24 +54,16 @@ class TakePhotoForEditFragment : Fragment() {
             cameraService.setUpCamera(this, view.context, viewFinder)
         }
 
-        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, { value ->
-
-            if (!value.first?.imageUri.isNullOrEmpty()) findNavController().navigate(R.id.next_action)
-            value.first?.let { expenses ->
-                camera_capture_button.setOnClickListener {
-                    viewModel.createJPGFile()?.let {
-                        cameraService.takePhoto(it) { uriString ->
-                            viewModel.addExpenses(
-                                expenses.copy(imageUri = uriString ))
-                        }
-                    }
+        camera_capture_button.setOnClickListener {
+            viewModel.createJPGFile()?.let {
+                cameraService.takePhoto(it) { uriString ->
+                    viewModel.updateExpensesImageUri(uriString)
                 }
             }
-
-        })
-
-
-
+        }
+        viewModel.expensesEdit.observe(viewLifecycleOwner){ (expenses,_)->
+            if (expenses.imageUri != null) findNavController().navigate(R.id.next_action)
+        }
     }
 
     override fun onDestroy() {

@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
-import m.kampukter.travelexpenses.data.dto.BackupServer
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
 import m.kampukter.travelexpenses.data.repository.FSRepository
 import m.kampukter.travelexpenses.data.repository.RateCurrencyAPIRepository
@@ -103,8 +102,9 @@ class MyViewModel(
 
     private val updateFolderName = MutableLiveData<String>()
     fun setFolderNameForUpd(name: String) {
-        updateFolderName.postValue( name)
+        updateFolderName.postValue(name)
     }
+
     private val updateFolderDescription = MutableLiveData<String>()
     fun setFolderDescriptionForUpd(description: String) {
         updateFolderDescription.postValue(description)
@@ -126,12 +126,6 @@ class MyViewModel(
                 val currentFolder = lastCurrentFolder ?: return
                 postValue(Triple(currentFolder, newFolder, lastCandidates))
             }
-           /* addSource(updateFoldersCandidate) {
-                if (it != lastNewFolder) {
-                    lastNewFolder = it
-                    update()
-                }
-            }*/
             addSource(folderCandidates) { listFolders ->
                 lastCandidates = listFolders
                 update()
@@ -148,7 +142,7 @@ class MyViewModel(
                 }
             }
             addSource(updateFolderDescription) { description ->
-                if ( description != null) {
+                if (description != null) {
                     lastNewFolder = lastNewFolder?.copy(description = description)
                     update()
                 }
@@ -158,11 +152,8 @@ class MyViewModel(
     fun deleteFolderId(folderId: Long) {
         viewModelScope.launch { expensesRepository.deleteFolder(folderId) }
     }
-
-
     /*
-    End
-    Folders Expenses
+    End Folders Expenses
     */
 
     /*
@@ -189,17 +180,10 @@ class MyViewModel(
         }
     }
 
-/*
-* Удаление всех записей из Expenses
-*/
-
     fun deleteAllExpenses() {
         viewModelScope.launch { expensesRepository.deleteAll() }
     }
 
-    fun addExpenses(expenses: Expenses) {
-        viewModelScope.launch { expensesRepository.addExpenses(expenses) }
-    }
 
     val expensesInFolder: LiveData<Pair<Folders, List<ExpensesExtendedView>>> =
         MediatorLiveData<Pair<Folders, List<ExpensesExtendedView>>>().apply {
@@ -222,25 +206,9 @@ class MyViewModel(
 
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll().asLiveData()
 
-    val expensesWithRate: LiveData<List<ExpensesWithRate>> =
-        expensesRepository.getAllExpensesWithRate().asLiveData()
-
-
     private val expensesFindId = MutableLiveData<Long>()
     fun setQueryExpensesId(query: Long) {
         expensesFindId.postValue(query)
-    }
-
-    val expensesById: LiveData<Expenses> =
-        Transformations.switchMap(expensesFindId) { query ->
-            expensesRepository.getRecordById(
-                query
-            )
-        }
-
-
-    fun setDefCurrency(query: String) {
-        expensesRepository.setDefCurrency(query)
     }
 
     private val savedStateSearchFragmentMutableLiveData =
@@ -273,115 +241,236 @@ class MyViewModel(
         }
     }
 
-    fun resetDef() {
-        expensesRepository.resetDef()
-    }
-
     private val currencyTableList: LiveData<List<CurrencyTable>> =
-        expensesRepository.getCurrencyAllLiveData()
+        expensesRepository.getCurrencyAllFlow().asLiveData()
 
+    val expenseList: LiveData<List<Expense>> = expensesRepository.getAllExpenseFlow().asLiveData()
 
-    private val queryExpense = MutableLiveData<String>()
-    fun setQueryExpense(query: String) {
-        queryExpense.postValue(query)
+    private val lastExpenseMutableLiveData = MutableLiveData<Long>()
+    fun setLastExpense(id: Long) {
+        lastExpenseMutableLiveData.postValue(id)
     }
 
-    val expenseById: LiveData<Expense> =
-        Transformations.switchMap(queryExpense) { query ->
-            expensesRepository.getExpenseByName(
-                query
-            )
+    private val lastSumMutableLiveData = MutableLiveData<Double>()
+    fun setLastSum(sum: Double) {
+        lastSumMutableLiveData.postValue(sum)
+    }
+
+    private val lastNoteMutableLiveData = MutableLiveData<String>()
+    fun setLastNote(note: String) {
+        lastNoteMutableLiveData.postValue(note)
+    }
+
+    private val lastCurrencyMutableLiveData = MutableLiveData<String>()
+    fun setLastCurrency(note: String) {
+        lastCurrencyMutableLiveData.postValue(note)
+    }
+
+    private val lastLocationMutableLiveData = MutableLiveData<MyLocation>()
+    fun setLastLocation(location: MyLocation) {
+        lastLocationMutableLiveData.postValue(location)
+    }
+
+    private val lastUriPhotoMutableLiveData = MutableLiveData<String?>()
+    fun setLastUriPhoto(uriPhoto: String?) {
+        lastUriPhotoMutableLiveData.postValue(uriPhoto)
+    }
+
+    private val isAddNewExpense = MutableLiveData<Boolean>()
+    fun addNewExpenses() = isAddNewExpense.postValue(true)
+
+    val addExpensesLiveData: LiveData<Triple<ExpensesUpdate, List<Expense>, List<CurrencyTable>>> =
+        MediatorLiveData<Triple<ExpensesUpdate, List<Expense>, List<CurrencyTable>>>().apply {
+            var lastExpenses = ExpensesUpdate()
+            var lastExpenseList: List<Expense> = listOf()
+            var lastCurrencyList: List<CurrencyTable> = listOf()
+            fun update() {
+                postValue(Triple(lastExpenses, lastExpenseList, lastCurrencyList))
+            }
+            addSource(isAddNewExpense) {
+                viewModelScope.launch {
+                    expensesRepository.addExpenses(lastExpenses)
+                }
+            }
+            addSource(expenseList) {
+                lastExpenseList = it
+                update()
+            }
+            addSource(currentFolder) {
+                lastExpenses = lastExpenses.copy(folderId = it.id)
+            }
+            addSource(currencyTableList) {
+                lastCurrencyList = it
+                update()
+            }
+            addSource(lastExpenseMutableLiveData) { id ->
+                lastExpenses = lastExpenses.copy(expense_id = id)
+                update()
+            }
+            addSource(lastSumMutableLiveData) { sum ->
+                lastExpenses = lastExpenses.copy(sum = sum)
+                update()
+            }
+            addSource(lastNoteMutableLiveData) { note ->
+                lastExpenses = lastExpenses.copy(note = note)
+                update()
+            }
+            addSource(lastCurrencyMutableLiveData) {
+                lastExpenses = lastExpenses.copy(currency = it)
+                update()
+            }
+            addSource(lastLocationMutableLiveData) {
+                lastExpenses = lastExpenses.copy(location = it)
+                update()
+            }
+            addSource(lastUriPhotoMutableLiveData) {
+                lastExpenses = lastExpenses.copy(imageUri = it)
+                update()
+            }
         }
 
-    val expenseList: LiveData<List<Expense>> = expensesRepository.getExpenseAllLiveData()
-    fun addExpense(expense: Expense) {
-        expensesRepository.addExpense(expense)
+    // Edit record Expenses
+    private val expensesIdEditMutableLiveData = MutableLiveData<Long>()
+    fun expensesIdEdit(expensesId: Long) {
+        expensesIdEditMutableLiveData.postValue(expensesId)
     }
 
-    // Удаление записи в Expense и связанных записей. В два этапа
-// 1 если нет связанных записей, удаляем сразу
-// 2 если есть связанные то удаление после подтверждения
-    private val expenseDelTrigger = MutableLiveData<Boolean>()
-    private val expenseDeleteName = MutableLiveData<String>()
-    val expenseDeletionResult: LiveData<ExpenseDeletionResult> =
-        MediatorLiveData<ExpenseDeletionResult>().apply {
-            var lastExpenseName: String? = null
-            var lastExpenseTrigger: Boolean? = null
-            fun reset() {
-                expenseDelTrigger.postValue(null)
-                expenseDeleteName.postValue(null)
-                postValue(null)
-            }
+    private val expensesById =
+        Transformations.switchMap(expensesIdEditMutableLiveData) { expensesId ->
+            expensesRepository.getExpensesById(expensesId).asLiveData()
+        }
+    private val updateExpensesMutableLiveData = MutableLiveData<Expense>()
+    private val updateExpensesCurrency = MutableLiveData<CurrencyTable>()
+    private val updateExpensesNote = MutableLiveData<String>()
+    private val updateExpensesSum = MutableLiveData<Double>()
+    private val updateExpensesImageUri = MutableLiveData<String?>()
+    fun updateExpenses(expense: Expense) {
+        updateExpensesMutableLiveData.postValue(expense)
+    }
 
+    fun updateExpenses(currency: CurrencyTable) {
+        updateExpensesCurrency.postValue(currency)
+    }
+
+    fun updateExpenses(note: String) {
+        updateExpensesNote.postValue(note)
+    }
+
+    fun updateExpenses(sum: Double) {
+        updateExpensesSum.postValue(sum)
+    }
+
+    fun updateExpensesImageUri(value: String?) {
+        updateExpensesImageUri.postValue(value)
+    }
+
+    val expensesEdit: LiveData<Pair<ExpensesExtendedView, List<CurrencyTable>>> =
+        MediatorLiveData<Pair<ExpensesExtendedView, List<CurrencyTable>>>().apply {
+            var lastExpenses: ExpensesExtendedView? = null
+            var lastCurrencyList: List<CurrencyTable> = listOf()
             fun update() {
-                val expenseName = lastExpenseName
-                val expenseTrigger = lastExpenseTrigger
-
-                if (expenseName == null || expenseTrigger == null) return
-
-                viewModelScope.launch {
-                    if (expenseTrigger) {
-                        expensesRepository.deleteExpenseRecord(expenseName, true)
-                        postValue(ExpenseDeletionResult.Success)
-                        delay(1000)
-                        reset()
-                    } else {
-                        val numberRec = expensesRepository.deleteExpenseRecord(
-                            expenseName,
-                            expenseTrigger
-                        )
-                        if (numberRec == 0L) {
-                            expensesRepository.deleteExpenseRecord(expenseName, true)
-                            postValue(ExpenseDeletionResult.Success)
-                            delay(1000)
-                            reset()
-                        } else postValue(
-                            ExpenseDeletionResult.Warning(
-                                expenseName,
-                                numberRec
-                            )
-                        )
+                val expenses = lastExpenses ?: return
+                postValue(Pair(expenses, lastCurrencyList))
+            }
+            addSource(expensesById) {
+                lastExpenses = it
+                update()
+            }
+            addSource(currencyTableList) {
+                lastCurrencyList = it
+                update()
+            }
+            addSource(updateExpensesMutableLiveData) { expense ->
+                lastExpenses?.let {
+                    viewModelScope.launch {
+                        expensesRepository.updateExpense(it.id, expense.id)
                     }
                 }
             }
-            addSource(expenseDeleteName) {
-                lastExpenseName = it
-                update()
+            addSource(updateExpensesCurrency) { currency ->
+                lastExpenses?.let {
+                    viewModelScope.launch {
+                        expensesRepository.updateCurrency(it.id, currency.name)
+                    }
+                }
             }
-            addSource(expenseDelTrigger) {
-                lastExpenseTrigger = it
-                update()
+            addSource(updateExpensesNote) { noteString ->
+                noteString?.let { note ->
+                    lastExpenses?.let {
+                        viewModelScope.launch {
+                            expensesRepository.updateNote(it.id, note)
+                        }
+                    }
+                }
             }
-        }
-
-    fun deleteExpenseName(expenseName: String) {
-        expenseDeleteName.postValue(expenseName)
-    }
-
-    fun deleteExpenseTrigger(isDelete: Boolean) {
-        expenseDelTrigger.postValue(isDelete)
-    }
-
-    // Update Expense
-    private val expenseUpdateTrigger = MutableLiveData<String>()
-    val expenseUpdateMediator: LiveData<Int> = MediatorLiveData<Int>().apply {
-        var oldExpenseName: String? = null
-        addSource(expenseUpdateTrigger) {
-            if (it != null) oldExpenseName?.let { oldName ->
-                viewModelScope.launch {
-                    postValue(expensesRepository.updateExpense(it, oldName))
-                    queryExpense.postValue(it)
+            addSource(updateExpensesSum) { sum ->
+                lastExpenses?.let {
+                    viewModelScope.launch {
+                        expensesRepository.updateSum(it.id, sum)
+                    }
+                }
+            }
+            addSource(updateExpensesImageUri) { imageUri ->
+                lastExpenses?.let {
+                    viewModelScope.launch {
+                        expensesRepository.updateImageUri(it.id, imageUri)
+                    }
                 }
 
             }
         }
-        addSource(expenseById) {
-            if (it != null) oldExpenseName = it.name
+
+    fun deleteImageFromExpenses(id: Long) {
+        viewModelScope.launch {
+            expensesRepository.updateImageUri(id, null)
         }
     }
 
-    fun updateExpense(expenseNewName: String) {
-        expenseUpdateTrigger.postValue(expenseNewName)
+    /*
+    Edit expense name
+    */
+    private val editExpense = MutableLiveData<Expense>()
+    private val expensesByExpense = Transformations.switchMap(editExpense) {
+        expensesRepository.getExpensesByExpense(it.id).asLiveData()
+    }
+    fun setEditExpense(expense: Expense) {
+        editExpense.postValue(expense)
+    }
+    private val editExpenseName = MutableLiveData<String>()
+    fun setEditExpenseName( expenseName: String ){
+        editExpenseName.postValue( expenseName)
+    }
+    val editExpenseLiveData: LiveData<Pair<Expense, List<ExpensesExtendedView>>> =
+        MediatorLiveData<Pair<Expense, List<ExpensesExtendedView>>>().apply {
+            var lastEditExpense: Expense? = null
+            var lastExpensesList: List<ExpensesExtendedView> = listOf()
+            fun update() {
+                val editExpense = lastEditExpense ?: return
+                postValue(Pair(editExpense, lastExpensesList))
+            }
+            addSource(editExpense) {
+                lastEditExpense = it
+                update()
+            }
+            addSource(expensesByExpense) {
+                lastExpensesList = it
+                update()
+            }
+            addSource(editExpenseName){ name ->
+                lastEditExpense = lastEditExpense?.copy( name = name)
+                lastEditExpense?.let { expensesRepository.updateExpense(
+                    it.id,
+                    it.name
+                ) }
+            }
+        }
+
+    fun addNewExpense(expense: Expense) {
+        expensesRepository.addExpense(expense)
+    }
+
+    fun deleteExpense(idExpense: Long) {
+        expensesRepository.deleteExpense( idExpense )
     }
 
     fun deleteRate() {
@@ -427,100 +516,6 @@ class MyViewModel(
         expensesRepository.stopBackupWorker()
     }
 
-    private val idProgram = MutableLiveData<String>()
-    fun setIdProgram(id: String) {
-        idProgram.postValue(id)
-    }
-
-    val restoreBackupLiveData: LiveData<BackupServer.Backup> =
-        Transformations.switchMap(idProgram) { name ->
-            expensesRepository.restoreBackupLiveData(name)
-        }
-
-
-    val expenseMediatorLiveData: LiveData<Pair<Expenses?, List<CurrencyTable>?>> =
-        MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
-            var currentExpenses: Expenses? = null
-            var currencyList: List<CurrencyTable> = emptyList()
-            addSource(expensesById) {
-                if (it != null) currentExpenses = it
-                postValue(Pair(currentExpenses, currencyList))
-            }
-            addSource(currencyTableList) {
-                if (it != null) currencyList = it
-                postValue(Pair(currentExpenses, currencyList))
-            }
-        }
-
-    val isSavingAllowed = MutableLiveData<Boolean?>()
-    private val isSaveNewExpenses = MutableLiveData<Boolean>()
-
-    fun saveNewExpenses() {
-        isSaveNewExpenses.postValue(true)
-    }
-
-    private val bufferForSaveExpenseLocation = MutableLiveData<MyLocation?>()
-    fun setBufferExpensesLocation(location: MyLocation) {
-        bufferForSaveExpenseLocation.postValue(location)
-    }
-
-    private val bufferForSaveExpensePhoto = MutableLiveData<String?>()
-    fun setBufferExpensesPhoto(file: String?) {
-        bufferForSaveExpensePhoto.postValue(file)
-    }
-
-
-    private val bufferForSaveExpense = MutableLiveData<Expenses?>()
-    val bufferExpensesMediatorLiveData: LiveData<Pair<Expenses?, List<CurrencyTable>?>> =
-        MediatorLiveData<Pair<Expenses?, List<CurrencyTable>?>>().apply {
-            var lastExpenses: Expenses? = null
-            var currencyList: List<CurrencyTable> = emptyList()
-            var lastCurrentFolder = 0L
-            addSource(bufferForSaveExpense) {
-                lastExpenses = it
-                postValue(Pair(lastExpenses, currencyList))
-               /* isSavingAllowed.postValue(
-                    it != null && it.currency.isNotBlank() && (it.sum != 0.0) && it.note.isNotBlank() && it.expense.isNotBlank()
-                )*/
-            }
-            addSource(currencyTableList) {
-                if (it != null) currencyList = it
-                postValue(Pair(lastExpenses, currencyList))
-            }
-            addSource(isSaveNewExpenses) {
-
-                if (it) lastExpenses?.let { _expenses ->
-                    viewModelScope.launch {
-                        expensesRepository.addExpenses(_expenses.copy(folder_id = lastCurrentFolder))
-
-                        //установка сохраняемой валюты как по умолчанию
-                        expensesRepository.resetDef()
-                        expensesRepository.setDefCurrency(_expenses.currency)
-
-                        isSaveNewExpenses.postValue(false)
-                    }
-                }
-
-            }
-            addSource(bufferForSaveExpenseLocation) {
-                if (it != null) {
-                    lastExpenses = lastExpenses?.copy(location = it)
-                    postValue(Pair(lastExpenses, currencyList))
-                }
-            }
-            addSource(bufferForSaveExpensePhoto) {
-                lastExpenses = lastExpenses?.copy(imageUri = it)
-                postValue(Pair(lastExpenses, currencyList))
-            }
-            addSource(currentFolder) {
-                lastCurrentFolder = it.id
-            }
-        }
-
-    fun setBufferExpenses(expenses: Expenses?) {
-        bufferForSaveExpense.postValue(expenses)
-    }
-
 /*
 Exchange
 */
@@ -543,7 +538,8 @@ Exchange
         foundDateExchangeCurrency.postValue(date)
     }
 
-    private val resultExchangeCurrentRateLiveData = expensesRepository.exchangeRateLiveDate
+    private val resultExchangeCurrentRateLiveData =
+        expensesRepository.exchangeRateLiveDate
     val exchangeRateLiveDate: LiveData<ResultCurrentExchangeRate> =
         MediatorLiveData<ResultCurrentExchangeRate>().apply {
             var lastResultExchangeCurrentRate: ResultCurrentExchangeRate? = null
@@ -614,11 +610,15 @@ Exchange
 
 
     private val filterForExpensesMap = MutableLiveData<FilterForExpensesMap>()
-    val expensesForMapMutableLiveData: LiveData<Pair<List<Expenses>, FilterForExpensesMap?>> =
-        MediatorLiveData<Pair<List<Expenses>, FilterForExpensesMap?>>().apply {
-            var lastExpenses = listOf<Expenses>()
+    fun setFilterForExpensesMap(filter: FilterForExpensesMap) {
+        filterForExpensesMap.postValue(filter)
+    }
+
+    val expensesInFolderForMap: LiveData<Pair<List<ExpensesExtendedView>, FilterForExpensesMap?>> =
+        MediatorLiveData<Pair<List<ExpensesExtendedView>, FilterForExpensesMap?>>().apply {
             var lastFilterForExpensesMap: FilterForExpensesMap? = null
-            addSource(expenses) {
+            var lastExpenses = listOf<ExpensesExtendedView>()
+            addSource(expensesRepository.getExpensesFlow().asLiveData()) {
                 lastExpenses = it
                 postValue(Pair(it, lastFilterForExpensesMap))
 
@@ -642,21 +642,17 @@ Exchange
                         )
                     }
 
-                    is FilterForExpensesMap.ExpenseFilter ->{}
-                       /* postValue(
+                    is FilterForExpensesMap.ExpenseFilter -> {
+                        postValue(
                             Pair(
-                                lastExpenses.filter { it.expense == filter.expenseName },
+                                lastExpenses.filter { it.expense_id == filter.expense.id },
                                 lastFilterForExpensesMap
                             )
-                        )*/
-
+                        )
+                    }
                 }
             }
         }
-
-    fun setFilterForExpensesMap(filter: FilterForExpensesMap) {
-        filterForExpensesMap.postValue(filter)
-    }
 
     fun createJPGFile() = fileSystemRepository.createJPGFile()
     fun deleteFile(file: File) = fileSystemRepository.deleteFile(file)
@@ -671,36 +667,14 @@ Exchange
 Search in Expenses
 */
 
-    private val searchStringExpenses = MutableLiveData<String>().apply { postValue(null) }
+    private val searchStringExpenses =
+        MutableLiveData<String>().apply { postValue(null) }
 
-    private val expensesSearch: LiveData<Pair<String, String>> =
-        MediatorLiveData<Pair<String, String>>().apply {
-            var lastSearchStringExpenses: String? = null
-            var lastCurrentFolderName: String? = null
-            fun update() {
-                lastSearchStringExpenses?.let { searchString ->
-                    lastCurrentFolderName?.let { folder ->
-                        postValue(Pair(searchString, folder))
-                    }
-                }
-            }
-            addSource(searchStringExpenses) {
-                if (it != null) {
-                    lastSearchStringExpenses = it
-                    update()
-                }
-            }
-            addSource(currentFolder) {
-                if (it != null) {
-                    lastCurrentFolderName = it.shortName
-                    update()
-                }
-            }
+    val expensesSearchResult =
+        Transformations.switchMap(searchStringExpenses) { query ->
+            expensesRepository.getSearchExpenses( query )
+                .asLiveData()
         }
-    val expensesSearchResult = Transformations.switchMap(expensesSearch) { (query, folder) ->
-        expensesRepository.getSearchExpenses( query, folder)
-            .asLiveData()
-    }
     val searchStringExpensesLiveData: LiveData<String>
         get() = searchStringExpenses
 
@@ -717,7 +691,6 @@ Search in Expenses
     }
 
     fun getSearchResultExpensesOpenActive() = isSearchResultExpensesActive
-
 
 }
 

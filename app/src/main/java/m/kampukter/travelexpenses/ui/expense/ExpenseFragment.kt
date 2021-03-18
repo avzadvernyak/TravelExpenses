@@ -1,9 +1,11 @@
 package m.kampukter.travelexpenses.ui.expense
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -34,6 +36,9 @@ class ExpenseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+
         val navController = findNavController()
 
         expenseAdapter = ExpenseEditAdapter()
@@ -45,46 +50,13 @@ class ExpenseFragment : Fragment() {
             )
             adapter = expenseAdapter
         }
-        viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
+        viewModel.expenseList.observe(viewLifecycleOwner, { expenseList ->
             expenseAdapter.setItems(expenseList)
         })
-        expenseAdapter.onClickCallback = {
-        // Надо переделать
-        // expense ->
-           /* viewModel.setQueryExpense(expense.name)
-            navController.navigate(R.id.toEditExpenseDialogFragment)*/
+        expenseAdapter.onClickCallback = { expense ->
+            viewModel.setEditExpense( expense )
+            navController.navigate(R.id.toExpenseEditFragment)
         }
-        expenseAdapter.onLongClickCallback = { expense ->
-            viewModel.deleteExpenseName(expense.name)
-            val bundle = bundleOf("expensePhaseOne" to expense.name)
-            navController.navigate(R.id.toDelExpensePhaseOneDialogFragment, bundle)
-            true
-        }
-        viewModel.expenseUpdateMediator.observe(viewLifecycleOwner, Observer {
-            Snackbar.make(view, getString(R.string.expense_update_message), Snackbar.LENGTH_SHORT)
-                .show()
-        })
-
-        viewModel.expenseDeletionResult.observe(viewLifecycleOwner, Observer { result ->
-            when (result) {
-                is ExpenseDeletionResult.Warning -> {
-                    val bundle = bundleOf(
-                        "expensePhaseSecond" to resources.getString(
-                            R.string.expense_del_warning,
-                            result.expenseName,
-                            result.countRecords
-                        )
-                    )
-                    navController.navigate(R.id.toDelExpensePhaseSecondDialogFragment, bundle)
-                }
-                is ExpenseDeletionResult.Success -> Snackbar.make(
-                    view,
-                    "Success",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-
-            }
-        })
         val addFAB = activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpenseFab)
         addFAB?.setOnClickListener {
             navController.navigate(R.id.toAddExpenseDialogFragment)

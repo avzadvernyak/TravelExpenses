@@ -45,8 +45,13 @@
 
     <string name="last_backup">Last backup in %1$s</string>
     <string name="expense_update_message">Все записи изменены</string>
-    <string name="expense_del_warning">"%1$s\nЕсть связанные с этой статьей записи в количестве %2$d шт."
-    "Данные будут безвозвратно потеряны! "</string>
+
+    <!--
+    "%1$s\nЕсть связанные с этой статьей записи в количестве %2$d шт."
+    "Данные будут безвозвратно потеряны!
+    -->
+    <string name="expense_del_warning">"По статье найдено %1$d записей в %2$d папках"
+     "</string>
 
     <string name="edit_record_title">Редактирование записи</string>
     <string name="dialog_expenses_del_all_title">Удалить?</string>
@@ -111,5 +116,6 @@
     <string name="folder_name_validate_msg_duplicate">Такое имя уже есть</string>
     <string name="folder_name_validate_msg_empty">Заполните поле</string>
     <string name="expenses">Расходы %1$s</string>
+    <string name="expense_del_warning_1">В случае удаления статьи все связанные записи будут удалены.</string>
 
 </resources>

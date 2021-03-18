@@ -3,18 +3,29 @@ package m.kampukter.travelexpenses.ui.expenses
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.text.format.DateFormat
-import android.util.Log
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.add_expenses_fragment.*
 import kotlinx.android.synthetic.main.edit_expenses_fragment.*
+import kotlinx.android.synthetic.main.edit_expenses_fragment.currencyTextInputEdit
+import kotlinx.android.synthetic.main.edit_expenses_fragment.expenseTextInputEdit
+import kotlinx.android.synthetic.main.edit_expenses_fragment.noteTextInputEdit
+import kotlinx.android.synthetic.main.edit_expenses_fragment.sumTextInputEdit
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.CurrencyTable
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
+import m.kampukter.travelexpenses.ui.test.DecimalDigitsInputFilter
+import m.kampukter.travelexpenses.ui.test.MoneyValueFilter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+
 
 class EditExpensesFragment : Fragment() {
 
@@ -40,67 +51,85 @@ class EditExpensesFragment : Fragment() {
             MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
         currencyTextInputEdit?.setAdapter(myDropdownAdapter)
 
-        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, { value ->
-            value.first?.let { expenses ->
+        arguments?.getLong("expensesId")?.let { viewModel.expensesIdEdit(it) }
+        viewModel.expensesEdit.observe(viewLifecycleOwner) { (expenses, currencyList) ->
 
-                if (expenses.imageUri != null) {
-                    attachmentImageView.visibility = View.VISIBLE
-                    Glide.with(view).load(Uri.parse(expenses.imageUri))
-                        .placeholder(R.drawable.ic_photo_24)
-                        .into(attachmentImageView)
-                } else {
-                    attachmentImageView.visibility = View.INVISIBLE
-                }
+            if (expenseTextInputEdit.text.toString() != expenses.expense) expenseTextInputEdit.setText(
+                expenses.expense
+            )
+            if (currencyTextInputEdit.text.toString() != expenses.currency) currencyTextInputEdit.setText(
+                expenses.currency
+            )
+            if (sumTextInputEdit.text.toString() != expenses.sum.toString()) sumTextInputEdit.setText(
+                expenses.sum.toString()
+            )
+            if (noteTextInputEdit.text.toString() != expenses.note) noteTextInputEdit.setText(
+                expenses.note
+            )
 
-
-                sumTextInputEdit.setText(expenses.sum.toString())
-                dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
-                expenseTextInputEdit.setText(expenses.expense_id.toString())
-                noteTextInputEdit.setText(expenses.note)
-                noteTextInputEdit.onFocusChangeListener =
-                    View.OnFocusChangeListener { _, p1 ->
-                        if (!p1) viewModel.addExpenses(expenses.copy(note = noteTextInputEdit.text.toString()))
-                    }
-                sumTextInputEdit.onFocusChangeListener =
-                    View.OnFocusChangeListener { _, p1 ->
-                        if (!p1) viewModel.addExpenses(
-                            expenses.copy(
-                                sum = sumTextInputEdit.text.toString().toDouble()
-                            )
-                        )
-                    }
-                currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
-                    if (!p1) {
-                        val newValue = currencyTextInputEdit.text.toString()
-                        if (expenses.currency != newValue) {
-                            viewModel.resetDef()
-                            viewModel.setDefCurrency(newValue)
-                            viewModel.addExpenses(expenses.copy(currency = newValue))
-                        } else Log.d("blablabla", "Не сохраняем")
-                    } else {
-                        val imm =
-                            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                        imm.hideSoftInputFromWindow(view.windowToken, 0)
-                    }
-                }
-            }
-            value.second?.let { list ->
-                myDropdownAdapter.addAll(list.map { it.name })
+            if (expenses.imageUri != null) {
+                attachmentImageView.visibility = View.VISIBLE
+                Glide.with(view).load(Uri.parse(expenses.imageUri))
+                    .placeholder(R.drawable.ic_photo_24)
+                    .into(attachmentImageView)
+            } else {
+                attachmentImageView.visibility = View.INVISIBLE
             }
 
-            value.first?.currency.let {
-                val currencyPosition = myDropdownAdapter.getPosition(it)
-                if (currencyPosition >= 0) {
-                    currencyTextInputEdit?.setText(
-                        myDropdownAdapter.getItem(currencyPosition).toString(), false
-                    )
-                }
+            myDropdownAdapter.addAll(currencyList.map { it.name })
+            val currencyName =
+                if (expenses.currency.isBlank()) currencyList.find { it.defCurrency == 1 }?.name
+                else expenses.currency
+            myDropdownAdapter.getPosition(currencyName).let {
+                if (currencyTextInputEdit.text.toString() != currencyName)
+                    currencyTextInputEdit?.setText(currencyName)
             }
-
-        })
-        expenseTextInputEdit.setOnClickListener {
-            navController.navigate(R.id.toChoiceExpenseForEditFragment)
+            expenseTextInputEdit.setOnClickListener {
+                val bundle = bundleOf("expensesIdForEdit" to expenses.id)
+                navController.navigate(R.id.toChoiceExpenseForEditFragment, bundle)
+            }
         }
+        currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
+            if (p1) {
+                (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(view.windowToken, 0)
+            }
+        }
+        currencyTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.updateExpenses(CurrencyTable(name = p0.toString()))
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
+        sumTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                viewModel.updateExpenses( p0.toString().toDouble())
+
+            /*val inputString = p0.toString()
+                if (inputString.length == 1 && inputString == ".") {
+                    sumTextInputEdit.setText("0.")
+                } else {
+                    viewModel.updateExpenses(
+                        if (inputString.isNotBlank()) inputString.toDouble()
+                        else 0.0
+                    )
+                }*/
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
+        noteTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.updateExpenses(p0.toString())
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
         attachmentImageView.setOnClickListener {
             navController.navigate(R.id.toAttachmentPhotoViewFragment)
         }
@@ -109,11 +138,9 @@ class EditExpensesFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.edit_expenses, menu)
         super.onCreateOptionsMenu(menu, inflater)
-        viewModel.expenseMediatorLiveData.observe(viewLifecycleOwner, { value ->
-            value.first?.let { expenses ->
-                menu.findItem(R.id.addPhoto).isVisible = expenses.imageUri == null
-            }
-        })
+        viewModel.expensesEdit.observe(viewLifecycleOwner) { (expenses, _) ->
+            menu.findItem(R.id.addPhoto).isVisible = expenses.imageUri == null
+        }
 
     }
 

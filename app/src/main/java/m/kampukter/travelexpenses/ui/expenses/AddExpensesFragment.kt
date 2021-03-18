@@ -28,12 +28,6 @@ class AddExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.isSavingAllowed.observe(viewLifecycleOwner, { _isSavingAllowed ->
-            _isSavingAllowed?.let {
-                saveExpensesFAB.isEnabled = it
-            }
-        })
-
         pager.adapter = object : FragmentStateAdapter(this) {
 
             override fun getItemCount(): Int = 2
@@ -53,9 +47,8 @@ class AddExpensesFragment : Fragment() {
             }
         }.attach()
         saveExpensesFAB.setOnClickListener {
-            viewModel.saveNewExpenses()
-            //сброс временной переменной
-            viewModel.setBufferExpenses(null)
+            // Save expenses
+            viewModel.addNewExpenses()
 
             (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
                 view.windowToken,

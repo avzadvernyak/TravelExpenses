@@ -4,15 +4,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginBottom
-import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -20,19 +20,21 @@ import com.google.android.gms.location.*
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
-import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
-import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
+import kotlinx.android.synthetic.main.add_expenses_fragment.currencyTextInputEdit
+import kotlinx.android.synthetic.main.add_expenses_fragment.expenseTextInputEdit
+import kotlinx.android.synthetic.main.add_expenses_fragment.noteTextInputEdit
+import kotlinx.android.synthetic.main.add_expenses_fragment.noteTextInputLayout
+import kotlinx.android.synthetic.main.add_expenses_fragment.sumTextInputEdit
+import kotlinx.android.synthetic.main.edit_expenses_fragment.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.Expenses
 import m.kampukter.travelexpenses.data.MyLocation
-import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
 import m.kampukter.travelexpenses.ui.STATUS_GPS_OFF
 import m.kampukter.travelexpenses.ui.STATUS_GPS_ON
 import m.kampukter.travelexpenses.ui.permissionsForLocation
+import m.kampukter.travelexpenses.ui.test.DecimalDigitsInputFilter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import java.util.*
 
 
 class AddMainExpensesFragment : Fragment() {
@@ -55,8 +57,8 @@ class AddMainExpensesFragment : Fragment() {
                 getString(R.string.accuracy_value, locationResult.locations.last().accuracy.toInt())
 
             locationResult.locations.last()?.let { lastLocation ->
-                viewModel.setBufferExpensesLocation(
-                    location = MyLocation(
+                viewModel.setLastLocation(
+                    MyLocation(
                         accuracy = lastLocation.accuracy,
                         latitude = lastLocation.latitude,
                         longitude = lastLocation.longitude
@@ -105,7 +107,6 @@ class AddMainExpensesFragment : Fragment() {
                         locationCallback,
                         Looper.getMainLooper()
                     ) else {
-                        //Log.d("blabla", "Permission no granted")
                         viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
                         navController.navigate(R.id.toLocationPermissionsDialogFragment)
                     }
@@ -122,117 +123,6 @@ class AddMainExpensesFragment : Fragment() {
 
         navController = findNavController()
 
-        myDropdownAdapter =
-            context?.let {
-                MyArrayAdapter(it, android.R.layout.simple_list_item_1, mutableListOf())
-            }
-        currencyTextInputEdit?.setAdapter(myDropdownAdapter)
-
-        sumTextInputEdit.setText("")
-
-        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
-
-            value.second?.let { list -> myDropdownAdapter?.addAll(list.map { it.name }) }
-
-            val tempExpenses = value.first
-
-            if (tempExpenses == null) {
-                val currencyList = value.second
-                if (!currencyList.isNullOrEmpty()) {
-
-                    val defCurrencyName =
-                        currencyList.find { currency -> currency.defCurrency == 1 }?.name
-
-                    val currency = if (defCurrencyName != null) {
-                        val currencyPosition = myDropdownAdapter?.getPosition(defCurrencyName)
-                        if (currencyPosition != null && currencyPosition >= 0) {
-                            currencyTextInputEdit?.setText(
-                                myDropdownAdapter?.getItem(currencyPosition).toString(), false
-                            )
-                        }
-                        defCurrencyName
-                    } else {
-                        when (mainApplication.getActiveCurrencySession()) {
-                            DEFAULT_CURRENCY_CONST_RUB -> "RUB"
-                            DEFAULT_CURRENCY_CONST_BYN -> "BYN"
-                            else -> "UAH"
-                        }
-                    }
-                    viewModel.setBufferExpenses(
-                        Expenses(
-                            dateTime = Calendar.getInstance().time,
-                            sum = 0.0,
-                            currency = currency,
-                            expense_id = 0L,
-                            note = "",
-                            location = null,
-                            imageUri = null,
-                            // тут текущая папка выберется в VM
-                            folder_id = 0L
-                        )
-                    )
-                }
-            } else {
-
-                /*  if (sumTextInputEdit.text.toString()
-                          .toDoubleOrNull() != tempExpenses.sum
-                  ) sumTextInputEdit.setText(tempExpenses.sum.toString())*/
-
-                expenseTextInputEdit.setText(tempExpenses.expense_id.toString())
-                if (noteTextInputEdit.text.toString() != tempExpenses.note) noteTextInputEdit.setText(
-                    tempExpenses.note
-                )
-
-            }
-            noteTextInputEdit.doOnTextChanged { text, _, _, _ ->
-                viewModel.setBufferExpenses(
-                    tempExpenses?.copy(note = text.toString())
-                )
-            }
-
-            sumTextInputEdit.doOnTextChanged { text, _, _, _ ->
-                val inputString = text.toString()
-                if (inputString.length == 1 && inputString == ".") {
-                    sumTextInputEdit.setText("0.")
-                } else {
-                    if (inputString.isNotBlank()) viewModel.setBufferExpenses(
-                        tempExpenses?.copy(sum = inputString.toDouble())
-                    ) else viewModel.setBufferExpenses(tempExpenses?.copy(sum = 0.0))
-                }
-            }
-
-            currencyTextInputEdit.onItemClickListener =
-                AdapterView.OnItemClickListener { _, _, _, _ ->
-                    val newValue = currencyTextInputEdit.text.toString()
-                    if (tempExpenses?.currency != newValue) {
-                        viewModel.resetDef()
-                        viewModel.setDefCurrency(newValue)
-                        viewModel.setBufferExpenses(tempExpenses?.copy(currency = newValue))
-                    } //else Log.d("blablabla", "Не сохраняем")
-                }
-
-            tempExpenses?.currency.let {
-                val currencyPosition = myDropdownAdapter?.getPosition(it)
-                if (currencyPosition != null && currencyPosition >= 0) {
-                    currencyTextInputEdit?.setText(
-                        myDropdownAdapter?.getItem(currencyPosition).toString(), false
-                    )
-                }
-            }
-
-        })
-        currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
-            if (p1) {
-                (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-                    view?.windowToken,
-                    0
-                )
-            }
-        }
-        expenseTextInputEdit.setOnClickListener {
-            navController.navigate(R.id.toChoiceExpenseForAddFragment)
-        }
-
         //Реализация изменения ФАБ в зависимости от взаиморасположения вьющек на экране
         val saveFab = activity?.findViewById<ExtendedFloatingActionButton>(R.id.saveExpensesFAB)
         val tabLayout = activity?.findViewById<TabLayout>(R.id.tab_layout)
@@ -244,7 +134,79 @@ class AddMainExpensesFragment : Fragment() {
                 }
             }
         }
+        saveFab?.isEnabled = false
 
+        myDropdownAdapter =
+            context?.let {
+                MyArrayAdapter(it, android.R.layout.simple_list_item_1, mutableListOf())
+            }
+        currencyTextInputEdit?.setAdapter(myDropdownAdapter)
+
+        viewModel.addExpensesLiveData.observe(viewLifecycleOwner) { (expenses, expenseList, currencyList) ->
+            val expenseName = expenseList.find { it.id == expenses.expense_id }?.name
+            if (expenseTextInputEdit.text.toString() != expenseName) expenseTextInputEdit.setText(
+                expenseName
+            )
+            when {
+                expenses.sum == 0.0 ||
+                        expenseName.isNullOrBlank() ||
+                        expenses.currency.isBlank() ||
+                        expenses.note.isBlank() -> {
+                    saveFab?.isEnabled = false
+                }
+                else -> saveFab?.isEnabled = true
+            }
+
+            myDropdownAdapter?.addAll(currencyList.map { it.name })
+            val currencyName =
+                if (expenses.currency.isBlank()) currencyList.find { it.defCurrency == 1 }?.name
+                else expenses.currency
+            myDropdownAdapter?.getPosition(currencyName)?.let {
+                if (currencyTextInputEdit.text.toString() != currencyName)
+                    currencyTextInputEdit?.setText(currencyName)
+            }
+        }
+        expenseTextInputEdit.setOnClickListener {
+            navController.navigate(R.id.toChoiceExpenseForAddFragment)
+        }
+        currencyTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.setLastCurrency(p0.toString())
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
+        currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
+            if (p1) {
+                (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(view.windowToken, 0)
+            }
+        }
+        sumTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val inputString = p0.toString()
+                if (inputString.length == 1 && inputString == ".") {
+                    sumTextInputEdit.setText("0.")
+                } else {
+                    viewModel.setLastSum(
+                        if (inputString.isNotBlank()) inputString.toDouble()
+                        else 0.0
+                    )
+                }
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
+        noteTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.setLastNote(p0.toString())
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        })
     }
 
     override fun onPause() {

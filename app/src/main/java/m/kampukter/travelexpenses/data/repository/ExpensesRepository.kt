@@ -46,19 +46,27 @@ class ExpensesRepository(
     fun getAll(): Flow<List<Expenses>> =
         currentSettingsFlow.flatMapLatest { expensesDao.getAll(it.folder_id) }
 
-    fun getAllExpensesWithRate(): Flow<List<ExpensesWithRate>> =
-        currentSettingsFlow.flatMapLatest { expensesDao.getAllExpensesWithRate(it.folder_id) }
 
+    fun getExpensesById(id: Long): Flow<ExpensesExtendedView> = expensesDao.getExpensesById(id)
+    fun getExpensesByExpense(id: Long): Flow<List<ExpensesExtendedView>> =
+        expensesDao.getExpensesByExpense(id)
 
-    fun getRecordById(id: Long): LiveData<Expenses> = expensesDao.getExpensesById(id)
-
-    suspend fun addExpenses(expenses: Expenses) {
-        expensesDao.insert(expenses)
-    }
-
-
-    suspend fun deleteExpensesById(selectedId: Long) {
-        expensesDao.deleteExpensesById(selectedId)
+    suspend fun addExpenses(expensesUpdate: ExpensesUpdate) {
+        if (expensesUpdate.folderId != null) {
+            expensesDao.insert(
+                Expenses(
+                    folder_id = expensesUpdate.folderId,
+                    currency = expensesUpdate.currency,
+                    note = expensesUpdate.note,
+                    sum = expensesUpdate.sum,
+                    expense_id = expensesUpdate.expense_id,
+                    dateTime = Calendar.getInstance().time,
+                    location = expensesUpdate.location,
+                    imageUri = expensesUpdate.imageUri
+                )
+            )
+            currencyDao.setDefault(expensesUpdate.currency)
+        }
     }
 
     suspend fun deleteIdList(selectedListId: Set<Long>) {
@@ -80,7 +88,7 @@ class ExpensesRepository(
             resultString = resultString + DateFormat.format(
                 "dd/MM/yyyy HH:mm",
                 it.dateTime
-            ) + "," + it.expense_id + "," + it.sum + "," + it.currency + "," + it.note + "\n"
+            ) + "," + it.expense + "," + it.sum + "," + it.currency + "," + it.note + ","+ it.folderName+ "\n"
         }
         result.postValue(resultString)
         return result
@@ -95,19 +103,7 @@ class ExpensesRepository(
     }
 
     // CurrencyDao
-    fun getCurrencyAllLiveData(): LiveData<List<CurrencyTable>> = currencyDao.getAllLiveData()
-
-    fun setDefCurrency(currencyName: String) {
-        GlobalScope.launch(context = Dispatchers.IO) {
-            currencyDao.setDefault(currencyName)
-        }
-    }
-
-    fun resetDef() {
-        GlobalScope.launch(context = Dispatchers.IO) {
-            currencyDao.resetDef()
-        }
-    }
+    fun getCurrencyAllFlow(): Flow<List<CurrencyTable>> = currencyDao.getAllFlow()
 
     suspend fun deleteRate() {
         rateCurrencyDao.deleteAll()
@@ -117,7 +113,6 @@ class ExpensesRepository(
     suspend fun getSettings() = settingsDao.getSettings()
     suspend fun insertSettings(settings: Settings) {
         settingsDao.insert(settings)
-        //getCurrentFolder()
     }
 
     fun updateFolderInSettings(folderId: Long) =
@@ -199,27 +194,32 @@ class ExpensesRepository(
         backupServer.getRestoreBackupLiveData(idProgram)
 
     // Из ExpenseRepository
-    fun getExpenseAllLiveData(): LiveData<List<Expense>> = expenseDao.getAllLiveData()
-    fun getExpenseByName(expense: String) = expenseDao.search(expense)
+    fun getAllExpenseFlow(): Flow<List<Expense>> = expenseDao.getAllFlow()
+
     fun addExpense(expense: Expense) {
         GlobalScope.launch(context = Dispatchers.IO) {
             expenseDao.addExpense(expense)
         }
     }
 
-    suspend fun deleteExpenseRecord(expense: String, isDelete: Boolean): Long {
-        var numberRecords = 0L
-        if (isDelete) expenseDao.deleteExpenseByName(expense)
-        else numberRecords = expensesDao.getExpensesCount(expense)
-        return numberRecords
-
+    fun deleteExpense(expenseId: Long) {
+        GlobalScope.launch(context = Dispatchers.IO) {
+            expenseDao.deleteExpense(expenseId)
+        }
     }
 
     /*
     * Для изменения Expense
     */
-    suspend fun updateExpense(newExpenseName: String, oldExpenseName: String) =
-        expenseDao.updateRecord(newExpenseName, oldExpenseName)
+    fun updateExpense(expenseId: Long, expenseName: String) {
+        GlobalScope.launch(context = Dispatchers.IO) {
+            expenseDao.updateRecord(
+                expenseId,
+                expenseName
+            )
+        }
+    }
+
 
     /*
     * Получение курсов валют за дату
@@ -243,10 +243,7 @@ class ExpensesRepository(
     Search in Expenses
     */
     private val historySearchStringExpenses = mutableListOf<String>()
-    fun getSearchExpenses(
-        searchString: String,
-        folder: String
-    ): Flow<List<ExpensesExtendedView>> {
+    fun getSearchExpenses( searchString: String ): Flow<List<ExpensesExtendedView>> {
         if (searchString.isNotBlank() && !historySearchStringExpenses.contains(searchString)) historySearchStringExpenses.add(
             searchString
         )
@@ -277,6 +274,28 @@ class ExpensesRepository(
     }
 
     suspend fun updateFolder(folder: Folders) {
-        foldersDao.update( folder )
+        foldersDao.update(folder)
+    }
+
+    suspend fun updateExpense(id: Long, expenseId: Long) {
+        expensesDao.updateExpense(id, expenseId)
+    }
+
+    suspend fun updateCurrency(id: Long, currencyName: String) {
+        expensesDao.updateCurrency(id, currencyName)
+        currencyDao.setDefault(currencyName)
+    }
+
+    suspend fun updateNote(id: Long, note: String) {
+        expensesDao.updateNote(id, note)
+
+    }
+
+    suspend fun updateSum(id: Long, sum: Double) {
+        expensesDao.updateSum(id, sum)
+    }
+
+    suspend fun updateImageUri(id: Long, imageUri: String?) {
+        expensesDao.updateImageUri(id, imageUri)
     }
 }

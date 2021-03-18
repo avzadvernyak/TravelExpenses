@@ -40,14 +40,13 @@ class ChoiceExpenseForEditFragment : Fragment() {
             )
             adapter = expenseAdapter
         }
-        viewModel.expensesById.observe(viewLifecycleOwner, Observer {  expenses ->
-            expenseAdapter.setCallback { item ->
-               /* viewModel.addExpenses(expenses.copy(expense = item.name))
-                findNavController().navigate(R.id.next_action)*/
-            }
-        })
-        viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
+        viewModel.expenseList.observe(viewLifecycleOwner, { expenseList ->
             expenseAdapter.setList(expenseList)
         })
+
+        expenseAdapter.setCallback { item ->
+            viewModel.updateExpenses( item )
+            findNavController().navigateUp()
+        }
     }
 }

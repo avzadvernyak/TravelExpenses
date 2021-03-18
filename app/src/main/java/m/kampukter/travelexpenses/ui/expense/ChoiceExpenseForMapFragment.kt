@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui.map
+package m.kampukter.travelexpenses.ui.expense
 
 import android.content.Context
 import android.os.Bundle
@@ -32,8 +32,9 @@ class ChoiceExpenseForMapFragment: Fragment() {
 
         val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+
         expenseAdapter = ExpenseChoiceAdapter{ item->
-            viewModel.setFilterForExpensesMap(FilterForExpensesMap.ExpenseFilter(item.name))
+            viewModel.setFilterForExpensesMap(FilterForExpensesMap.ExpenseFilter( item ))
             findNavController().navigate(R.id.next_action)
         }
         with(recyclerView) {
@@ -45,7 +46,7 @@ class ChoiceExpenseForMapFragment: Fragment() {
             adapter = expenseAdapter
         }
 
-        viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
+        viewModel.expenseList.observe(viewLifecycleOwner, { expenseList ->
             expenseAdapter?.setList(expenseList)
         })
     }

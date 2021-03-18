@@ -119,13 +119,10 @@
     </fragment>
     <fragment
             android:id="@+id/takePhotoForEditFragment"
-            android:name="m.kampukter.travelexpenses.ui.TakePhotoForEditFragment">
+            android:name="m.kampukter.travelexpenses.ui.expenses.TakePhotoForEditFragment">
         <action
                 android:id="@+id/toCameraPermissionsDialogFragment"
                 app:destination="@id/cameraPermissionsDialogFragment" />
-        <action
-                android:id="@+id/toDelAttachmentPhotoDialogFragment"
-                app:destination="@id/delAttachmentPhotoDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/editExpensesFragment" />
@@ -174,14 +171,7 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </dialog>
-   <!-- <dialog
-            android:id="@+id/expensesMoveDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesMoveDialogFragment">
 
-        <action
-                android:id="@+id/next_action"
-                app:popUpTo="@id/homeExpensesFragment" />
-    </dialog>-->
     <fragment
             android:id="@+id/expensesMoveFragment"
             android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesMoveFragment"
@@ -222,33 +212,13 @@
             android:label="@string/nav_label_expense"
             tools:layout="@layout/expense_fragment">
         <action
-                android:id="@+id/toDelExpensePhaseOneDialogFragment"
-                app:destination="@id/delExpensePhaseOneDialogFragment" />
-        <action
-                android:id="@+id/toDelExpensePhaseSecondDialogFragment"
-                app:destination="@id/delExpensePhaseSecondDialogFragment" />
-        <action
-                android:id="@+id/toEditExpenseDialogFragment"
-                app:destination="@id/editExpenseDialogFragment" />
+                android:id="@+id/toExpenseEditFragment"
+                app:destination="@id/expenseEditFragment" />
         <action
                 android:id="@+id/toAddExpenseDialogFragment"
                 app:destination="@id/addExpenseDialogFragment" />
 
     </fragment>
-    <dialog
-            android:id="@+id/delExpensePhaseOneDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expense.DelExpensePhaseOneDialogFragment">
-        <action
-                android:id="@+id/toExpenseFragment"
-                app:popUpTo="@id/expenseFragment" />
-    </dialog>
-    <dialog
-            android:id="@+id/delExpensePhaseSecondDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expense.DelExpensePhaseSecondDialogFragment">
-        <action
-                android:id="@+id/toExpenseFragment"
-                app:popUpTo="@id/expenseFragment" />
-    </dialog>
     <dialog
             android:id="@+id/addExpenseDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.expense.AddExpenseDialogFragment">
@@ -256,9 +226,9 @@
                 android:id="@+id/toExpenseFragment"
                 app:popUpTo="@id/expenseFragment" />
     </dialog>
-    <dialog
-            android:id="@+id/editExpenseDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expenses.EditExpenseDialogFragment"
+    <fragment
+            android:id="@+id/expenseEditFragment"
+            android:name="m.kampukter.travelexpenses.ui.expense.ExpenseEditFragment"
             android:label="@string/nav_label_edit_expense">
         <argument
                 android:name="expenseArg"
@@ -267,7 +237,7 @@
         <action
                 android:id="@+id/toExpenseFragment"
                 app:popUpTo="@id/expenseFragment" />
-    </dialog>
+    </fragment>
     <dialog
             android:id="@+id/datePickerDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.DatePickerDialogFragment">
@@ -341,7 +311,7 @@
     </fragment>
     <fragment
             android:id="@+id/choiceExpenseForMapFragment"
-            android:name="m.kampukter.travelexpenses.ui.map.ChoiceExpenseForMapFragment"
+            android:name="m.kampukter.travelexpenses.ui.expense.ChoiceExpenseForMapFragment"
             android:label="@string/nav_label_expense_choice"
             tools:layout="@layout/choice_expense_fragment">
         <action

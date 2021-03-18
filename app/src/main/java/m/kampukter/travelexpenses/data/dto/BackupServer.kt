@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import m.kampukter.travelexpenses.data.CurrencyTable
 import m.kampukter.travelexpenses.data.Expense
 import m.kampukter.travelexpenses.data.Expenses
+import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import java.util.*
 
 interface BackupServer {
@@ -16,6 +17,6 @@ interface BackupServer {
         val backupTime: Date = Calendar.getInstance().time,
         val expense: List<Expense>,
         val currency: List<CurrencyTable>,
-        val expenses: List<Expenses>
+        val expenses: List<ExpensesExtendedView>
     )
 }

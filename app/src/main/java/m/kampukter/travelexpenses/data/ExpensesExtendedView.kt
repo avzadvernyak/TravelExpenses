@@ -12,5 +12,7 @@ data class ExpensesExtendedView(
     val note: String,
     val location: MyLocation?,
     val imageUri: String?,
-    val rate: Float?
+    val rate: Float?,
+    val folderId: Long,
+    val folderName: String?
 )

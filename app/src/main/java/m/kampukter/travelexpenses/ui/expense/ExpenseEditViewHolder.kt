@@ -7,12 +7,11 @@ import m.kampukter.travelexpenses.data.Expense
 
 class ExpenseEditViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    fun bind(expense: Expense, onClickCallback: ((Expense) -> Unit)?, onLongClickCallback: ((Expense) -> Boolean)?) {
+    fun bind(expense: Expense, onClickCallback: ((Expense) -> Unit)?) {
         with(itemView) {
             expenseIdTextView.text = expense.name
 
             setOnClickListener { onClickCallback?.invoke(expense) }
-            setOnLongClickListener { onLongClickCallback?.invoke(expense) ?: false }
         }
     }
 

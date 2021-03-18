@@ -39,17 +39,13 @@ class ChoiceExpenseForAddFragment : Fragment() {
             )
             adapter = expenseAdapter
         }
-        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, Observer { value ->
-            value.first?.let { expenses ->
-                expenseAdapter?.setCallback {
-                   /* viewModel.setBufferExpenses(expenses.copy(expense = it.name))
-                    findNavController().navigate(R.id.next_action)*/
-                }
-            }
-        })
-
-        viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
+        expenseAdapter?.setCallback { item ->
+            viewModel.setLastExpense(item.id)
+            findNavController().navigate(R.id.next_action)
+        }
+        viewModel.expenseList.observe(viewLifecycleOwner) { expenseList ->
             expenseAdapter?.setList(expenseList)
-        })
+        }
+
     }
 }

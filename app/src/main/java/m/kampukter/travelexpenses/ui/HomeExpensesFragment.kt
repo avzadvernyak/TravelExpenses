@@ -86,7 +86,6 @@ class HomeExpensesFragment : Fragment() {
         navController = findNavController()
 
         val toolbar = activity?.findViewById<Toolbar>(R.id.toolbar)
-
         toolbar?.title = "Поиск в расходах"
         toolbar?.setOnClickListener { navController.navigate(R.id.toSearchExpensesFragment) }
 
@@ -96,8 +95,8 @@ class HomeExpensesFragment : Fragment() {
 
         expensesAdapter =
             ExpensesAdapter(view.context) { item ->
-                viewModel.setQueryExpensesId(item.id)
-                navController.navigate(R.id.toEditExpensesFragment)
+                val bundle = bundleOf("expensesId" to item.id)
+                navController.navigate(R.id.toEditExpensesFragment, bundle)
             }.apply {
                 enableActionMode(actionModeCallback) { count ->
                     actionMode?.title = getString(R.string.expenses_am_title_count, count)
@@ -119,13 +118,15 @@ class HomeExpensesFragment : Fragment() {
             adapter = expensesAdapter
         }
 
-        viewModel.expensesInFolder.observe(viewLifecycleOwner, { (currentFolder, expensesInFolder) ->
-            val expenses = mutableListOf<ExpensesMainCollection>()
+        viewModel.expensesInFolder.observe(
+            viewLifecycleOwner,
+            { (currentFolder, expensesInFolder) ->
+                val expenses = mutableListOf<ExpensesMainCollection>()
 
-            expenses.add(ExpensesMainCollection.Header(currentFolder.shortName))
-            expensesInFolder.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
-            expensesAdapter?.setList(expenses)
-        })
+                expenses.add(ExpensesMainCollection.Header(currentFolder.shortName))
+                expensesInFolder.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
+                expensesAdapter?.setList(expenses)
+            })
 
         val addExpensesExtendedFab =
             activity?.findViewById<ExtendedFloatingActionButton>(R.id.addExpensesExtendedFab)
@@ -149,7 +150,6 @@ class HomeExpensesFragment : Fragment() {
                 }
             })
             addExpensesExtendedFab.setOnClickListener {
-                viewModel.setBufferExpenses(null)
                 navController.navigate(R.id.toAddExpensesFragment)
             }
         }
