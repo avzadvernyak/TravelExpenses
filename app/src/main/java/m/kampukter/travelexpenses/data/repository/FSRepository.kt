@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.data.repository
 
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toFile
 import m.kampukter.travelexpenses.data.dao.ExpensesDao
 import m.kampukter.travelexpenses.data.dto.FileSystemAPI

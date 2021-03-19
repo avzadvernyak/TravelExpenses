@@ -3,7 +3,6 @@ package m.kampukter.travelexpenses.ui.expense
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +29,7 @@ class ExpenseEditFragment: Fragment() {
 
         viewModel.editExpenseLiveData.observe(viewLifecycleOwner) { (expense, list)->
             if (expenseTextInputEdit.text.toString() != expense.name) expenseTextInputEdit.setText(expense.name)
-            expensesCount.text = getString(R.string.expense_del_warning, list.size, list.groupBy { it.folderId }.size)
+            expensesCount.text = getString(R.string.expense_info_warning, list.size, list.groupBy { it.folderId }.size)
 
             deleteExpenseMaterialButton.setOnClickListener{
                 viewModel.deleteExpense( expense.id )

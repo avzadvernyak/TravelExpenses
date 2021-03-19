@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.ui.expenses
 
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.expenses_item.view.*

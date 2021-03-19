@@ -1,6 +1,5 @@
 package m.kampukter.travelexpenses.ui.folders
 
-import android.text.format.DateFormat
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.folders_item.view.*
@@ -16,7 +15,7 @@ class FoldersViewHolder(
             shortNameTextView.text = item.shortName
             descriptionTextView.text = item.description
 
-            item.countRecords?.let {
+            item.countRecords.let {
                 countRecordTextView.text = if (it < 999) it.toString() else "999+"
             }
             setOnClickListener {

@@ -2,7 +2,6 @@ package m.kampukter.travelexpenses.viewmodel
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
@@ -205,11 +204,6 @@ class MyViewModel(
         }
 
     val expenses: LiveData<List<Expenses>> = expensesRepository.getAll().asLiveData()
-
-    private val expensesFindId = MutableLiveData<Long>()
-    fun setQueryExpensesId(query: Long) {
-        expensesFindId.postValue(query)
-    }
 
     private val savedStateSearchFragmentMutableLiveData =
         MutableLiveData<List<ExpensesMainCollection>>()

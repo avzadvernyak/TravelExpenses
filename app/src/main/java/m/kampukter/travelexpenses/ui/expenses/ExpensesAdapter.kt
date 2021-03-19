@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity

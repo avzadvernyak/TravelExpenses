@@ -2,7 +2,6 @@ package m.kampukter.travelexpenses.ui.expenses
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import m.kampukter.travelexpenses.R

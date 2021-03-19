@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.sum_viewing_fragment.*
 import m.kampukter.travelexpenses.R
@@ -37,7 +36,7 @@ class SumExpenseFragment : Fragment() {
             adapter = expensesSumAdapter
         }
 
-        viewModel.getExpensesSum().observe(viewLifecycleOwner, Observer { list ->
+        viewModel.getExpensesSum().observe(viewLifecycleOwner, { list ->
             expensesSumAdapter.setList(list)
         })
 

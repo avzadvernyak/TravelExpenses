@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment

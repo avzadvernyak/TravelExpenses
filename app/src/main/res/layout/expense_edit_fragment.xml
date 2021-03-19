@@ -27,7 +27,6 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -52,7 +51,6 @@
                     android:textColor="?android:attr/textColorSecondary"
                     />
             <TextView
-                    android:id="@+id/expensesDelMessage"
                     android:text="@string/expense_del_warning_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -12,13 +12,13 @@ class CBRDateConverter : TypeConverter<Date> {
 }
 class CBRFloatConverter : TypeConverter<Float> {
 
-    override fun read(value: String): Float? = value.replace(",",".").toFloat()
+    override fun read(value: String): Float = value.replace(",",".").toFloat()
 
     override fun write(value: Float): String = value.toString()
 }
 class CBRIntConverter : TypeConverter<Int> {
 
-    override fun read(value: String): Int? = value.toInt()
+    override fun read(value: String): Int = value.toInt()
 
     override fun write(value: Int): String = value.toString()
 }

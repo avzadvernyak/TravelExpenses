@@ -3,23 +3,22 @@ package m.kampukter.travelexpenses.ui.expenses
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.*
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.search_result_expenses_fragment.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.ExpensesWithRate
-import m.kampukter.travelexpenses.viewmodel.MyViewModel
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import android.text.format.DateFormat
-import androidx.appcompat.view.ActionMode
-import androidx.core.os.bundleOf
-import androidx.navigation.NavController
 import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
+import m.kampukter.travelexpenses.viewmodel.MyViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
 class SearchResultExpensesFragment : Fragment() {
@@ -91,8 +90,8 @@ class SearchResultExpensesFragment : Fragment() {
 
         expensesAdapter =
             ExpensesAdapter(view.context) { item ->
-                viewModel.setQueryExpensesId(item.id)
-                navController.navigate(R.id.toEditExpensesFragment)
+                val bundle = bundleOf("expensesId" to item.id)
+                navController.navigate(R.id.toEditExpensesFragment, bundle)
             }.apply {
                 enableActionMode(actionModeCallback) { count ->
                     actionMode?.title = getString(R.string.expenses_am_title_count, count)
@@ -165,11 +164,12 @@ class SearchResultExpensesFragment : Fragment() {
             else {
                 val messageText = getString(
                     R.string.msg_sent_to,
-                    expensesList[0].expense_id.toString(),
+                    expensesList[0].expense,
                     expensesList[0].note,
                     expensesList[0].sum,
                     expensesList[0].currency,
-                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString()
+                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString(),
+                    expensesList[0].folderName
                 )
                 sharedExpensesTextIntent(messageText)
             }
@@ -178,11 +178,12 @@ class SearchResultExpensesFragment : Fragment() {
             expensesList.forEach {
                 messageText += getString(
                     R.string.msg_sent_to,
-                    it.expense_id.toString(),
+                    it.expense,
                     it.note,
                     it.sum,
                     it.currency,
-                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString()
+                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString(),
+                    it.folderName
                 )
             }
             sharedExpensesTextIntent(messageText)
@@ -197,11 +198,13 @@ class SearchResultExpensesFragment : Fragment() {
             putExtra(
                 Intent.EXTRA_TEXT, getString(
                     R.string.msg_sent_to,
-                    expenses.expense_id.toString(),
+                    expenses.expense,
                     expenses.note,
                     expenses.sum,
                     expenses.currency,
                     date
+                    ,
+                    expenses.folderName
                 )
             )
             putExtra(Intent.EXTRA_STREAM, Uri.parse(expenses.imageUri))

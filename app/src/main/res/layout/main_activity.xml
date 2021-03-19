@@ -11,14 +11,12 @@
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/mainCoordinatorLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
            >
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/mainConstraintLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">

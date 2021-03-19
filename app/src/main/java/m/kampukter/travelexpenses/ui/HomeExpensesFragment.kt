@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
-import m.kampukter.travelexpenses.data.ExpensesWithRate
 import m.kampukter.travelexpenses.ui.expenses.ExpensesAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -165,11 +164,12 @@ class HomeExpensesFragment : Fragment() {
             else {
                 val messageText = getString(
                     R.string.msg_sent_to,
-                    expensesList[0].expense_id.toString(),
+                    expensesList[0].expense,
                     expensesList[0].note,
                     expensesList[0].sum,
                     expensesList[0].currency,
-                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString()
+                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString(),
+                    expensesList[0].folderName
                 )
                 sharedExpensesTextIntent(messageText)
             }
@@ -178,11 +178,12 @@ class HomeExpensesFragment : Fragment() {
             expensesList.forEach {
                 messageText += getString(
                     R.string.msg_sent_to,
-                    it.expense_id.toString(),
+                    it.expense,
                     it.note,
                     it.sum,
                     it.currency,
-                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString()
+                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString(),
+                    expensesList[0].folderName
                 )
             }
             sharedExpensesTextIntent(messageText)
@@ -197,11 +198,12 @@ class HomeExpensesFragment : Fragment() {
             putExtra(
                 Intent.EXTRA_TEXT, getString(
                     R.string.msg_sent_to,
-                    expenses.expense_id.toString(),
+                    expenses.expense,
                     expenses.note,
                     expenses.sum,
                     expenses.currency,
-                    date
+                    date,
+                    expenses.folderName
                 )
             )
             putExtra(Intent.EXTRA_STREAM, Uri.parse(expenses.imageUri))

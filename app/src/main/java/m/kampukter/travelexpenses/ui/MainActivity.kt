@@ -19,7 +19,6 @@ import m.kampukter.travelexpenses.NetworkLiveData
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.mainApplication
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
-import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val STATUS_GPS_ON = 1
