@@ -33,10 +33,11 @@ interface ExpensesDao {
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
                          expenses.expense_id as expense_id, expense.name as expense, expenses.note as note, expenses.sum as sum, 
                          rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri,
-                         expenses.folder_id as folderId  
+                         expenses.folder_id as folderId, folders.shortName as folderName
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            LEFT JOIN expense ON expenses.expense_id = expense.id 
+            LEFT JOIN expense ON expenses.expense_id = expense.id
+            LEFT JOIN folders ON expenses.folder_id = folders.id 
             where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
