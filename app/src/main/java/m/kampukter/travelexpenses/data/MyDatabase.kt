@@ -148,8 +148,8 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
                     FOREIGN KEY (folder_id) REFERENCES folders(id) ON UPDATE NO ACTION ON DELETE CASCADE)"""
         )
         database.execSQL(
-            """ INSERT OR REPLACE INTO UpdatedTableExpenses(id, dateTime, expense_id, sum, currency_field , note ,
-                    location, imageUri, folder_id) 
+            """ INSERT OR REPLACE INTO UpdatedTableExpenses(id, dateTime, sum, currency_field , note ,
+                    location, imageUri, folder_id,  expense_id ) 
                     SELECT expenses.id as id, dateTime, sum, currency_field , expenses.note as note ,location, imageUri, folder_id,
                     (select A.id from expense A where A.name = expenses.expense) as expense_id  FROM expenses """
         )
