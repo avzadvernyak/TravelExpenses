@@ -240,91 +240,80 @@ class MyViewModel(
 
     val expenseList: LiveData<List<Expense>> = expensesRepository.getAllExpenseFlow().asLiveData()
 
-    private val lastExpenseMutableLiveData = MutableLiveData<Long>()
+    private val newExpensesExtendedView = MutableLiveData<ExpensesExtendedView>().apply {
+        postValue(ExpensesExtendedView())
+    }
+
+    fun <T> MutableLiveData<T>.modifyValue( transform: T.() -> T) {
+        this.value = this.value?.run(transform)
+    }
+
     fun setLastExpense(id: Long) {
-        lastExpenseMutableLiveData.postValue(id)
+        newExpensesExtendedView.modifyValue { copy(expense_id = id) }
     }
 
-    private val lastSumMutableLiveData = MutableLiveData<Double>()
     fun setLastSum(sum: Double) {
-        lastSumMutableLiveData.postValue(sum)
+        newExpensesExtendedView.modifyValue { copy(sum = sum) }
     }
 
-    private val lastNoteMutableLiveData = MutableLiveData<String>()
     fun setLastNote(note: String) {
-        lastNoteMutableLiveData.postValue(note)
+        newExpensesExtendedView.modifyValue { copy( note = note) }
     }
 
-    private val lastCurrencyMutableLiveData = MutableLiveData<String>()
-    fun setLastCurrency(note: String) {
-        lastCurrencyMutableLiveData.postValue(note)
+    fun setLastCurrency( currency: String) {
+        newExpensesExtendedView.modifyValue { copy(currency= currency) }
     }
 
-    private val lastLocationMutableLiveData = MutableLiveData<MyLocation>()
     fun setLastLocation(location: MyLocation) {
-        lastLocationMutableLiveData.postValue(location)
+        newExpensesExtendedView.modifyValue { copy( location = location ) }
     }
 
-    private val lastUriPhotoMutableLiveData = MutableLiveData<String?>()
-    fun setLastUriPhoto(uriPhoto: String?) {
-        lastUriPhotoMutableLiveData.postValue(uriPhoto)
+    fun setLastUriPhoto(imageUri: String?) {
+        newExpensesExtendedView.modifyValue { copy( imageUri= imageUri) }
     }
 
     private val isAddNewExpense = MutableLiveData<Boolean>()
     fun addNewExpenses() = isAddNewExpense.postValue(true)
 
-    val addExpensesLiveData: LiveData<Triple<ExpensesUpdate, List<Expense>, List<CurrencyTable>>> =
-        MediatorLiveData<Triple<ExpensesUpdate, List<Expense>, List<CurrencyTable>>>().apply {
-            var lastExpenses = ExpensesUpdate()
+    val addExpensesLiveData: LiveData<Triple<ExpensesExtendedView, List<Expense>, List<CurrencyTable>>> =
+        MediatorLiveData<Triple<ExpensesExtendedView, List<Expense>, List<CurrencyTable>>>().apply {
+            var lastExpenses = ExpensesExtendedView()
             var lastExpenseList: List<Expense> = listOf()
             var lastCurrencyList: List<CurrencyTable> = listOf()
+            var lastCurrentFolder: Folders? = null
             fun update() {
                 postValue(Triple(lastExpenses, lastExpenseList, lastCurrencyList))
             }
             addSource(isAddNewExpense) {
-                viewModelScope.launch {
-                    expensesRepository.addExpenses(lastExpenses)
+                lastCurrentFolder?.let {
+                    lastExpenses = lastExpenses.copy( folderId = it.id)
+                    viewModelScope.launch {
+                        expensesRepository.addExpenses(lastExpenses)
+                    }
                 }
             }
             addSource(expenseList) {
                 lastExpenseList = it
                 update()
             }
+            addSource(newExpensesExtendedView){
+                lastExpenses = it
+                update()
+            }
             addSource(currentFolder) {
-                lastExpenses = lastExpenses.copy(folderId = it.id)
+                lastCurrentFolder = it
             }
             addSource(currencyTableList) {
                 lastCurrencyList = it
-                update()
-            }
-            addSource(lastExpenseMutableLiveData) { id ->
-                lastExpenses = lastExpenses.copy(expense_id = id)
-                update()
-            }
-            addSource(lastSumMutableLiveData) { sum ->
-                lastExpenses = lastExpenses.copy(sum = sum)
-                update()
-            }
-            addSource(lastNoteMutableLiveData) { note ->
-                lastExpenses = lastExpenses.copy(note = note)
-                update()
-            }
-            addSource(lastCurrencyMutableLiveData) {
-                lastExpenses = lastExpenses.copy(currency = it)
-                update()
-            }
-            addSource(lastLocationMutableLiveData) {
-                lastExpenses = lastExpenses.copy(location = it)
-                update()
-            }
-            addSource(lastUriPhotoMutableLiveData) {
-                lastExpenses = lastExpenses.copy(imageUri = it)
                 update()
             }
         }
 
     // Edit record Expenses
     private val expensesIdEditMutableLiveData = MutableLiveData<Long>()
+    val expensesIdEditLiveData: LiveData<Long>
+        get() = expensesIdEditMutableLiveData
+
     fun expensesIdEdit(expensesId: Long) {
         expensesIdEditMutableLiveData.postValue(expensesId)
     }
@@ -333,29 +322,22 @@ class MyViewModel(
         Transformations.switchMap(expensesIdEditMutableLiveData) { expensesId ->
             expensesRepository.getExpensesById(expensesId).asLiveData()
         }
-    private val updateExpensesMutableLiveData = MutableLiveData<Expense>()
-    private val updateExpensesCurrency = MutableLiveData<CurrencyTable>()
-    private val updateExpensesNote = MutableLiveData<String>()
-    private val updateExpensesSum = MutableLiveData<Double>()
-    private val updateExpensesImageUri = MutableLiveData<String?>()
-    fun updateExpenses(expense: Expense) {
-        updateExpensesMutableLiveData.postValue(expense)
-    }
 
-    fun updateExpenses(currency: CurrencyTable) {
-        updateExpensesCurrency.postValue(currency)
-    }
-
-    fun updateExpenses(note: String) {
-        updateExpensesNote.postValue(note)
-    }
-
-    fun updateExpenses(sum: Double) {
-        updateExpensesSum.postValue(sum)
-    }
-
-    fun updateExpensesImageUri(value: String?) {
-        updateExpensesImageUri.postValue(value)
+    fun updateExpenses(value: EditedExpensesField) {
+        viewModelScope.launch {
+            when (value) {
+                is EditedExpensesField.NoteField ->
+                    expensesRepository.updateNote(value.idExpenses, value.note)
+                is EditedExpensesField.ExpenseField ->
+                    expensesRepository.updateExpense(value.idExpenses, value.expense.id)
+                is EditedExpensesField.CurrencyField ->
+                    expensesRepository.updateCurrency(value.idExpenses, value.currency.name)
+                is EditedExpensesField.SumField ->
+                    expensesRepository.updateSum(value.idExpenses, value.sum)
+                is EditedExpensesField.ImageUriField ->
+                    expensesRepository.updateImageUri(value.idExpenses, value.uri)
+            }
+        }
     }
 
     val expensesEdit: LiveData<Pair<ExpensesExtendedView, List<CurrencyTable>>> =
@@ -374,44 +356,6 @@ class MyViewModel(
                 lastCurrencyList = it
                 update()
             }
-            addSource(updateExpensesMutableLiveData) { expense ->
-                lastExpenses?.let {
-                    viewModelScope.launch {
-                        expensesRepository.updateExpense(it.id, expense.id)
-                    }
-                }
-            }
-            addSource(updateExpensesCurrency) { currency ->
-                lastExpenses?.let {
-                    viewModelScope.launch {
-                        expensesRepository.updateCurrency(it.id, currency.name)
-                    }
-                }
-            }
-            addSource(updateExpensesNote) { noteString ->
-                noteString?.let { note ->
-                    lastExpenses?.let {
-                        viewModelScope.launch {
-                            expensesRepository.updateNote(it.id, note)
-                        }
-                    }
-                }
-            }
-            addSource(updateExpensesSum) { sum ->
-                lastExpenses?.let {
-                    viewModelScope.launch {
-                        expensesRepository.updateSum(it.id, sum)
-                    }
-                }
-            }
-            addSource(updateExpensesImageUri) { imageUri ->
-                lastExpenses?.let {
-                    viewModelScope.launch {
-                        expensesRepository.updateImageUri(it.id, imageUri)
-                    }
-                }
-
-            }
         }
 
     fun deleteImageFromExpenses(id: Long) {
@@ -427,13 +371,16 @@ class MyViewModel(
     private val expensesByExpense = Transformations.switchMap(editExpense) {
         expensesRepository.getExpensesByExpense(it.id).asLiveData()
     }
+
     fun setEditExpense(expense: Expense) {
         editExpense.postValue(expense)
     }
+
     private val editExpenseName = MutableLiveData<String>()
-    fun setEditExpenseName( expenseName: String ){
-        editExpenseName.postValue( expenseName)
+    fun setEditExpenseName(expenseName: String) {
+        editExpenseName.postValue(expenseName)
     }
+
     val editExpenseLiveData: LiveData<Pair<Expense, List<ExpensesExtendedView>>> =
         MediatorLiveData<Pair<Expense, List<ExpensesExtendedView>>>().apply {
             var lastEditExpense: Expense? = null
@@ -450,12 +397,14 @@ class MyViewModel(
                 lastExpensesList = it
                 update()
             }
-            addSource(editExpenseName){ name ->
-                lastEditExpense = lastEditExpense?.copy( name = name)
-                lastEditExpense?.let { expensesRepository.updateExpense(
-                    it.id,
-                    it.name
-                ) }
+            addSource(editExpenseName) { name ->
+                lastEditExpense = lastEditExpense?.copy(name = name)
+                lastEditExpense?.let {
+                    expensesRepository.updateExpense(
+                        it.id,
+                        it.name
+                    )
+                }
             }
         }
 
@@ -464,7 +413,7 @@ class MyViewModel(
     }
 
     fun deleteExpense(idExpense: Long) {
-        expensesRepository.deleteExpense( idExpense )
+        expensesRepository.deleteExpense(idExpense)
     }
 
     fun deleteRate() {
@@ -666,7 +615,7 @@ Search in Expenses
 
     val expensesSearchResult =
         Transformations.switchMap(searchStringExpenses) { query ->
-            expensesRepository.getSearchExpenses( query )
+            expensesRepository.getSearchExpenses(query)
                 .asLiveData()
         }
     val searchStringExpensesLiveData: LiveData<String>

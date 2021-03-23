@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.choice_expense_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -42,10 +43,12 @@ class ChoiceExpenseForEditFragment : Fragment() {
         viewModel.expenseList.observe(viewLifecycleOwner, { expenseList ->
             expenseAdapter.setList(expenseList)
         })
-
-        expenseAdapter.setCallback { item ->
-            viewModel.updateExpenses( item )
-            findNavController().navigateUp()
+        viewModel.expensesIdEditLiveData.observe(viewLifecycleOwner) { idExpenses ->
+            expenseAdapter.setCallback { item ->
+                viewModel.updateExpenses( EditedExpensesField.ExpenseField( idExpenses, item ) )
+                findNavController().navigateUp()
+            }
         }
+
     }
 }

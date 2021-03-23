@@ -51,7 +51,7 @@ class ExpensesRepository(
     fun getExpensesByExpense(id: Long): Flow<List<ExpensesExtendedView>> =
         expensesDao.getExpensesByExpense(id)
 
-    suspend fun addExpenses(expensesUpdate: ExpensesUpdate) {
+    suspend fun addExpenses(expensesUpdate: ExpensesExtendedView) {
         if (expensesUpdate.folderId != null) {
             expensesDao.insert(
                 Expenses(

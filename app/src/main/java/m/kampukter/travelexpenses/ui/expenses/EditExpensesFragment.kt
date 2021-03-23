@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.edit_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.CurrencyTable
+import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -38,12 +39,16 @@ class EditExpensesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val navController = findNavController()
+        var currentIdExpenses: Long? = null
 
         myDropdownAdapter =
             MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
         currencyTextInputEdit?.setAdapter(myDropdownAdapter)
 
-        arguments?.getLong("expensesId")?.let { viewModel.expensesIdEdit(it) }
+        arguments?.getLong("expensesId")?.let {
+            viewModel.expensesIdEdit(it)
+            currentIdExpenses = it
+        }
         viewModel.expensesEdit.observe(viewLifecycleOwner) { (expenses, currencyList) ->
 
             if (expenseTextInputEdit.text.toString() != expenses.expense) expenseTextInputEdit.setText(
@@ -89,7 +94,11 @@ class EditExpensesFragment : Fragment() {
         }
         currencyTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.updateExpenses(CurrencyTable(name = p0.toString()))
+                currentIdExpenses?.let { id ->
+                    viewModel.updateExpenses(
+                        EditedExpensesField.CurrencyField(id, CurrencyTable(name = p0.toString()))
+                    )
+                }
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -98,17 +107,11 @@ class EditExpensesFragment : Fragment() {
         sumTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
-                viewModel.updateExpenses( p0.toString().toDouble())
-
-            /*val inputString = p0.toString()
-                if (inputString.length == 1 && inputString == ".") {
-                    sumTextInputEdit.setText("0.")
-                } else {
+                currentIdExpenses?.let { id ->
                     viewModel.updateExpenses(
-                        if (inputString.isNotBlank()) inputString.toDouble()
-                        else 0.0
+                        EditedExpensesField.SumField(id, p0.toString().toDouble())
                     )
-                }*/
+                }
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -116,7 +119,8 @@ class EditExpensesFragment : Fragment() {
         })
         noteTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.updateExpenses(p0.toString())
+                currentIdExpenses?.let { id ->
+                    viewModel.updateExpenses(EditedExpensesField.NoteField(id, p0.toString())) }
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}

@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.camerax_fragment.*
 import m.kampukter.travelexpenses.CameraXService
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.ui.permissionsForCamera
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -54,15 +55,15 @@ class TakePhotoForEditFragment : Fragment() {
             cameraService.setUpCamera(this, view.context, viewFinder)
         }
 
-        camera_capture_button.setOnClickListener {
-            viewModel.createJPGFile()?.let {
-                cameraService.takePhoto(it) { uriString ->
-                    viewModel.updateExpensesImageUri(uriString)
-                }
-            }
-        }
         viewModel.expensesEdit.observe(viewLifecycleOwner){ (expenses,_)->
             if (expenses.imageUri != null) findNavController().navigate(R.id.next_action)
+            camera_capture_button.setOnClickListener {
+                viewModel.createJPGFile()?.let {
+                    cameraService.takePhoto(it) { uriString ->
+                        viewModel.updateExpenses( EditedExpensesField.ImageUriField(expenses.id, uriString ))
+                    }
+                }
+            }
         }
     }
 
