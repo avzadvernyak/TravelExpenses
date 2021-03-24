@@ -12,6 +12,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.map_expenses_fragment.*
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -79,7 +80,7 @@ class MapExpensesFragment : Fragment() {
             mapController.setZoom(8.5)
             mapController.setCenter(GeoPoint(48.0154, 37.8647))
         }
-        viewModel.expensesInFolderForMap.observe(viewLifecycleOwner) { (expenses, filter) ->
+        viewModel.expensesInFolderForMap.observe(viewLifecycleOwner) { (lastExpenses, filter) ->
             mapMapView.overlays.clear()
 
             var pointsLongitudeMax: Double = -90.0
@@ -87,32 +88,48 @@ class MapExpensesFragment : Fragment() {
             var pointsLatitudeMax: Double = -180.0
             var pointsLatitudeMin = 180.0
 
-            var count = 0
+            val expenses = when (filter) {
+                is FilterForExpensesMap.DateRangeFilter -> {
+                    val filteredExpenses =
+                        lastExpenses.filter { it.dateTime.time in filter.startPeriod..filter.endPeriod && it.location != null }
+                    if (filteredExpenses.isNotEmpty()) {
+                        val actionMode =
+                            (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                        actionMode?.title = "Найдено записей: ${filteredExpenses.size}"
+                        val startDate =
+                            DateFormat.format("dd/MM/yyyy", filter.startPeriod).toString()
+                        val endDate =
+                            DateFormat.format("dd/MM/yyyy", filter.endPeriod).toString()
+                        actionMode?.subtitle = "c $startDate по $endDate"
+                    }
+                    filteredExpenses
+                }
+                is FilterForExpensesMap.ExpenseFilter -> {
+                    val filteredExpenses =
+                        lastExpenses.filter { it.expense_id == filter.expense.id && it.location != null }
+                    val actionMode =
+                        (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                    actionMode?.title = "Найдено записей: ${filteredExpenses.size}"
+                    actionMode?.subtitle = filter.expense.name
+                    filteredExpenses
+                }
+                else -> lastExpenses
+            }
 
             expenses.forEach { itemExpenses ->
-                if (itemExpenses.location != null) {
-                    count += 1
-                    if (itemExpenses.location.latitude > pointsLatitudeMax) pointsLatitudeMax =
-                        itemExpenses.location.latitude
-                    if (itemExpenses.location.latitude < pointsLatitudeMin) pointsLatitudeMin =
-                        itemExpenses.location.latitude
-                    if (itemExpenses.location.longitude > pointsLongitudeMax) pointsLongitudeMax =
-                        itemExpenses.location.longitude
-                    if (itemExpenses.location.longitude < pointsLongitudeMin) pointsLongitudeMin =
-                        itemExpenses.location.longitude
+                itemExpenses.location?.let { location ->
+                    if (location.latitude > pointsLatitudeMax) pointsLatitudeMax = location.latitude
+                    if (location.latitude < pointsLatitudeMin) pointsLatitudeMin = location.latitude
+                    if (location.longitude > pointsLongitudeMax) pointsLongitudeMax =
+                        location.longitude
+                    if (location.longitude < pointsLongitudeMin) pointsLongitudeMin =
+                        location.longitude
 
                     val myMarker = Marker(mapMapView)
-                    myMarker.position =
-                        GeoPoint(
-                            itemExpenses.location.latitude,
-                            itemExpenses.location.longitude
-                        )
+                    myMarker.position = GeoPoint(location.latitude, location.longitude)
 
                     myMarker.title = "${
-                        DateFormat.format(
-                            "dd/MM/yyyy HH:mm",
-                            itemExpenses.dateTime
-                        )
+                        DateFormat.format("dd/MM/yyyy HH:mm", itemExpenses.dateTime)
                     } ${itemExpenses.sum} ${itemExpenses.currency}"
 
                     myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -122,35 +139,7 @@ class MapExpensesFragment : Fragment() {
                     mapMapView.overlays.add(myMarker)
                 }
             }
-            if (count != 0) {
-
-                when (filter) {
-                    is FilterForExpensesMap.ExpenseFilter -> {
-                        val actionMode =
-                            (context as AppCompatActivity).startSupportActionMode(
-                                actionModeCallback
-                            )
-                        actionMode?.title = "Найдено записей: $count"
-                        actionMode?.subtitle = filter.expense.name
-
-                    }
-                    is FilterForExpensesMap.DateRangeFilter -> {
-                        val actionMode =
-                            (context as AppCompatActivity).startSupportActionMode(
-                                actionModeCallback
-                            )
-                        actionMode?.title = "Найдено записей: $count"
-                        val startDate =
-                            DateFormat.format("dd/MM/yyyy", filter.startPeriod).toString()
-                        val endDate =
-                            DateFormat.format("dd/MM/yyyy", filter.endPeriod).toString()
-                        actionMode?.subtitle = "c $startDate по $endDate"
-                    }
-                    else -> {
-                        // Show all
-                    }
-                }
-
+            if (expenses.isNotEmpty()) {
                 val centerLatitude =
                     pointsLatitudeMin + ((pointsLatitudeMax - pointsLatitudeMin) / 2.0)
                 val centerLongitude =
@@ -163,7 +152,7 @@ class MapExpensesFragment : Fragment() {
                     viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
                 }
 
-                when {
+                when  {
                     pointsLatitudeMax - pointsLatitudeMin > 360 -> mapController.setZoom(0.1)
                     pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(1.0)
                     pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(2.0)
@@ -181,7 +170,8 @@ class MapExpensesFragment : Fragment() {
                     pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
                     pointsLatitudeMax - pointsLatitudeMin > 0.011 -> mapController.setZoom(15.0)
                     pointsLatitudeMax - pointsLatitudeMin > 0.0055 -> mapController.setZoom(16.0)
-                    else -> mapController.setZoom(17.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.00255 -> mapController.setZoom(17.0)
+                    else -> mapController.setZoom(18.0)
                 }
                 mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
             } else {

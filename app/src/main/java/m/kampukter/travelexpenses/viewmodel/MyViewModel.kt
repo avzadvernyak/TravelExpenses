@@ -2,6 +2,7 @@ package m.kampukter.travelexpenses.viewmodel
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.data.*
 import m.kampukter.travelexpenses.data.repository.ExpensesRepository
@@ -244,7 +245,7 @@ class MyViewModel(
         postValue(ExpensesExtendedView())
     }
 
-    fun <T> MutableLiveData<T>.modifyValue( transform: T.() -> T) {
+    private fun <T> MutableLiveData<T>.modifyValue(transform: T.() -> T) {
         this.value = this.value?.run(transform)
     }
 
@@ -257,19 +258,19 @@ class MyViewModel(
     }
 
     fun setLastNote(note: String) {
-        newExpensesExtendedView.modifyValue { copy( note = note) }
+        newExpensesExtendedView.modifyValue { copy(note = note) }
     }
 
-    fun setLastCurrency( currency: String) {
-        newExpensesExtendedView.modifyValue { copy(currency= currency) }
+    fun setLastCurrency(currency: String) {
+        newExpensesExtendedView.modifyValue { copy(currency = currency) }
     }
 
     fun setLastLocation(location: MyLocation) {
-        newExpensesExtendedView.modifyValue { copy( location = location ) }
+        newExpensesExtendedView.modifyValue { copy(location = location) }
     }
 
     fun setLastUriPhoto(imageUri: String?) {
-        newExpensesExtendedView.modifyValue { copy( imageUri= imageUri) }
+        newExpensesExtendedView.modifyValue { copy(imageUri = imageUri) }
     }
 
     private val isAddNewExpense = MutableLiveData<Boolean>()
@@ -286,7 +287,7 @@ class MyViewModel(
             }
             addSource(isAddNewExpense) {
                 lastCurrentFolder?.let {
-                    lastExpenses = lastExpenses.copy( folderId = it.id)
+                    lastExpenses = lastExpenses.copy(folderId = it.id)
                     viewModelScope.launch {
                         expensesRepository.addExpenses(lastExpenses)
                     }
@@ -296,7 +297,7 @@ class MyViewModel(
                 lastExpenseList = it
                 update()
             }
-            addSource(newExpensesExtendedView){
+            addSource(newExpensesExtendedView) {
                 lastExpenses = it
                 update()
             }
@@ -464,83 +465,44 @@ Exchange
 */
 
     private val queryInExchangeCurrentRate = MutableLiveData<String>()
-    val queryInExchangeLiveData: LiveData<String>
-        get() = queryInExchangeCurrentRate
-
     fun setQueryInExchangeCurrentRate(query: String) {
         queryInExchangeCurrentRate.postValue(query)
     }
 
-    private val triggerForCurrencyExchange = MutableLiveData<Boolean>()
-    fun getExchangeCurrency() {
-        triggerForCurrencyExchange.postValue(true)
+    private val foundDateExchangeCurrency = MutableLiveData<Date>().apply {
+        postValue(Calendar.getInstance().time)
     }
-
-    private val foundDateExchangeCurrency = MutableLiveData<Date>()
     fun setDateForCurrencyExchange(date: Date) {
         foundDateExchangeCurrency.postValue(date)
     }
 
-    private val resultExchangeCurrentRateLiveData =
-        expensesRepository.exchangeRateLiveDate
-    val exchangeRateLiveDate: LiveData<ResultCurrentExchangeRate> =
-        MediatorLiveData<ResultCurrentExchangeRate>().apply {
+    private val _rate: LiveData<ResultCurrentExchangeRate> =
+        foundDateExchangeCurrency.distinctUntilChanged().switchMap { date ->
+            liveData {
+                mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()
+                    ?.fetchRate(date)?.collect { emit(it) }
+            }
+        }
+    val currencyRateLiveDate: LiveData<Pair<ResultCurrentExchangeRate, String?>> =
+        MediatorLiveData<Pair<ResultCurrentExchangeRate, String?>>().apply {
+
             var lastResultExchangeCurrentRate: ResultCurrentExchangeRate? = null
             var lastQuery: String? = null
-            var lastFoundDate: Date? = null
 
-            fun filterExchangeCollection(query: String): List<ExchangeCurrentRate>? {
-                return (lastResultExchangeCurrentRate as? ResultCurrentExchangeRate.Success)?.exchangeCurrentRate?.filter { item ->
-                    item.currencyName.indexOf(
-                        query,
-                        0,
-                        true
-                    ) != -1 || item.currencyCode.indexOf(query, 0, true) != -1
-                }
+            fun update() {
+                val resultExchangeCurrentRate = lastResultExchangeCurrentRate ?: return
+                postValue(Pair(resultExchangeCurrentRate, lastQuery))
             }
 
-            fun getExchangeCurrency() {
-                viewModelScope.launch {
-                    mainApplication.getCurrentScope()?.get<RateCurrencyAPIRepository>()
-                        ?.getCurrentRate()
-                }
-            }
-
-            addSource(triggerForCurrencyExchange) {
-                if (lastFoundDate == null) getExchangeCurrency()
-            }
-            addSource(foundDateExchangeCurrency) {
-                expensesRepository.setFindDate(it)
-                if (lastFoundDate != it) getExchangeCurrency()
-                lastFoundDate = it
-
-            }
-            addSource(resultExchangeCurrentRateLiveData) { result ->
-                lastResultExchangeCurrentRate = result
-                if (result is ResultCurrentExchangeRate.ErrorAPI) lastFoundDate = null
-                if (lastQuery.isNullOrEmpty()) postValue(result)
-                else {
-                    lastQuery?.let {
-                        filterExchangeCollection(it)?.let { filter ->
-                            postValue(
-                                ResultCurrentExchangeRate.Success(filter)
-                            )
-                        }
-                    }
-                }
+            addSource(_rate) {
+                lastResultExchangeCurrentRate = it
+                update()
             }
             addSource(queryInExchangeCurrentRate) { query ->
                 lastQuery = query
-                if (query.isNotEmpty()) {
-                    query?.let { filterExchangeCollection(it) }?.let { filter ->
-                        postValue(
-                            ResultCurrentExchangeRate.Success(filter)
-                        )
-                    }
-                } else postValue(lastResultExchangeCurrentRate)
+                update()
             }
         }
-
 
     // For map (osmdroid)
     private val paramMapViewMutableLiveData = MutableLiveData<Pair<Double, GeoPoint>>()
@@ -561,39 +523,16 @@ Exchange
         MediatorLiveData<Pair<List<ExpensesExtendedView>, FilterForExpensesMap?>>().apply {
             var lastFilterForExpensesMap: FilterForExpensesMap? = null
             var lastExpenses = listOf<ExpensesExtendedView>()
+            fun update() {
+                postValue(Pair(lastExpenses, lastFilterForExpensesMap))
+            }
             addSource(expensesRepository.getExpensesFlow().asLiveData()) {
                 lastExpenses = it
-                postValue(Pair(it, lastFilterForExpensesMap))
-
+                update()
             }
             addSource(filterForExpensesMap) { filter ->
                 lastFilterForExpensesMap = filter
-                when (filter) {
-                    is FilterForExpensesMap.All -> postValue(
-                        Pair(
-                            lastExpenses,
-                            lastFilterForExpensesMap
-                        )
-                    )
-
-                    is FilterForExpensesMap.DateRangeFilter -> {
-                        postValue(
-                            Pair(
-                                lastExpenses.filter { it.dateTime.time in filter.startPeriod..filter.endPeriod },
-                                lastFilterForExpensesMap
-                            )
-                        )
-                    }
-
-                    is FilterForExpensesMap.ExpenseFilter -> {
-                        postValue(
-                            Pair(
-                                lastExpenses.filter { it.expense_id == filter.expense.id },
-                                lastFilterForExpensesMap
-                            )
-                        )
-                    }
-                }
+                update()
             }
         }
 

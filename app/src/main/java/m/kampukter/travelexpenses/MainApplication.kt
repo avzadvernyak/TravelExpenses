@@ -123,7 +123,7 @@ class MainApplication : Application() {
                 RateCurrencyAPIRepository(
                     get<MyDatabase>().expensesDao(),
                     get<MyDatabase>().rateCurrencyDao(),
-                    get(),get()
+                    get()
                 )
             }
         }

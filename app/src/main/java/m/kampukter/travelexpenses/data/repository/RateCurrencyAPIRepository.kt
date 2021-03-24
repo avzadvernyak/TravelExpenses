@@ -2,11 +2,16 @@ package m.kampukter.travelexpenses.data.repository
 
 import android.text.format.DateFormat
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
 import m.kampukter.travelexpenses.data.ExchangeCurrentRate
 import m.kampukter.travelexpenses.data.RateCurrency
+import m.kampukter.travelexpenses.data.ResultAPIExchange
 import m.kampukter.travelexpenses.data.ResultCurrentExchangeRate
 import m.kampukter.travelexpenses.data.dao.ExpensesDao
 import m.kampukter.travelexpenses.data.dao.RateCurrencyDao
@@ -24,126 +29,9 @@ import java.util.*
 class RateCurrencyAPIRepository(
     private val expensesDao: ExpensesDao,
     private val rateCurrencyDao: RateCurrencyDao,
-    private val rateCurrencyAPI: RateCurrencyAPI,
-    private val expensesRepository: ExpensesRepository
+    private val rateCurrencyAPI: RateCurrencyAPI
 ) : KoinComponent {
 
-    suspend fun getCurrentRate() {
-        val foundDate = expensesRepository.getFoundDate()
-
-        val result = when (mainApplication.getActiveCurrencySession()) {
-            DEFAULT_CURRENCY_CONST_UAH -> getRateNBU(foundDate)
-            DEFAULT_CURRENCY_CONST_RUB -> getRateCBR(foundDate)
-            DEFAULT_CURRENCY_CONST_BYN -> getRateNBRB(foundDate)
-            else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
-        }
-        expensesRepository.getExchangeRate(result)
-
-    }
-
-    private suspend fun getRateNBU(date: Date): ResultCurrentExchangeRate {
-        val resultListRate = mutableListOf<ExchangeCurrentRate>()
-        try {
-            val response = rateCurrencyAPI.getRateTodayNbu(
-                DateFormat.format("yyyyMMdd", date).toString(),
-                "json"
-            )
-            if (response.code() == 200) {
-                response.body()?.forEach {
-                    resultListRate.add(
-                        ExchangeCurrentRate(
-                            currencyCode = it.cc,
-                            currencyName = it.txt,
-                            rate = it.rate,
-                            exchangeDate = it.exchangedate
-                        )
-                    )
-                }
-
-                return ResultCurrentExchangeRate.Success(resultListRate)
-            } else {
-                Log.e("blablabla", " Error in API (response.code NBU) ${response.code()}")
-                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
-            }
-
-        } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (getRateCurrency NBU) $e")
-            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
-        }
-
-    }
-
-    private suspend fun getRateCBR(date: Date): ResultCurrentExchangeRate {
-
-        val foundDateString = DateFormat.format("dd/MM/yyyy", date).toString()
-
-        val resultListRate = mutableListOf<ExchangeCurrentRate>()
-        try {
-            val response = rateCurrencyAPI.getRateTodayCBR(foundDateString)
-            if (response.code() == 200) {
-                val resDate = DateFormat.format("dd.MM.yyyy", response.body()?.date).toString()
-                response.body()?.valute?.forEach { _valute ->
-                    resultListRate.add(
-                        ExchangeCurrentRate(
-                            currencyCode = _valute.charCode,
-                            currencyName = _valute.name,
-                            rate = _valute.value / _valute.nominal,
-                            exchangeDate = resDate
-                        )
-                    )
-                }
-                return ResultCurrentExchangeRate.Success(resultListRate)
-            } else {
-
-                Log.e("blablabla", " Error in API (response.code CBR) ${response.code()}")
-                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
-            }
-        } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (IOException) $e")
-            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
-        }
-    }
-
-    private suspend fun getRateNBRB(date: Date): ResultCurrentExchangeRate {
-        val resultListRate = mutableListOf<ExchangeCurrentRate>()
-        try {
-            val response = rateCurrencyAPI.getRateTodayNBRB(
-                DateFormat.format("yyyy-MM-dd", date).toString(),
-                "0"
-            )
-            if (response.code() == 200) {
-
-                val resDate = response.body()?.first()?.Date?.let { _date ->
-                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(
-                        _date
-                    )
-                }
-
-                val dateString = DateFormat.format("dd.MM.yyyy", resDate).toString()
-
-                response.body()?.forEach {
-                    resultListRate.add(
-                        ExchangeCurrentRate(
-                            currencyCode = it.Cur_Abbreviation,
-                            currencyName = it.Cur_Name,
-                            rate = it.Cur_OfficialRate / it.Cur_Scale,
-                            exchangeDate = dateString
-                        )
-                    )
-                }
-                return ResultCurrentExchangeRate.Success(resultListRate)
-            } else {
-
-                Log.e("blablabla", " Error in API (response.code NBRB) ${response.code()}")
-                return ResultCurrentExchangeRate.ErrorAPI(response.code().toString())
-            }
-
-        } catch (e: IOException) {
-            Log.e("blablabla", " Error in API (getRateCurrencyNBRB) $e")
-            return ResultCurrentExchangeRate.ErrorAPI(e.toString())
-        }
-
-    }
 
     suspend fun rateSynchronization(currencyId: Int) {
 
@@ -307,6 +195,113 @@ class RateCurrencyAPIRepository(
                     }
                 }
             }
+        }
+    }
+
+    suspend fun fetchRate(date: Date): Flow<ResultCurrentExchangeRate> {
+        return flow {
+            when (mainApplication.getActiveCurrencySession()) {
+                DEFAULT_CURRENCY_CONST_UAH -> emit(fetchRateNBU(date))
+                DEFAULT_CURRENCY_CONST_RUB -> emit(fetchRateCBR(date))
+                DEFAULT_CURRENCY_CONST_BYN -> emit(fetchRateNBBR(date))
+                else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
+            }
+
+        }.flowOn(Dispatchers.IO)
+    }
+    private suspend fun fetchRateNBU(date: Date): ResultCurrentExchangeRate {
+        val exchangeCurrentRate = mutableListOf<ExchangeCurrentRate>()
+        val resultApi = getResponse {
+            rateCurrencyAPI.getRateTodayNbu( DateFormat.format("yyyyMMdd", date).toString(),
+                "json")
+        }
+        return when (resultApi.status) {
+            ResultAPIExchange.Status.SUCCESS -> {
+                resultApi.data?.forEach {
+                    exchangeCurrentRate.add(
+                        ExchangeCurrentRate(
+                            currencyCode = it.cc,
+                            currencyName = it.txt,
+                            rate = it.rate,
+                            exchangeDate = it.exchangedate
+                        )
+                    )
+                }
+                ResultCurrentExchangeRate.Success(exchangeCurrentRate)
+            }
+            ResultAPIExchange.Status.ERROR -> ResultCurrentExchangeRate.ErrorAPI(resultApi.toString())
+            else -> ResultCurrentExchangeRate.ErrorAPI("Unknown Error")
+        }
+
+    }
+    private suspend fun fetchRateCBR(date: Date): ResultCurrentExchangeRate {
+        val exchangeCurrentRate = mutableListOf<ExchangeCurrentRate>()
+        val resultApi = getResponse {
+            rateCurrencyAPI.getRateTodayCBR(DateFormat.format("dd/MM/yyyy", date).toString())
+        }
+        return when (resultApi.status) {
+            ResultAPIExchange.Status.SUCCESS -> {
+                val resDate = DateFormat.format("dd.MM.yyyy", resultApi.data?.date).toString()
+                resultApi.data?.valute?.forEach { _valute ->
+                    exchangeCurrentRate.add(
+                        ExchangeCurrentRate(
+                            currencyCode = _valute.charCode,
+                            currencyName = _valute.name,
+                            rate = _valute.value / _valute.nominal,
+                            exchangeDate = resDate
+                        )
+                    )
+                }
+                ResultCurrentExchangeRate.Success(exchangeCurrentRate)
+            }
+            ResultAPIExchange.Status.ERROR -> ResultCurrentExchangeRate.ErrorAPI(resultApi.toString())
+            else -> ResultCurrentExchangeRate.ErrorAPI("Unknown Error")
+        }
+    }
+
+    private suspend fun fetchRateNBBR(date: Date): ResultCurrentExchangeRate {
+
+        val exchangeCurrentRate = mutableListOf<ExchangeCurrentRate>()
+        val resultApi = getResponse {
+            rateCurrencyAPI.getRateTodayNBRB(
+                DateFormat.format("yyyy-MM-dd", date).toString(), "0"
+            )
+        }
+        return when (resultApi.status) {
+            ResultAPIExchange.Status.SUCCESS -> {
+                resultApi.data?.forEach {
+                    exchangeCurrentRate.add(
+                        ExchangeCurrentRate(
+                            currencyCode = it.Cur_Abbreviation,
+                            currencyName = it.Cur_Name,
+                            rate = it.Cur_OfficialRate / it.Cur_Scale,
+                            exchangeDate = DateFormat.format(
+                                "dd.MM.yyyy",
+                                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(
+                                    it.Date
+                                )
+                            ).toString()
+                        )
+                    )
+                }
+                ResultCurrentExchangeRate.Success(exchangeCurrentRate)
+            }
+            ResultAPIExchange.Status.ERROR -> ResultCurrentExchangeRate.ErrorAPI(resultApi.toString())
+            else -> ResultCurrentExchangeRate.ErrorAPI("Unknown Error")
+        }
+    }
+
+    private suspend fun <T> getResponse(request: suspend () -> Response<T>): ResultAPIExchange<T> {
+        return try {
+            val result = request.invoke()
+            if (result.isSuccessful) {
+                return ResultAPIExchange.success(result.body())
+            } else {
+                val errorResponse = result.errorBody().toString()
+                ResultAPIExchange.error(errorResponse)
+            }
+        } catch (e: Throwable) {
+            ResultAPIExchange.error("Unknown Error")
         }
     }
 }

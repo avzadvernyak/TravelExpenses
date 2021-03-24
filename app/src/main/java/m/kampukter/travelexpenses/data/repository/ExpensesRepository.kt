@@ -52,21 +52,19 @@ class ExpensesRepository(
         expensesDao.getExpensesByExpense(id)
 
     suspend fun addExpenses(expensesUpdate: ExpensesExtendedView) {
-        if (expensesUpdate.folderId != null) {
-            expensesDao.insert(
-                Expenses(
-                    folder_id = expensesUpdate.folderId,
-                    currency = expensesUpdate.currency,
-                    note = expensesUpdate.note,
-                    sum = expensesUpdate.sum,
-                    expense_id = expensesUpdate.expense_id,
-                    dateTime = Calendar.getInstance().time,
-                    location = expensesUpdate.location,
-                    imageUri = expensesUpdate.imageUri
-                )
+        expensesDao.insert(
+            Expenses(
+                folder_id = expensesUpdate.folderId,
+                currency = expensesUpdate.currency,
+                note = expensesUpdate.note,
+                sum = expensesUpdate.sum,
+                expense_id = expensesUpdate.expense_id,
+                dateTime = Calendar.getInstance().time,
+                location = expensesUpdate.location,
+                imageUri = expensesUpdate.imageUri
             )
-            currencyDao.setDefault(expensesUpdate.currency)
-        }
+        )
+        currencyDao.setDefault(expensesUpdate.currency)
     }
 
     suspend fun deleteIdList(selectedListId: Set<Long>) {
@@ -220,24 +218,6 @@ class ExpensesRepository(
         }
     }
 
-
-    /*
-    * Получение курсов валют за дату
-    */
-    private val exchangeRateMutableLiveDate = MutableLiveData<ResultCurrentExchangeRate>()
-    val exchangeRateLiveDate: LiveData<ResultCurrentExchangeRate>
-        get() = exchangeRateMutableLiveDate
-
-    fun getExchangeRate(par: ResultCurrentExchangeRate) {
-        exchangeRateMutableLiveDate.postValue(par)
-    }
-
-    private var findDate: Date = Calendar.getInstance().time
-    fun setFindDate(date: Date) {
-        findDate = date
-    }
-
-    fun getFoundDate() = findDate
 
     /*
     Search in Expenses
