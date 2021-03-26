@@ -154,7 +154,7 @@ class MainApplication : Application() {
             modules(module)
         }
         // Delete Invalid Photo Files
-       // getKoin().get<MyViewModel>().deleteInvalidFiles()
+        getKoin().get<MyViewModel>().deleteInvalidFiles()
 
         GlobalScope.launch(context = Dispatchers.IO) {
 

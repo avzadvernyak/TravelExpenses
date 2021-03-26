@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
@@ -18,6 +19,9 @@ import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.*
 
 
 class EditExpensesFragment : Fragment() {
@@ -37,6 +41,8 @@ class EditExpensesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sumTextInputEdit.setText("0,0")
 
         val navController = findNavController()
         var currentIdExpenses: Long? = null
@@ -115,12 +121,14 @@ class EditExpensesFragment : Fragment() {
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun afterTextChanged(p0: Editable?) {}
+            override fun afterTextChanged(p0: Editable?) {
+            }
         })
         noteTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 currentIdExpenses?.let { id ->
-                    viewModel.updateExpenses(EditedExpensesField.NoteField(id, p0.toString())) }
+                    viewModel.updateExpenses(EditedExpensesField.NoteField(id, p0.toString()))
+                }
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}

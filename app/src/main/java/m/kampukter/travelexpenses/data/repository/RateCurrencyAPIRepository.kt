@@ -200,11 +200,12 @@ class RateCurrencyAPIRepository(
 
     suspend fun fetchRate(date: Date): Flow<ResultCurrentExchangeRate> {
         return flow {
+            emit( ResultCurrentExchangeRate.Loading )
             when (mainApplication.getActiveCurrencySession()) {
                 DEFAULT_CURRENCY_CONST_UAH -> emit(fetchRateNBU(date))
                 DEFAULT_CURRENCY_CONST_RUB -> emit(fetchRateCBR(date))
                 DEFAULT_CURRENCY_CONST_BYN -> emit(fetchRateNBBR(date))
-                else -> ResultCurrentExchangeRate.ErrorAPI("Error choice")
+                else -> emit( ResultCurrentExchangeRate.ErrorAPI("Error choice") )
             }
 
         }.flowOn(Dispatchers.IO)

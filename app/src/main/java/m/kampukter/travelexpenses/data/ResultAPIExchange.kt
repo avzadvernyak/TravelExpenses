@@ -4,8 +4,7 @@ data class ResultAPIExchange<out T>(val status: Status, val data: T?, val errorM
 
     enum class Status {
         SUCCESS,
-        ERROR,
-        LOADING
+        ERROR
     }
 
     companion object {
@@ -15,10 +14,6 @@ data class ResultAPIExchange<out T>(val status: Status, val data: T?, val errorM
 
         fun <T> error(message: String ): ResultAPIExchange<T> {
             return ResultAPIExchange(Status.ERROR, null, message)
-        }
-
-        fun <T> loading(data: T? = null): ResultAPIExchange<T> {
-            return ResultAPIExchange(Status.LOADING, data, null)
         }
     }
 

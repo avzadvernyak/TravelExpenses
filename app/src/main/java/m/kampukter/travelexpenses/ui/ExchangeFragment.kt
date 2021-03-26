@@ -31,8 +31,6 @@ class ExchangeFragment : Fragment() {
         val navController = findNavController()
         val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
 
-        progressBar?.visibility = View.VISIBLE
-        dateTextInputLayout.visibility = View.INVISIBLE
         exchangeRateAdapter = ExchangeRateAdapter()
         with(exchangeRateRecyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -44,6 +42,12 @@ class ExchangeFragment : Fragment() {
         }
         viewModel.currencyRateLiveDate.observe(viewLifecycleOwner) { (resultExchangeCurrentRate, queryString) ->
             when (resultExchangeCurrentRate) {
+                is ResultCurrentExchangeRate.Loading -> {
+                    progressBar?.visibility = View.VISIBLE
+                    errorApiTextView.visibility = View.INVISIBLE
+                    reloadRateButton.visibility = View.INVISIBLE
+                    dateTextInputLayout.visibility = View.INVISIBLE
+                }
                 is ResultCurrentExchangeRate.ErrorAPI -> {
                     progressBar?.visibility = View.GONE
                     errorApiTextView?.visibility = View.VISIBLE
@@ -67,9 +71,8 @@ class ExchangeFragment : Fragment() {
 
                     if (currencyRate.isNotEmpty()) {
                         dateTextInputLayout.visibility = View.VISIBLE
-                        val exchangeDateString =
-                            currencyRate.first().exchangeDate
-                        val myHint = when (defaultProgramCurrency) {
+
+                        dateTextInputLayout.hint = when (defaultProgramCurrency) {
                             // Гривна по умолчанию
                             DEFAULT_CURRENCY_CONST_UAH -> getString(R.string.oneUah)
                             // Рубль по умолчению
@@ -78,8 +81,7 @@ class ExchangeFragment : Fragment() {
                             DEFAULT_CURRENCY_CONST_BYN -> getString(R.string.oneByn)
                             else -> getString(R.string.noCurrency)
                         }
-                        dateTextInputLayout.hint = myHint
-                        dateTextInputEdit.setText(exchangeDateString)
+                        dateTextInputEdit.setText( currencyRate.first().exchangeDate )
                     } else {
                         dateTextInputLayout.visibility = View.INVISIBLE
                         Snackbar.make(
@@ -93,9 +95,7 @@ class ExchangeFragment : Fragment() {
             }
         }
         reloadRateButton?.setOnClickListener {
-            errorApiTextView.visibility = View.INVISIBLE
-            reloadRateButton.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
+
             if (navController.currentDestination?.id == R.id.exchangeFragment)
                 navController.navigate(R.id.toDatePickerDialogFragment)
         }
