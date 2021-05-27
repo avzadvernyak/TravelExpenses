@@ -12,7 +12,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.map_expenses_fragment.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -81,6 +80,7 @@ class MapExpensesFragment : Fragment() {
             mapController.setCenter(GeoPoint(48.0154, 37.8647))
         }
         viewModel.expensesInFolderForMap.observe(viewLifecycleOwner) { (lastExpenses, filter) ->
+
             mapMapView.overlays.clear()
 
             var pointsLongitudeMax: Double = -90.0
@@ -113,7 +113,7 @@ class MapExpensesFragment : Fragment() {
                     actionMode?.subtitle = filter.expense.name
                     filteredExpenses
                 }
-                else -> lastExpenses
+                else -> lastExpenses.filter { it.location != null }
             }
 
             expenses.forEach { itemExpenses ->
@@ -147,9 +147,9 @@ class MapExpensesFragment : Fragment() {
 
 
                 if (pointsLatitudeMax - pointsLatitudeMin == -360.0) {
-                    Snackbar.make(view, "Empty list points, show ALL", Snackbar.LENGTH_SHORT)
+                    Snackbar.make(view, getString(R.string.points_is_empty), Snackbar.LENGTH_SHORT)
                         .show()
-                    viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
+                    if (filter !is FilterForExpensesMap.All) viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
                 }
 
                 when  {
@@ -175,9 +175,9 @@ class MapExpensesFragment : Fragment() {
                 }
                 mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
             } else {
-                if (filter != FilterForExpensesMap.All && filter != null) {
+                if (filter !is FilterForExpensesMap.All ) {
                     viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
-                    Snackbar.make(mapMapView, "Нет записей по фильтру", Snackbar.LENGTH_SHORT)
+                    Snackbar.make(mapMapView, getString(R.string.points_is_empty), Snackbar.LENGTH_SHORT)
                         .show()
                 }
             }

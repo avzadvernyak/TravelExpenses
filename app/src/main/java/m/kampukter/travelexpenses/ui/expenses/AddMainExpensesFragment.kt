@@ -1,12 +1,14 @@
 package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +27,6 @@ import kotlinx.android.synthetic.main.add_expenses_fragment.expenseTextInputEdit
 import kotlinx.android.synthetic.main.add_expenses_fragment.noteTextInputEdit
 import kotlinx.android.synthetic.main.add_expenses_fragment.noteTextInputLayout
 import kotlinx.android.synthetic.main.add_expenses_fragment.sumTextInputEdit
-import kotlinx.android.synthetic.main.edit_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.MyLocation
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
@@ -34,9 +35,6 @@ import m.kampukter.travelexpenses.ui.STATUS_GPS_ON
 import m.kampukter.travelexpenses.ui.permissionsForLocation
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.*
 
 
 class AddMainExpensesFragment : Fragment() {
@@ -69,7 +67,7 @@ class AddMainExpensesFragment : Fragment() {
             }
         }
     }
-    private val locationRequest = LocationRequest.create()?.apply {
+    private val locationRequest = LocationRequest.create().apply {
         interval = 10000
         fastestInterval = 5000
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -95,7 +93,7 @@ class AddMainExpensesFragment : Fragment() {
             viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, { settings ->
                 if (settings.statusGPS == STATUS_GPS_ON) {
 
-                    locationRequest?.let {
+                    locationRequest.let {
                         LocationSettingsRequest.Builder().addLocationRequest(it)
                     }
                     val isLocationPermission = permissionsForLocation.all {
@@ -104,11 +102,17 @@ class AddMainExpensesFragment : Fragment() {
                             it
                         ) == PackageManager.PERMISSION_GRANTED
                     }
-                    if (isLocationPermission) fusedLocationClient.requestLocationUpdates(
-                        locationRequest,
-                        locationCallback,
-                        Looper.getMainLooper()
-                    ) else {
+                    if (isLocationPermission) {
+
+                        val manager = context.getSystemService( Context.LOCATION_SERVICE) as LocationManager
+                        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        } else fusedLocationClient.requestLocationUpdates(
+                            locationRequest,
+                            locationCallback,
+                            Looper.getMainLooper()
+                        )
+                    } else {
                         viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
                         navController.navigate(R.id.toLocationPermissionsDialogFragment)
                     }

@@ -122,6 +122,21 @@ class EditExpensesFragment : Fragment() {
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {
+
+                Log.d("blabla", " --> ${ Currency.getInstance( Locale.getDefault() ).currencyCode }")
+                /*sumTextInputEdit.removeTextChangedListener(this)
+                val doubleVal = p0.toString().toDouble()
+                val formatter = NumberFormat.getInstance(Locale.getDefault()) as DecimalFormat
+                formatter.applyPattern("#######0.00")
+                var formattedString = formatter.format(doubleVal)
+                //Log.d("blabla", " --> $formattedString")
+
+                formattedString = formattedString.replace(",",".")
+                Log.d("blabla", " --> $formattedString")
+
+                sumTextInputEdit.setText(formattedString)
+                sumTextInputEdit.text?.let { sumTextInputEdit.setSelection(it.length) }
+                sumTextInputEdit.addTextChangedListener(this)*/
             }
         })
         noteTextInputEdit.addTextChangedListener(object : TextWatcher {
