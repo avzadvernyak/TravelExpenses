@@ -17,5 +17,5 @@ data class Settings(
     val defCurrency: Int = 0,
     val backupPeriod: Int = 0,
     val statusGPS: Int = 0,
-    val folder_id: Long = 0
+    val folder_id: Long = 1L
 )

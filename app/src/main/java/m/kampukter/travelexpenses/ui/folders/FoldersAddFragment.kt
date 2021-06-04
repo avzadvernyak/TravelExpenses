@@ -32,7 +32,6 @@ class FoldersAddFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         // Set filter folderShortNameTextInputEdit len string max 20
         val filterArray = arrayOfNulls<InputFilter>(1)
         filterArray[0] = LengthFilter(20)
@@ -45,6 +44,7 @@ class FoldersAddFragment : Fragment() {
                 UUID.randomUUID().toString()
             )
         )
+
 
         viewModel.lastFolderLiveData.observe(viewLifecycleOwner) { (candidate, folders) ->
             if (folderShortNameTextInputEdit.text.toString() != candidate.shortName) {
@@ -68,7 +68,7 @@ class FoldersAddFragment : Fragment() {
 
         }
 
-        folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
+       folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 viewModel.setNewFolderName(p0.toString())
             }
@@ -94,5 +94,6 @@ class FoldersAddFragment : Fragment() {
             )
             findNavController().navigate(R.id.toFoldersFragment)
         }
+
     }
 }

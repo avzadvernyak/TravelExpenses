@@ -17,11 +17,11 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         with(itemView) {
 
             Glide.with(this).load(Uri.parse(item.imageUri)).placeholder(R.drawable.ic_photo_24)
-                .fitCenter().into(itemPhotoView)
+                .fitCenter().into(itemGridPhotoView)
 
-            itemPhotoView.setOnClickListener { onClickCallback?.invoke(ACTION_FULL_SCREEN) }
-            itemPhotoView.setOnMatrixChangeListener {
-                if (itemPhotoView.scale == 1F) {
+            itemGridPhotoView.setOnClickListener { onClickCallback?.invoke(ACTION_FULL_SCREEN) }
+            itemGridPhotoView.setOnMatrixChangeListener {
+                if (itemGridPhotoView.scale == 1F) {
                     onClickCallback?.invoke(ACTION_ZOOM_ON)
                 } else {
                     onClickCallback?.invoke(ACTION_ZOOM_OFF)

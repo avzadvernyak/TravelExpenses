@@ -2,6 +2,7 @@ package m.kampukter.travelexpenses.ui.expenses
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +49,7 @@ class AddPlusExpensesFragment : Fragment() {
                 }
             }
 
+            Log.w("blabla","2 **** -> ${expense.imageUri}")
             Glide.with(view).load(expense.imageUri).placeholder(R.drawable.ic_photo_24)
                 .into(photoImageView)
 

@@ -75,7 +75,9 @@ class CameraXFragment : Fragment() {
 
         camera_capture_button.setOnClickListener {
             viewModel.createJPGFile()?.let {
-                cameraService.takePhoto(it) { uriPhoto -> viewModel.setLastUriPhoto(uriPhoto) }
+                cameraService.takePhoto(it) { uriPhoto ->
+                    viewModel.setLastUriPhoto(uriPhoto)
+                }
             }
         }
     }

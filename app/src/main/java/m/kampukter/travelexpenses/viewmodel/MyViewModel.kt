@@ -241,36 +241,33 @@ class MyViewModel(
 
     val expenseList: LiveData<List<Expense>> = expensesRepository.getAllExpenseFlow().asLiveData()
 
-    private val newExpensesExtendedView = MutableLiveData<ExpensesExtendedView>().apply {
-        postValue(ExpensesExtendedView())
-    }
-
-    private fun <T> MutableLiveData<T>.modifyValue(transform: T.() -> T) {
-        this.value = this.value?.run(transform)
-    }
-
+    private val newExpensesExpense = MutableLiveData<Long>()
     fun setLastExpense(id: Long) {
-        newExpensesExtendedView.modifyValue { copy(expense_id = id) }
+        newExpensesExpense.postValue( id )
     }
 
+    private val newExpensesSum = MutableLiveData<Double>()
     fun setLastSum(sum: Double) {
-        newExpensesExtendedView.modifyValue { copy(sum = sum) }
+        newExpensesSum.postValue(sum)
     }
 
+    private val newExpensesNote = MutableLiveData<String>()
     fun setLastNote(note: String) {
-        newExpensesExtendedView.modifyValue { copy(note = note) }
+        newExpensesNote.postValue( note )
     }
-
+    private val newExpensesCurrency = MutableLiveData<String>()
     fun setLastCurrency(currency: String) {
-        newExpensesExtendedView.modifyValue { copy(currency = currency) }
+        newExpensesCurrency.postValue( currency )
     }
 
+    private val newExpensesLocation = MutableLiveData<MyLocation?>()
     fun setLastLocation(location: MyLocation) {
-        newExpensesExtendedView.modifyValue { copy(location = location) }
+        newExpensesLocation.postValue( location )
     }
 
+    private val newExpensesImageURI = MutableLiveData<String?>()
     fun setLastUriPhoto(imageUri: String?) {
-        newExpensesExtendedView.modifyValue { copy(imageUri = imageUri) }
+        newExpensesImageURI.postValue( imageUri )
     }
 
     private val isAddNewExpense = MutableLiveData<Boolean>()
@@ -297,15 +294,36 @@ class MyViewModel(
                 lastExpenseList = it
                 update()
             }
-            addSource(newExpensesExtendedView) {
-                lastExpenses = it
-                update()
-            }
+
             addSource(currentFolder) {
                 lastCurrentFolder = it
             }
             addSource(currencyTableList) {
                 lastCurrencyList = it
+                update()
+            }
+            addSource(newExpensesImageURI){
+                lastExpenses = lastExpenses.copy(imageUri = it)
+                update()
+            }
+            addSource(newExpensesLocation){
+                lastExpenses = lastExpenses.copy(location = it)
+                update()
+            }
+            addSource(newExpensesNote){
+                lastExpenses = lastExpenses.copy(note = it)
+                update()
+            }
+            addSource(newExpensesSum){
+                lastExpenses = lastExpenses.copy(sum = it)
+                update()
+            }
+            addSource(newExpensesExpense){
+                lastExpenses = lastExpenses.copy( expense_id = it)
+                update()
+            }
+            addSource(newExpensesCurrency){
+                lastExpenses = lastExpenses.copy(currency = it)
                 update()
             }
         }
@@ -472,6 +490,7 @@ Exchange
     private val foundDateExchangeCurrency = MutableLiveData<Date>().apply {
         postValue(Calendar.getInstance().time)
     }
+
     fun setDateForCurrencyExchange(date: Date) {
         foundDateExchangeCurrency.postValue(date)
     }

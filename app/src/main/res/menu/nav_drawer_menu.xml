@@ -12,7 +12,7 @@
                 android:icon="@drawable/ic_map_24"
                 android:title="@string/menu_map" />
         <item
-                android:id="@id/galleryFragment"
+                android:id="@id/galleryGridFragment"
                 android:icon="@drawable/ic_baseline_photo_library_24"
                 android:title="@string/menu_gallery" />
         <item

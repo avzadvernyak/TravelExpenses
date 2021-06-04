@@ -341,6 +341,20 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/galleryFragment" />
     </dialog>
+
+    <!--   Gallery Grid   -->
+    <fragment
+            android:id="@+id/galleryGridFragment"
+            android:name="m.kampukter.travelexpenses.ui.gallery.GalleryGridFragment"
+            android:label="@string/nav_label_gallery"
+            tools:layout="@layout/gallery_fragment">
+
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+
+    </fragment>
+
     <!--   Folders Expenses    -->
     <fragment
             android:id="@+id/foldersFragment"
