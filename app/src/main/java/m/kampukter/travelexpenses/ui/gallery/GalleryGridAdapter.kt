@@ -2,41 +2,55 @@ package m.kampukter.travelexpenses.ui.gallery
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.ExpensesExtendedView
+import m.kampukter.travelexpenses.data.ExpensesMainCollection
+import m.kampukter.travelexpenses.ui.ClickEventDelegate
+import m.kampukter.travelexpenses.ui.gallery.GalleryGridFragment.Companion.GALLERY_GRID_TYPE_ITEM_PHOTO
+import m.kampukter.travelexpenses.ui.gallery.GalleryGridFragment.Companion.GALLERY_GRID_TYPE_ITEM_TITLE
 
-class GalleryGridAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class GalleryGridAdapter(private var clickListener: ClickEventDelegate<ViewItem>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var mediaList = emptyList<ExpensesExtendedView>()
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder  = GalleryGridViewHolder( LayoutInflater
-        .from(parent.context)
-        .inflate(R.layout.gallery_grid_item, parent, false))
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as GalleryGridViewHolder).bind( mediaList[position] )
-    }
+    private var mediaList = emptyList<ViewItem>()
 
     override fun getItemCount(): Int = mediaList.size
 
-    fun setList(newMediaList: List<ExpensesExtendedView>) {
+    override fun getItemViewType(position: Int): Int = when (mediaList[position]) {
+        is ViewItem.DateItem -> GALLERY_GRID_TYPE_ITEM_TITLE
+        is ViewItem.ImageItem -> GALLERY_GRID_TYPE_ITEM_PHOTO
+    }
 
-        val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                mediaList[oldItemPosition].id == newMediaList[newItemPosition].id
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        when (viewType) {
+            1 -> GalleryGridHeaderViewHolder(
+                LayoutInflater
+                    .from(parent.context)
+                    .inflate(R.layout.gallery_grid_item_date, parent, false)
+            )
+            else -> GalleryGridViewHolder(
+                LayoutInflater
+                    .from(parent.context)
+                    .inflate(R.layout.gallery_grid_item, parent, false),
+                clickListener
 
-            override fun getOldListSize(): Int = mediaList.size
+            )
+        }
 
-            override fun getNewListSize(): Int = newMediaList.size
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is GalleryGridViewHolder -> {
+                val item = mediaList[position]
+                holder.bind(item)
+            }
+            is GalleryGridHeaderViewHolder -> holder.bind(mediaList[position])
+        }
+    }
 
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                mediaList[oldItemPosition].imageUri == newMediaList[newItemPosition].imageUri
+    fun setList(newMediaList: List<ViewItem>) {
 
-        })
-        mediaList = newMediaList
-        diff.dispatchUpdatesTo(this)
+        this.mediaList = newMediaList
+        notifyDataSetChanged()
 
     }
 

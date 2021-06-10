@@ -31,6 +31,13 @@ class ExpensesViewHolder(
                 clickEventDelegate.onLongClick(item)
                 return@setOnLongClickListener true
             }
+            photoTextView.visibility = if (data.imageUri == null) View.GONE else View.VISIBLE
+            locationTextView.visibility = if (data.location == null) View.INVISIBLE else View.VISIBLE
+
+            /*locationImageView.visibility = if ( data.location == null )  View.INVISIBLE else View.VISIBLE
+            attachmentImageView.visibility =
+                if (data.imageUri == null) View.INVISIBLE else View.VISIBLE*/
+
             sumTextView.text = data.sum.toString()
             expenseTextView.text = data.expense
             currencyTextView.text = data.currency
@@ -48,8 +55,7 @@ class ExpensesViewHolder(
             data.rate?.let {
                 rateTextView.text = DecimalFormat(pattern).format(data.sum * it)
             }
-            attachmentImageView.visibility =
-                if (data.imageUri == null) View.INVISIBLE else View.VISIBLE
+
         }
 
     }

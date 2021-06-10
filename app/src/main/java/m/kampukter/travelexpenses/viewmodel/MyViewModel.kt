@@ -289,6 +289,7 @@ class MyViewModel(
                         expensesRepository.addExpenses(lastExpenses)
                     }
                 }
+                lastExpenses = ExpensesExtendedView()
             }
             addSource(expenseList) {
                 lastExpenseList = it

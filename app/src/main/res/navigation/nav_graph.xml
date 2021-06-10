@@ -350,6 +350,9 @@
             tools:layout="@layout/gallery_fragment">
 
         <action
+                android:id="@+id/toGalleryFragment"
+                app:destination="@+id/galleryFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
 

@@ -46,6 +46,7 @@ class GalleryFragment : Fragment() {
         pageAdapter = GalleryPageAdapter()
 
         photoPager.adapter = pageAdapter
+
         photoPager.setPageTransformer { _, _ ->
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             imageInGalleryToggleButton.visibility = View.VISIBLE
@@ -95,6 +96,7 @@ class GalleryFragment : Fragment() {
         viewModel.expensesInFolder.observe(viewLifecycleOwner) { (_, expenses) ->
             val collection = expenses.filter { it.imageUri != null }
             pageAdapter.setList(collection)
+
             photoPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
@@ -106,8 +108,12 @@ class GalleryFragment : Fragment() {
                                 imageInGalleryToggleButton.visibility = View.INVISIBLE
                             }
                             delButton.id -> {
-                                val bundle = bundleOf("expensesIdDelImage" to collection[position].id )
-                                navController.navigate(R.id.delPhotoFromGalleryDialogFragment, bundle)
+                                val bundle =
+                                    bundleOf("expensesIdDelImage" to collection[position].id)
+                                navController.navigate(
+                                    R.id.delPhotoFromGalleryDialogFragment,
+                                    bundle
+                                )
                             }
                             shareButton.id -> {
                                 val sendIntent: Intent = Intent().apply {
@@ -139,6 +145,12 @@ class GalleryFragment : Fragment() {
                     }
                 }
             })
+            arguments?.getLong("galleryItemId")?.let { idPhoto ->
+                val currentItem = collection.indexOfFirst { it.id == idPhoto }
+                if (currentItem != -1) photoPager.post {
+                    photoPager.setCurrentItem(currentItem, false)
+                }
+            }
         }
     }
 
@@ -155,7 +167,7 @@ class GalleryFragment : Fragment() {
 
     private fun bottomSheetInit(item: ExpensesExtendedView) {
         sumTextView.text = item.sum.toString()
-        expenseTextView.text = item.expense_id.toString()
+        expenseTextView.text = item.expense
         currencyTextView.text = item.currency
         noteTextView.text = item.note
         dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", item.dateTime)
