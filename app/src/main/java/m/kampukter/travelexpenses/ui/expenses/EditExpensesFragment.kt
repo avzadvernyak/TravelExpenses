@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -19,8 +20,6 @@ import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.*
 
 
@@ -56,6 +55,8 @@ class EditExpensesFragment : Fragment() {
             currentIdExpenses = it
         }
         viewModel.expensesEdit.observe(viewLifecycleOwner) { (expenses, currencyList) ->
+
+            dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
 
             if (expenseTextInputEdit.text.toString() != expenses.expense) expenseTextInputEdit.setText(
                 expenses.expense

@@ -31,30 +31,30 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-       <!-- <ImageView
-                android:id="@+id/attachmentImageView"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="8dp"
-                android:alpha=".75"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_photo_24"
-                app:layout_constraintStart_toEndOf="@id/dateTimeTextView"
-                app:layout_constraintTop_toTopOf="parent" />
+        <!-- <ImageView
+                 android:id="@+id/attachmentImageView"
+                 android:layout_width="24dp"
+                 android:layout_height="24dp"
+                 android:layout_marginStart="2dp"
+                 android:layout_marginTop="8dp"
+                 android:alpha=".75"
+                 android:contentDescription="@null"
+                 android:src="@drawable/ic_photo_24"
+                 app:layout_constraintStart_toEndOf="@id/dateTimeTextView"
+                 app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-                android:id="@+id/locationImageView"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="1dp"
-                android:layout_marginTop="8dp"
-                android:alpha=".5"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_where_to_vote"
-                app:layout_constraintStart_toEndOf="@id/attachmentImageView"
-                app:layout_constraintTop_toTopOf="parent" />
--->
+         <ImageView
+                 android:id="@+id/locationImageView"
+                 android:layout_width="24dp"
+                 android:layout_height="24dp"
+                 android:layout_marginStart="1dp"
+                 android:layout_marginTop="8dp"
+                 android:alpha=".5"
+                 android:contentDescription="@null"
+                 android:src="@drawable/ic_where_to_vote"
+                 app:layout_constraintStart_toEndOf="@id/attachmentImageView"
+                 app:layout_constraintTop_toTopOf="parent" />
+ -->
         <TextView
                 android:id="@+id/sumTextView"
                 android:layout_width="0dp"
@@ -110,39 +110,38 @@
                 android:layout_marginBottom="8dp"
                 android:textAlignment="textStart"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toTopOf="@id/photoTextView"
+                app:layout_constraintBottom_toTopOf="@id/photoChip"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/expenseTextView" />
 
-        <TextView
-                android:id="@+id/photoTextView"
+        <com.google.android.material.chip.Chip
+                android:id="@+id/photoChip"
+                style="@style/AppTheme.AdvancedChipText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
-                android:background="@drawable/back"
-                android:padding="2dp"
-                android:text="Фото"
-                android:textAlignment="textStart"
-                android:textSize="10sp"
+                android:text="@string/photo"
+
+                app:chipIcon="@drawable/ic_photo_24"
 
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/noteTextView"
 
-        <TextView
-                android:id="@+id/locationTextView"
+                />
+        <com.google.android.material.chip.Chip
+                android:id="@+id/locationChip"
+                style="@style/AppTheme.AdvancedChipText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
-                android:background="@drawable/back"
-                android:padding="2dp"
-                android:text="Карта"
-                android:textAlignment="textStart"
-                android:textSize="10sp"
+                android:text="@string/map"
 
-                app:layout_constraintStart_toEndOf="@id/photoTextView"
+                app:chipIcon="@drawable/ic_gps_fixed_24"
+
+                app:layout_constraintStart_toEndOf="@id/photoChip"
                 app:layout_constraintTop_toBottomOf="@+id/noteTextView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

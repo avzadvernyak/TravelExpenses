@@ -106,5 +106,7 @@
     <string name="take_photo">Take Photo</string>
     <string name="menu_folders">Папки расходов</string>
     <string name="points_is_empty">Записей с локацией нет</string>
+    <string name="map">Карта</string>
+    <string name="photo">Фото</string>
 
 </resources>
