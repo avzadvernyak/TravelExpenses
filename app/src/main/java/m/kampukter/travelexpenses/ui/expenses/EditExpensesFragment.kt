@@ -93,6 +93,9 @@ class EditExpensesFragment : Fragment() {
                 navController.navigate(R.id.toChoiceExpenseForEditFragment, bundle)
             }
         }
+        locationChip.setOnClickListener {
+            navController.navigate(R.id.toMapPointFragment)
+        }
         currencyTextInputEdit.onFocusChangeListener = View.OnFocusChangeListener { _, p1 ->
             if (p1) {
                 (activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)

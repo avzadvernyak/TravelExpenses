@@ -64,10 +64,12 @@ class MapExpensesFragment : Fragment() {
         Configuration.getInstance()
             .load(view.context, PreferenceManager.getDefaultSharedPreferences(view.context))
 
-        mapMapView.setTileSource(TileSourceFactory.MAPNIK)
-        mapMapView.setMultiTouchControls(true)
-        mapMapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
-
+        with( mapMapView ) {
+            setTileSource(TileSourceFactory.MAPNIK)
+            setMultiTouchControls(true)
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
+            isTilesScaledToDpi = true
+        }
         val mapController = mapMapView.controller
 
         viewModel.paramMapViewLiveData.observe(viewLifecycleOwner, {

@@ -50,7 +50,7 @@
     <style name="AppTheme.AdvancedChipText" parent="TextAppearance.MaterialComponents.Chip">
         <item name="android:textAppearance">@style/SmallerText</item>
         <item name="chipMinTouchTargetSize">0dp</item>
-        <item name="chipMinHeight">18dp</item>
+        <item name="chipMinHeight">20dp</item>
         <item name="chipStrokeColor">#B1BCBE</item>
         <item name="chipStrokeWidth">1dp</item>
         <item name="chipIconSize">12dp</item>
@@ -58,7 +58,7 @@
     </style>
 
     <style name="SmallerText" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">14sp</item>
 
     </style>
 </resources>

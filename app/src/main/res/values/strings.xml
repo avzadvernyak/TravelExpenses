@@ -108,5 +108,6 @@
     <string name="points_is_empty">Записей с локацией нет</string>
     <string name="map">Карта</string>
     <string name="photo">Фото</string>
+    <string name="nav_label_view_map">View Point on Map</string>
 
 </resources>
