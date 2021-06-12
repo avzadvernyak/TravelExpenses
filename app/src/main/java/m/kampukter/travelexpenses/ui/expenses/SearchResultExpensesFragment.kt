@@ -5,11 +5,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +19,7 @@ import kotlinx.android.synthetic.main.search_result_expenses_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesExtendedView
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
+import m.kampukter.travelexpenses.ui.ExpensesClickEventDelegate
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -29,6 +32,50 @@ class SearchResultExpensesFragment : Fragment() {
 
     private lateinit var navController: NavController
     private var actionMode: ActionMode? = null
+
+    private var isInSelection = false
+
+    val countSelectedItem = MutableLiveData<Int>()
+
+    private val expensesClickEventDelegate: ExpensesClickEventDelegate<ExpensesMainCollection> =
+        object : ExpensesClickEventDelegate<ExpensesMainCollection> {
+            override fun onClick(item: ExpensesMainCollection) {
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    val bundle = bundleOf("expensesId" to item.id)
+                    navController.navigate(R.id.toEditExpensesFragment, bundle)
+                }
+            }
+
+            override fun onLongClick(item: ExpensesMainCollection) {
+                expensesAdapter?.let { adapter ->
+                    if (!isInSelection) {
+                        (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                        isInSelection = true
+                        countSelectedItem.postValue(adapter.toggleItemSelection(item))
+                    }
+                }
+            }
+
+            override fun onLocationClick(item: ExpensesMainCollection) {
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    viewModel.expensesIdEdit(item.id)
+                    navController.navigate(R.id.toMapPointFragment)
+                }
+            }
+
+            override fun onPhotoClick(item: ExpensesMainCollection) {
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    val bundle = bundleOf("galleryItemId" to item.id)
+                    navController.navigate(R.id.toGalleryFragment, bundle)
+                }
+            }
+        }
 
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -88,22 +135,16 @@ class SearchResultExpensesFragment : Fragment() {
 
         navController = findNavController()
 
-        expensesAdapter =
-            ExpensesAdapter(view.context) { item ->
-                val bundle = bundleOf("expensesId" to item.id)
-                navController.navigate(R.id.toEditExpensesFragment, bundle)
-            }.apply {
-                enableActionMode(actionModeCallback) { count ->
-                    actionMode?.title = getString(R.string.expenses_am_title_count, count)
-                    if (count == 0) {
-                        actionMode?.finish()
-                        expensesAdapter?.endSelection()
-                    }
-                }
-                viewModel.savedStateSearchFragmentLiveData.observe(viewLifecycleOwner, {
+        expensesAdapter = ExpensesAdapter(expensesClickEventDelegate).apply {
+            viewModel.savedStateSearchFragmentLiveData.observe(viewLifecycleOwner, {
+                if (it.isNotEmpty()) {
+                    (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                    isInSelection = true
                     this.setSelection(it)
-                })
-            }
+                    actionMode?.title = getString(R.string.expenses_am_title_count, it.size)
+                }
+            })
+        }
 
         with(resultRecyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -113,6 +154,17 @@ class SearchResultExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
+
+        countSelectedItem.observe(viewLifecycleOwner,
+            {
+                actionMode?.title = getString(R.string.expenses_am_title_count, it)
+                if (it == 0) {
+                    actionMode?.finish()
+                    expensesAdapter?.endSelection()
+                    isInSelection = false
+                }
+            })
+
         viewModel.expensesSearchResult.observe(viewLifecycleOwner, {
             val expenses = mutableListOf<ExpensesMainCollection>()
             expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.nav_label_search_result_expenses)))
@@ -202,8 +254,7 @@ class SearchResultExpensesFragment : Fragment() {
                     expenses.note,
                     expenses.sum,
                     expenses.currency,
-                    date
-                    ,
+                    date,
                     expenses.folderName
                 )
             )

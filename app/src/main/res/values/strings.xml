@@ -98,7 +98,7 @@
     <string name="expenses_am_action_move">Перенести</string>
     <string name="expenses_am_action_del">Удалить</string>
     <string name="expenses_am_title_count">Выбрано: %1$d</string>
-    <string name="msg_sent_to">%1$s \n%2$s \n%3$8.2f %4$s \n%5$s ;\n"</string>
+    <string name="msg_sent_to">%1$s \n%2$s \n%3$8.2f %4$s \n%5$s ;\n%6$s"</string>
     <string name="folder_name_validate_msg_duplicate">Такое имя уже есть</string>
     <string name="folder_name_validate_msg_empty">Заполните поле</string>
     <string name="expenses">Расходы %1$s</string>

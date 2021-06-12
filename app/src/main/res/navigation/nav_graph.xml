@@ -21,6 +21,12 @@
                 android:id="@+id/toAddExpensesFragment"
                 app:destination="@+id/addExpensesFragment" />
         <action
+                android:id="@+id/toMapPointFragment"
+                app:destination="@+id/mapPointFragment" />
+        <action
+                android:id="@+id/toGalleryFragment"
+                app:destination="@+id/galleryFragment" />
+        <action
                 android:id="@+id/toEditExpensesFragment"
                 app:destination="@+id/editExpensesFragment" />
         <action

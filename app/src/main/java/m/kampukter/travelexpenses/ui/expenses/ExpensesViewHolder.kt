@@ -10,12 +10,12 @@ import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_UAH
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
 import m.kampukter.travelexpenses.mainApplication
-import m.kampukter.travelexpenses.ui.ClickEventDelegate
+import m.kampukter.travelexpenses.ui.ExpensesClickEventDelegate
 import java.text.DecimalFormat
 
 class ExpensesViewHolder(
     itemView: View,
-    private val clickEventDelegate: ClickEventDelegate<ExpensesMainCollection>
+    private val clickEventDelegate: ExpensesClickEventDelegate<ExpensesMainCollection>
 ) : RecyclerView.ViewHolder(itemView) {
     private val defaultProgramCurrency = mainApplication.getActiveCurrencySession()
     fun bind(item: ExpensesMainCollection, isSelected: Boolean) {
@@ -24,6 +24,7 @@ class ExpensesViewHolder(
 
         with(itemView) {
             setSelected(isSelected)
+
             setOnClickListener {
                 clickEventDelegate.onClick(item)
             }
@@ -32,8 +33,12 @@ class ExpensesViewHolder(
                 return@setOnLongClickListener true
             }
             photoChip.visibility = if (data.imageUri == null) View.GONE else View.VISIBLE
-            locationChip.visibility = if (data.location == null) View.INVISIBLE else View.VISIBLE
+            photoChip.setOnClickListener { clickEventDelegate.onPhotoClick(item) }
 
+            locationChip.visibility = if (data.location == null) View.INVISIBLE else View.VISIBLE
+            locationChip.setOnClickListener {
+                clickEventDelegate.onLocationClick(item)
+            }
             /*locationImageView.visibility = if ( data.location == null )  View.INVISIBLE else View.VISIBLE
             attachmentImageView.visibility =
                 if (data.imageUri == null) View.INVISIBLE else View.VISIBLE*/

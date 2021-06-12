@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,6 +35,50 @@ class HomeExpensesFragment : Fragment() {
     private var expensesAdapter: ExpensesAdapter? = null
 
     private var actionMode: ActionMode? = null
+
+    private var isInSelection = false
+
+    val countSelectedItem = MutableLiveData<Int>()
+
+    private val expensesClickEventDelegate: ExpensesClickEventDelegate<ExpensesMainCollection> =
+        object : ExpensesClickEventDelegate<ExpensesMainCollection> {
+            override fun onClick(item: ExpensesMainCollection) {
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    val bundle = bundleOf("expensesId" to item.id)
+                    navController.navigate(R.id.toEditExpensesFragment, bundle)
+                }
+            }
+
+            override fun onLongClick(item: ExpensesMainCollection) {
+                expensesAdapter?.let { adapter ->
+                    if (!isInSelection) {
+                        (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                        isInSelection = true
+                        countSelectedItem.postValue(adapter.toggleItemSelection(item))
+                    }
+                }
+            }
+
+            override fun onLocationClick(item: ExpensesMainCollection) {
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    viewModel.expensesIdEdit(item.id)
+                    navController.navigate(R.id.toMapPointFragment)
+                }
+            }
+
+            override fun onPhotoClick(item: ExpensesMainCollection) {
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    val bundle = bundleOf("galleryItemId" to item.id)
+                    navController.navigate(R.id.toGalleryFragment, bundle)
+                }
+            }
+        }
 
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -69,6 +115,7 @@ class HomeExpensesFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode?) {
             actionMode = null
             expensesAdapter?.endSelection()
+            isInSelection = false
         }
     }
 
@@ -92,22 +139,17 @@ class HomeExpensesFragment : Fragment() {
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
 
-        expensesAdapter =
-            ExpensesAdapter(view.context) { item ->
-                val bundle = bundleOf("expensesId" to item.id)
-                navController.navigate(R.id.toEditExpensesFragment, bundle)
-            }.apply {
-                enableActionMode(actionModeCallback) { count ->
-                    actionMode?.title = getString(R.string.expenses_am_title_count, count)
-                    if (count == 0) {
-                        actionMode?.finish()
-                        this.endSelection()
-                    }
-                }
-                viewModel.savedStateHomeFragmentLiveData.observe(viewLifecycleOwner, {
+        expensesAdapter = ExpensesAdapter(expensesClickEventDelegate).apply {
+            viewModel.savedStateHomeFragmentLiveData.observe(viewLifecycleOwner, {
+                if (it.isNotEmpty()) {
+                    (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                    isInSelection = true
                     this.setSelection(it)
-                })
-            }
+                    actionMode?.title = getString(R.string.expenses_am_title_count, it.size)
+                }
+            })
+        }
+
         with(recyclerViewExpenses) {
             layoutManager = LinearLayoutManager(
                 context,
@@ -116,6 +158,15 @@ class HomeExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
+
+        countSelectedItem.observe(viewLifecycleOwner,
+            {
+                if (it == 0) {
+                    actionMode?.finish()
+                    expensesAdapter?.endSelection()
+                    isInSelection = false
+                } else actionMode?.title = getString(R.string.expenses_am_title_count, it)
+            })
 
         viewModel.expensesInFolder.observe(
             viewLifecycleOwner,

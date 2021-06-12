@@ -1,22 +1,18 @@
 package m.kampukter.travelexpenses.ui.expenses
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
-import m.kampukter.travelexpenses.ui.ClickEventDelegate
+import m.kampukter.travelexpenses.ui.ExpensesClickEventDelegate
 
 private const val TYPE_HEADER: Int = 2
 private const val TYPE_LIST: Int = 1
 
 class ExpensesAdapter(
-    private val context: Context,
-    private var clickListener: ((ExpensesMainCollection) -> Unit)? = null
+    private var clickListener: ExpensesClickEventDelegate<ExpensesMainCollection>
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -24,33 +20,9 @@ class ExpensesAdapter(
 
     private var selectedItems = mutableSetOf<ExpensesMainCollection>()
 
-    private var isInSelection = false
-    private var actionModeCallback: ActionMode.Callback? = null
     private var selectionCountListener: ((Int) -> Unit)? = null
 
-
-    private val clickEventDelegate: ClickEventDelegate<ExpensesMainCollection> =
-        object : ClickEventDelegate<ExpensesMainCollection> {
-            override fun onClick(item: ExpensesMainCollection) {
-                if (isInSelection) {
-                    toggleItemSelection(item)
-                } else {
-                    clickListener?.invoke(item)
-                }
-            }
-
-            override fun onLongClick(item: ExpensesMainCollection) {
-                if (!isInSelection) {
-                    actionModeCallback?.let { callback ->
-                        (context as AppCompatActivity).startSupportActionMode(callback)
-                        isInSelection = true
-                        toggleItemSelection(item)
-                    }
-                }
-            }
-        }
-
-    private fun toggleItemSelection(item: ExpensesMainCollection) {
+    fun toggleItemSelection(item: ExpensesMainCollection): Int {
         if (selectedItems.contains(item)) {
             selectedItems.remove(item)
         } else {
@@ -58,6 +30,7 @@ class ExpensesAdapter(
         }
         notifyItemChanged(expenses.indexOf(item))
         selectionCountListener?.invoke(selectedItems.size)
+        return selectedItems.size
     }
 
     override fun getItemCount(): Int = expenses.size
@@ -79,7 +52,7 @@ class ExpensesAdapter(
                 LayoutInflater
                     .from(parent.context)
                     .inflate(R.layout.expenses_item, parent, false),
-                clickEventDelegate
+                clickListener//clickEventDelegate
             )
         }
 
@@ -113,28 +86,14 @@ class ExpensesAdapter(
         diff.dispatchUpdatesTo(this)
     }
 
-    fun enableActionMode(
-        actionModeCallback: ActionMode.Callback,
-        selectionCountListener: (Int) -> Unit
-    ) {
-        this.actionModeCallback = actionModeCallback
-        this.selectionCountListener = selectionCountListener
-    }
-
     fun getSelectedItems(): List<ExpensesMainCollection> = selectedItems.toList()
     fun setSelection(expenses: List<ExpensesMainCollection>) {
         if (expenses.isNotEmpty()) {
-            actionModeCallback?.let<ActionMode.Callback, Unit> { callback ->
-                (context as AppCompatActivity).startSupportActionMode(callback)
-                isInSelection = true
-                selectedItems.addAll(expenses)
-                selectionCountListener?.invoke(selectedItems.size)
-            }
+            selectedItems.addAll(expenses)
         }
     }
 
     fun endSelection() {
-        isInSelection = false
         val selectedItemsCache = selectedItems.toSet()
         selectedItems.clear()
         selectedItemsCache.forEach { selectedItem ->

@@ -17,9 +17,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
 
-
-
-
 class MapPointFragment: Fragment() {
     private val viewModel by sharedViewModel<MyViewModel>()
     override fun onCreateView(
