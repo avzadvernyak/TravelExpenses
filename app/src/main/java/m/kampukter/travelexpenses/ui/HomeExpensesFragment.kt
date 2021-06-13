@@ -40,45 +40,6 @@ class HomeExpensesFragment : Fragment() {
 
     val countSelectedItem = MutableLiveData<Int>()
 
-    private val expensesClickEventDelegate: ExpensesClickEventDelegate<ExpensesMainCollection> =
-        object : ExpensesClickEventDelegate<ExpensesMainCollection> {
-            override fun onClick(item: ExpensesMainCollection) {
-                if (isInSelection) {
-                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
-                } else {
-                    val bundle = bundleOf("expensesId" to item.id)
-                    navController.navigate(R.id.toEditExpensesFragment, bundle)
-                }
-            }
-
-            override fun onLongClick(item: ExpensesMainCollection) {
-                expensesAdapter?.let { adapter ->
-                    if (!isInSelection) {
-                        (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
-                        isInSelection = true
-                        countSelectedItem.postValue(adapter.toggleItemSelection(item))
-                    }
-                }
-            }
-
-            override fun onLocationClick(item: ExpensesMainCollection) {
-                if (isInSelection) {
-                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
-                } else {
-                    viewModel.expensesIdEdit(item.id)
-                    navController.navigate(R.id.toMapPointFragment)
-                }
-            }
-
-            override fun onPhotoClick(item: ExpensesMainCollection) {
-                if (isInSelection) {
-                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
-                } else {
-                    val bundle = bundleOf("galleryItemId" to item.id)
-                    navController.navigate(R.id.toGalleryFragment, bundle)
-                }
-            }
-        }
 
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -139,7 +100,42 @@ class HomeExpensesFragment : Fragment() {
             activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
 
-        expensesAdapter = ExpensesAdapter(expensesClickEventDelegate).apply {
+        expensesAdapter = ExpensesAdapter().apply {
+            onClick = { item ->
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    navController.navigate(
+                        R.id.toEditExpensesFragment,
+                        bundleOf("expensesId" to item.id)
+                    )
+                }
+            }
+            onLongClick = { item ->
+                if (!isInSelection) {
+                    (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                    isInSelection = true
+                    countSelectedItem.postValue(toggleItemSelection(item))
+                }
+            }
+            onLocationClick = { item ->
+                if (isInSelection) {
+                    countSelectedItem.postValue(toggleItemSelection(item))
+                } else {
+                    viewModel.expensesIdEdit(item.id)
+                    navController.navigate(R.id.toMapPointFragment)
+                }
+            }
+            onPhotoClick = { item ->
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    navController.navigate(
+                        R.id.toGalleryFragment,
+                        bundleOf("galleryItemId" to item.id)
+                    )
+                }
+            }
             viewModel.savedStateHomeFragmentLiveData.observe(viewLifecycleOwner, {
                 if (it.isNotEmpty()) {
                     (context as AppCompatActivity).startSupportActionMode(actionModeCallback)

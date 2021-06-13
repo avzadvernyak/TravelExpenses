@@ -6,21 +6,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.ExpensesMainCollection
-import m.kampukter.travelexpenses.ui.ExpensesClickEventDelegate
 
 private const val TYPE_HEADER: Int = 2
 private const val TYPE_LIST: Int = 1
 
-class ExpensesAdapter(
-    private var clickListener: ExpensesClickEventDelegate<ExpensesMainCollection>
-) :
+typealias ClickExpenses = ((ExpensesMainCollection) -> Unit)
+
+class ExpensesAdapter :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var expenses = emptyList<ExpensesMainCollection>()
 
     private var selectedItems = mutableSetOf<ExpensesMainCollection>()
 
-    private var selectionCountListener: ((Int) -> Unit)? = null
+    lateinit var onClick: ClickExpenses
+    lateinit var onLongClick: ClickExpenses
+    lateinit var onLocationClick: ClickExpenses
+    lateinit var onPhotoClick: ClickExpenses
 
     fun toggleItemSelection(item: ExpensesMainCollection): Int {
         if (selectedItems.contains(item)) {
@@ -29,7 +31,6 @@ class ExpensesAdapter(
             selectedItems.add(item)
         }
         notifyItemChanged(expenses.indexOf(item))
-        selectionCountListener?.invoke(selectedItems.size)
         return selectedItems.size
     }
 
@@ -52,7 +53,10 @@ class ExpensesAdapter(
                 LayoutInflater
                     .from(parent.context)
                     .inflate(R.layout.expenses_item, parent, false),
-                clickListener//clickEventDelegate
+                onClick,
+                onLongClick,
+                onLocationClick,
+                onPhotoClick
             )
         }
 
@@ -60,7 +64,10 @@ class ExpensesAdapter(
         when (holder) {
             is ExpensesViewHolder -> {
                 val item = expenses[position]
-                holder.bind(item, selectedItems.contains(item))
+                holder.bind(
+                    item,
+                    selectedItems.contains(item)
+                )
             }
             is ExpensesHeaderViewHolder -> holder.bind(expenses[position])
         }
@@ -69,7 +76,6 @@ class ExpensesAdapter(
     fun setList(newListExpenses: List<ExpensesMainCollection>) {
         selectedItems =
             selectedItems.filter { expense -> expenses.contains(expense) }.toMutableSet()
-        selectionCountListener?.invoke(selectedItems.size)
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
                 expenses[oldItemPosition].id == newListExpenses[newItemPosition].id
