@@ -1,18 +1,29 @@
 package m.kampukter.travelexpenses.ui.map
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.text.format.DateFormat
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.map_expenses_fragment.*
+import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
+import m.kampukter.travelexpenses.ui.STATUS_GPS_OFF
+import m.kampukter.travelexpenses.ui.STATUS_GPS_ON
+import m.kampukter.travelexpenses.ui.permissionsForLocation
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.osmdroid.config.Configuration
@@ -20,6 +31,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,6 +40,9 @@ import java.util.*
 class MapExpensesFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
+
+    private var myLocationNewOverlay: MyLocationNewOverlay? = null
+
     private var firstStart = true
 
     private val actionModeCallback = object : ActionMode.Callback {
@@ -64,7 +80,7 @@ class MapExpensesFragment : Fragment() {
         Configuration.getInstance()
             .load(view.context, PreferenceManager.getDefaultSharedPreferences(view.context))
 
-        with( mapMapView ) {
+        with(mapMapView) {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
@@ -151,35 +167,40 @@ class MapExpensesFragment : Fragment() {
                 if (pointsLatitudeMax - pointsLatitudeMin == -360.0) {
                     Snackbar.make(view, getString(R.string.points_is_empty), Snackbar.LENGTH_SHORT)
                         .show()
-                    if (filter !is FilterForExpensesMap.All) viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
+                    if (filter !is FilterForExpensesMap.All) viewModel.setFilterForExpensesMap(
+                        FilterForExpensesMap.All
+                    )
                 }
-
-                when  {
+                when {
                     pointsLatitudeMax - pointsLatitudeMin > 360 -> mapController.setZoom(0.1)
-                    pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(1.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(2.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 45 -> mapController.setZoom(3.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 22.5 -> mapController.setZoom(4.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 11.25 -> mapController.setZoom(5.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 5.625 -> mapController.setZoom(6.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 2.813 -> mapController.setZoom(7.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 1.406 -> mapController.setZoom(8.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.703 -> mapController.setZoom(9.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.352 -> mapController.setZoom(10.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.176 -> mapController.setZoom(11.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(12.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(13.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(14.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.011 -> mapController.setZoom(15.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.0055 -> mapController.setZoom(16.0)
-                    pointsLatitudeMax - pointsLatitudeMin > 0.00255 -> mapController.setZoom(17.0)
-                    else -> mapController.setZoom(18.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 180 -> mapController.setZoom(0.5)
+                    pointsLatitudeMax - pointsLatitudeMin > 90 -> mapController.setZoom(1.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 45 -> mapController.setZoom(2.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 22.5 -> mapController.setZoom(3.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 11.25 -> mapController.setZoom(4.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 5.625 -> mapController.setZoom(5.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 2.813 -> mapController.setZoom(6.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 1.406 -> mapController.setZoom(7.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.703 -> mapController.setZoom(8.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.352 -> mapController.setZoom(9.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.176 -> mapController.setZoom(10.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.088 -> mapController.setZoom(11.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.044 -> mapController.setZoom(12.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.022 -> mapController.setZoom(13.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.011 -> mapController.setZoom(14.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.0055 -> mapController.setZoom(15.0)
+                    pointsLatitudeMax - pointsLatitudeMin > 0.00255 -> mapController.setZoom(16.0)
+                    else -> mapController.setZoom(17.0)
                 }
                 mapController.setCenter(GeoPoint(centerLatitude, centerLongitude))
             } else {
-                if (filter !is FilterForExpensesMap.All ) {
+                if (filter !is FilterForExpensesMap.All) {
                     viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
-                    Snackbar.make(mapMapView, getString(R.string.points_is_empty), Snackbar.LENGTH_SHORT)
+                    Snackbar.make(
+                        mapMapView,
+                        getString(R.string.points_is_empty),
+                        Snackbar.LENGTH_SHORT
+                    )
                         .show()
                 }
             }
@@ -188,17 +209,58 @@ class MapExpensesFragment : Fragment() {
     }
 
     override fun onResume() {
-        mapMapView.onResume()
         super.onResume()
 
+        currentLocationFAB.visibility = View.INVISIBLE
+        mapMapView.onResume()
+        context?.let { context ->
+            viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, { settings ->
+                if (settings.statusGPS == STATUS_GPS_ON) {
+                    val isLocationPermission = permissionsForLocation.all {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            it
+                        ) == PackageManager.PERMISSION_GRANTED
+                    }
+                    if (isLocationPermission) {
+                        val manager =
+                            context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        } else {
+
+                            myLocationNewOverlay = MyLocationNewOverlay(
+                                GpsMyLocationProvider(context),
+                                mapMapView
+                            )
+                            myLocationNewOverlay?.enableMyLocation()
+                            myLocationNewOverlay?.runOnFirstFix {
+                                lifecycleScope.launch {
+                                    mapMapView.overlays.add(myLocationNewOverlay)
+                                    currentLocationFAB.visibility = View.VISIBLE
+                                    currentLocationFAB.setOnClickListener {
+                                        mapMapView.controller.animateTo(myLocationNewOverlay?.myLocation)
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
+                        findNavController().navigate(R.id.toLocationPermissionsDialogFragment)
+                    }
+                }
+            })
+        }
     }
 
     override fun onPause() {
+        super.onPause()
+        myLocationNewOverlay?.disableMyLocation()
+        currentLocationFAB.visibility = View.INVISIBLE
         mapMapView.onPause()
         viewModel.setParamMapView(
             Pair(mapMapView.zoomLevelDouble, (mapMapView.mapCenter as GeoPoint))
         )
-        super.onPause()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -210,7 +272,6 @@ class MapExpensesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.pointsDateFilter -> {
-                //Log.d("blabla", "DateFilter")
                 val pickerRange = MaterialDatePicker.Builder.dateRangePicker().build()
                 pickerRange.show(parentFragmentManager, "Picker")
                 pickerRange.addOnPositiveButtonClickListener { dateSelected ->
@@ -218,7 +279,8 @@ class MapExpensesFragment : Fragment() {
                     val startLong =
                         SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(start)?.time
                     val end = DateFormat.format("yyyyMMdd", dateSelected.second).toString()
-                    val endLong = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(end)?.time
+                    val endLong =
+                        SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(end)?.time
                     if (startLong != null && endLong != null)
                         viewModel.setFilterForExpensesMap(
                             FilterForExpensesMap.DateRangeFilter(

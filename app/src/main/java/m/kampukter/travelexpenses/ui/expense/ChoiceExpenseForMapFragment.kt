@@ -33,7 +33,7 @@ class ChoiceExpenseForMapFragment: Fragment() {
 
         expenseAdapter = ExpenseChoiceAdapter{ item->
             viewModel.setFilterForExpensesMap(FilterForExpensesMap.ExpenseFilter( item ))
-            findNavController().navigate(R.id.next_action)
+            findNavController().navigateUp()
         }
         with(recyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(

@@ -52,6 +52,9 @@
                 android:id="@id/aboutDialogFragment"
                 android:icon="@drawable/ic_info_24"
                 android:title="@string/menu_about" />
+        <item
+                android:id="@id/mapGoogleFragment"
+                android:title="Google Maps" />
     </group>
 
 </menu>

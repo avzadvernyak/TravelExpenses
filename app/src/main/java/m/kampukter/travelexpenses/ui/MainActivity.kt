@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             toolbar.setOnClickListener(null)
             when (destination.id) {
                 R.id.homeExpensesFragment -> {
-                    toolbar.visibility = View.VISIBLE
+                    cardViewToolbarCardView.visibility = View.VISIBLE
                     enableLayoutBehaviour()
                     addExpensesExtendedFab.show()
 
@@ -75,21 +75,31 @@ class MainActivity : AppCompatActivity() {
                 R.id.expenseFragment -> {
                     enableLayoutBehaviour()
                     addExpenseFab.show()
-                    toolbar.visibility = View.VISIBLE
+                    cardViewToolbarCardView.visibility = View.VISIBLE
                 }
                 R.id.foldersFragment -> {
                     enableLayoutBehaviour()
                     addExpenseFab.show()
-                    toolbar.visibility = View.VISIBLE
+                    cardViewToolbarCardView.visibility = View.VISIBLE
                 }
                 R.id.exchangeFragment -> {
                     enableLayoutBehaviour()
-                    toolbar.visibility = View.VISIBLE
+                    cardViewToolbarCardView.visibility = View.VISIBLE
+                }
+
+                R.id.mapPointFragment -> {
+                    disableLayoutBehaviour()
+                    cardViewToolbarCardView.visibility = View.GONE
+                }
+
+                R.id.mapGoogleFragment -> {
+                    disableLayoutBehaviour()
                 }
 
                 R.id.cameraXFragment,
                 R.id.attachmentPhotoViewFragment,
-                R.id.delAttachmentPhotoDialogFragment -> toolbar.visibility = View.GONE
+                R.id.delAttachmentPhotoDialogFragment -> cardViewToolbarCardView.visibility =
+                    View.GONE
 
                 R.id.foldersAddFragment,
                 R.id.mapExpensesFragment,
@@ -97,12 +107,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.editExpensesFragment,
                 R.id.addExpensesFragment -> {
                     disableLayoutBehaviour()
-                    toolbar.visibility = View.VISIBLE
+                    cardViewToolbarCardView.visibility = View.VISIBLE
                 }
                 /*R.id.expensesMoveFragment -> {
                     toolbar.visibility = View.VISIBLE
                 }*/
-                else -> toolbar.visibility = View.VISIBLE
+                else -> cardViewToolbarCardView.visibility = View.VISIBLE
             }
         }
 

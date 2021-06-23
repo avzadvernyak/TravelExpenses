@@ -243,7 +243,7 @@ class MyViewModel(
 
     private val newExpensesExpense = MutableLiveData<Long>()
     fun setLastExpense(id: Long) {
-        newExpensesExpense.postValue( id )
+        newExpensesExpense.postValue(id)
     }
 
     private val newExpensesSum = MutableLiveData<Double>()
@@ -253,21 +253,22 @@ class MyViewModel(
 
     private val newExpensesNote = MutableLiveData<String>()
     fun setLastNote(note: String) {
-        newExpensesNote.postValue( note )
+        newExpensesNote.postValue(note)
     }
+
     private val newExpensesCurrency = MutableLiveData<String>()
     fun setLastCurrency(currency: String) {
-        newExpensesCurrency.postValue( currency )
+        newExpensesCurrency.postValue(currency)
     }
 
     private val newExpensesLocation = MutableLiveData<MyLocation?>()
     fun setLastLocation(location: MyLocation) {
-        newExpensesLocation.postValue( location )
+        newExpensesLocation.postValue(location)
     }
 
     private val newExpensesImageURI = MutableLiveData<String?>()
     fun setLastUriPhoto(imageUri: String?) {
-        newExpensesImageURI.postValue( imageUri )
+        newExpensesImageURI.postValue(imageUri)
     }
 
     private val isAddNewExpense = MutableLiveData<Boolean>()
@@ -303,27 +304,27 @@ class MyViewModel(
                 lastCurrencyList = it
                 update()
             }
-            addSource(newExpensesImageURI){
+            addSource(newExpensesImageURI) {
                 lastExpenses = lastExpenses.copy(imageUri = it)
                 update()
             }
-            addSource(newExpensesLocation){
+            addSource(newExpensesLocation) {
                 lastExpenses = lastExpenses.copy(location = it)
                 update()
             }
-            addSource(newExpensesNote){
+            addSource(newExpensesNote) {
                 lastExpenses = lastExpenses.copy(note = it)
                 update()
             }
-            addSource(newExpensesSum){
+            addSource(newExpensesSum) {
                 lastExpenses = lastExpenses.copy(sum = it)
                 update()
             }
-            addSource(newExpensesExpense){
-                lastExpenses = lastExpenses.copy( expense_id = it)
+            addSource(newExpensesExpense) {
+                lastExpenses = lastExpenses.copy(expense_id = it)
                 update()
             }
-            addSource(newExpensesCurrency){
+            addSource(newExpensesCurrency) {
                 lastExpenses = lastExpenses.copy(currency = it)
                 update()
             }
@@ -594,5 +595,15 @@ Search in Expenses
 
     fun getSearchResultExpensesOpenActive() = isSearchResultExpensesActive
 
+    /*
+    Set the map type
+    */
+    private val lastMapType = MutableLiveData<Int>().apply { postValue(1 ) }
+    val lastMapTypeLiveData: LiveData<Int>
+        get() = lastMapType
+
+    fun setMapType(typeMaps: Int) {
+        lastMapType.postValue(typeMaps)
+    }
 }
 

@@ -12,7 +12,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,9 +36,6 @@ class HomeExpensesFragment : Fragment() {
     private var actionMode: ActionMode? = null
 
     private var isInSelection = false
-
-    val countSelectedItem = MutableLiveData<Int>()
-
 
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -103,11 +99,12 @@ class HomeExpensesFragment : Fragment() {
         expensesAdapter = ExpensesAdapter().apply {
             onClick = { item ->
                 if (isInSelection) {
-                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                    expensesAdapter?.toggleItemSelection(item)?.let { showCountSelection(it) }
                 } else {
+                    val bundle = bundleOf("expensesId" to item.id)
                     navController.navigate(
                         R.id.toEditExpensesFragment,
-                        bundleOf("expensesId" to item.id)
+                        bundle
                     )
                 }
             }
@@ -115,12 +112,12 @@ class HomeExpensesFragment : Fragment() {
                 if (!isInSelection) {
                     (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
                     isInSelection = true
-                    countSelectedItem.postValue(toggleItemSelection(item))
+                    expensesAdapter?.toggleItemSelection(item)?.let { showCountSelection(it) }
                 }
             }
             onLocationClick = { item ->
                 if (isInSelection) {
-                    countSelectedItem.postValue(toggleItemSelection(item))
+                    expensesAdapter?.toggleItemSelection(item)?.let { showCountSelection(it) }
                 } else {
                     viewModel.expensesIdEdit(item.id)
                     navController.navigate(R.id.toMapPointFragment)
@@ -128,11 +125,12 @@ class HomeExpensesFragment : Fragment() {
             }
             onPhotoClick = { item ->
                 if (isInSelection) {
-                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                    expensesAdapter?.toggleItemSelection(item)?.let { showCountSelection(it) }
                 } else {
+                    val bundle = bundleOf("galleryItemId" to item.id)
                     navController.navigate(
                         R.id.toGalleryFragment,
-                        bundleOf("galleryItemId" to item.id)
+                        bundle
                     )
                 }
             }
@@ -154,15 +152,6 @@ class HomeExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
-
-        countSelectedItem.observe(viewLifecycleOwner,
-            {
-                if (it == 0) {
-                    actionMode?.finish()
-                    expensesAdapter?.endSelection()
-                    isInSelection = false
-                } else actionMode?.title = getString(R.string.expenses_am_title_count, it)
-            })
 
         viewModel.expensesInFolder.observe(
             viewLifecycleOwner,
@@ -199,6 +188,14 @@ class HomeExpensesFragment : Fragment() {
                 navController.navigate(R.id.toAddExpensesFragment)
             }
         }
+    }
+
+    private fun showCountSelection(countSelection: Int) {
+        if (countSelection == 0) {
+            actionMode?.finish()
+            expensesAdapter?.endSelection()
+            isInSelection = false
+        } else actionMode?.title = getString(R.string.expenses_am_title_count, countSelection)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

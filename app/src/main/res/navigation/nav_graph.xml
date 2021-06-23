@@ -167,7 +167,10 @@
             android:id="@+id/mapPointFragment"
             android:name="m.kampukter.travelexpenses.ui.map.MapPointFragment"
             android:label="@string/nav_label_view_map"
-            tools:layout="@layout/map_expenses_fragment">
+            tools:layout="@layout/map_point_fragment">
+        <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/editExpensesFragment" />
@@ -326,6 +329,9 @@
                 android:id="@+id/toChoiceExpenseForMapFragment"
                 app:destination="@id/choiceExpenseForMapFragment" />
         <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
@@ -423,5 +429,19 @@
         <action
                 android:id="@+id/toFoldersFragment"
                 app:popUpTo="@id/foldersFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/mapGoogleFragment"
+            android:name="m.kampukter.travelexpenses.ui.map.MapGoogleFragment"
+            android:label="@string/nav_map_google"
+            tools:layout="@layout/map_google_fragment">
+
+        <action
+                android:id="@+id/toChoiceExpenseForMapFragment"
+                app:destination="@id/choiceExpenseForMapFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+
     </fragment>
 </navigation>

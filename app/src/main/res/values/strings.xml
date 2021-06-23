@@ -109,5 +109,6 @@
     <string name="map">Карта</string>
     <string name="photo">Фото</string>
     <string name="nav_label_view_map">View Point on Map</string>
+    <string name="nav_map_google">Google Maps</string>
 
 </resources>

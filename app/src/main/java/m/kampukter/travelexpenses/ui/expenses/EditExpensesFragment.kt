@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
@@ -20,7 +19,6 @@ import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.ui.MyArrayAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import java.util.*
 
 
 class EditExpensesFragment : Fragment() {
@@ -41,58 +39,60 @@ class EditExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sumTextInputEdit.setText("0,0")
-
-        val navController = findNavController()
         var currentIdExpenses: Long? = null
-
-        myDropdownAdapter =
-            MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
-        currencyTextInputEdit?.setAdapter(myDropdownAdapter)
+        val navController = findNavController()
 
         arguments?.getLong("expensesId")?.let {
             viewModel.expensesIdEdit(it)
             currentIdExpenses = it
         }
+        sumTextInputEdit.setText("0,0")
+
+        myDropdownAdapter =
+            MyArrayAdapter(view.context, android.R.layout.simple_list_item_1, mutableListOf())
+        currencyTextInputEdit?.setAdapter(myDropdownAdapter)
+
         viewModel.expensesEdit.observe(viewLifecycleOwner) { (expenses, currencyList) ->
+            if (currentIdExpenses == expenses.id) {
+                locationChip.visibility =
+                    if (expenses.location == null) View.INVISIBLE else View.VISIBLE
 
-            locationChip.visibility = if ( expenses.location ==null ) View.INVISIBLE else View.VISIBLE
+                dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
 
-            dateTimeTextView.text = DateFormat.format("dd/MM/yyyy HH:mm", expenses.dateTime)
+                if (expenseTextInputEdit.text.toString() != expenses.expense) expenseTextInputEdit.setText(
+                    expenses.expense
+                )
+                if (currencyTextInputEdit.text.toString() != expenses.currency) currencyTextInputEdit.setText(
+                    expenses.currency
+                )
+                if (sumTextInputEdit.text.toString() != expenses.sum.toString()) sumTextInputEdit.setText(
+                    expenses.sum.toString()
+                )
+                if (noteTextInputEdit.text.toString() != expenses.note) noteTextInputEdit.setText(
+                    expenses.note
+                )
 
-            if (expenseTextInputEdit.text.toString() != expenses.expense) expenseTextInputEdit.setText(
-                expenses.expense
-            )
-            if (currencyTextInputEdit.text.toString() != expenses.currency) currencyTextInputEdit.setText(
-                expenses.currency
-            )
-            if (sumTextInputEdit.text.toString() != expenses.sum.toString()) sumTextInputEdit.setText(
-                expenses.sum.toString()
-            )
-            if (noteTextInputEdit.text.toString() != expenses.note) noteTextInputEdit.setText(
-                expenses.note
-            )
+                if (expenses.imageUri != null) {
+                    attachmentImageView.visibility = View.VISIBLE
+                    Glide.with(view).load(Uri.parse(expenses.imageUri))
+                        .placeholder(R.drawable.ic_photo_24)
+                        .into(attachmentImageView)
+                } else {
+                    attachmentImageView.visibility = View.INVISIBLE
+                }
 
-            if (expenses.imageUri != null) {
-                attachmentImageView.visibility = View.VISIBLE
-                Glide.with(view).load(Uri.parse(expenses.imageUri))
-                    .placeholder(R.drawable.ic_photo_24)
-                    .into(attachmentImageView)
-            } else {
-                attachmentImageView.visibility = View.INVISIBLE
-            }
-
-            myDropdownAdapter.addAll(currencyList.map { it.name })
-            val currencyName =
-                if (expenses.currency.isBlank()) currencyList.find { it.defCurrency == 1 }?.name
-                else expenses.currency
-            myDropdownAdapter.getPosition(currencyName).let {
-                if (currencyTextInputEdit.text.toString() != currencyName)
-                    currencyTextInputEdit?.setText(currencyName)
-            }
-            expenseTextInputEdit.setOnClickListener {
-                val bundle = bundleOf("expensesIdForEdit" to expenses.id)
-                navController.navigate(R.id.toChoiceExpenseForEditFragment, bundle)
+                myDropdownAdapter.addAll(currencyList.map { it.name })
+                val currencyName =
+                    if (expenses.currency.isBlank()) currencyList.find { it.defCurrency == 1 }?.name
+                    else expenses.currency
+                myDropdownAdapter.getPosition(currencyName).let {
+                    if (currencyTextInputEdit.text.toString() != currencyName)
+                        currencyTextInputEdit?.setText(currencyName)
+                }
+                expenseTextInputEdit.setOnClickListener {
+                    val bundle = bundleOf("expensesIdForEdit" to expenses.id)
+                    navController.navigate(R.id.toChoiceExpenseForEditFragment, bundle)
+                }
             }
         }
         locationChip.setOnClickListener {
