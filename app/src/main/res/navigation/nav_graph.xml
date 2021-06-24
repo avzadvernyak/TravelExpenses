@@ -440,6 +440,9 @@
                 android:id="@+id/toChoiceExpenseForMapFragment"
                 app:destination="@id/choiceExpenseForMapFragment" />
         <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
 

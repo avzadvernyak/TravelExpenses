@@ -1,23 +1,34 @@
 package m.kampukter.travelexpenses.ui.map
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.location.*
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.datepicker.MaterialDatePicker
+import kotlinx.android.synthetic.main.add_expenses_fragment.*
 import kotlinx.android.synthetic.main.map_google_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
+import m.kampukter.travelexpenses.ui.STATUS_GPS_OFF
+import m.kampukter.travelexpenses.ui.STATUS_GPS_ON
+import m.kampukter.travelexpenses.ui.permissionsForLocation
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.text.SimpleDateFormat
@@ -27,6 +38,28 @@ import java.util.*
 class MapGoogleFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
+
+    private var map: GoogleMap? = null
+
+    // The entry point to the Fused Location Provider.
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+    @SuppressLint("MissingPermission")
+    private val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult ?: return
+            locationResult.locations.last()?.let {
+                map?.isMyLocationEnabled = true
+                map?.uiSettings?.isMyLocationButtonEnabled = true
+            }
+        }
+    }
+
+    private val locationRequest = LocationRequest.create().apply {
+        interval = 10000
+        fastestInterval = 5000
+        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+    }
 
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -50,14 +83,15 @@ class MapGoogleFragment : Fragment() {
 
     private val myOnMapReadyCallback = OnMapReadyCallback { googleMap ->
         googleMap ?: return@OnMapReadyCallback
+        this.map = googleMap
         with(googleMap) {
-            viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner){
-                mapType = when (it){
+            viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) {
+                mapType = when (it) {
                     2 -> GoogleMap.MAP_TYPE_HYBRID
                     else -> GoogleMap.MAP_TYPE_NORMAL
                 }
             }
-            //
+
             val builder = LatLngBounds.Builder()
             viewModel.expensesInFolderForMap.observe(viewLifecycleOwner) { (lastExpenses, filter) ->
                 clear()
@@ -126,11 +160,70 @@ class MapGoogleFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        context?.let { context ->
+
+            fusedLocationProviderClient =
+                LocationServices.getFusedLocationProviderClient(context.applicationContext)
+
+            viewModel.savedSettingsLiveData.observe(viewLifecycleOwner, { settings ->
+                if (settings.statusGPS == STATUS_GPS_ON) {
+                    locationRequest.let {
+                        LocationSettingsRequest.Builder().addLocationRequest(it)
+                    }
+                    val isLocationPermission = permissionsForLocation.all {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            it
+                        ) == PackageManager.PERMISSION_GRANTED
+                    }
+                    if (isLocationPermission) {
+                        val manager =
+                            context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        } else {
+                            fusedLocationProviderClient.requestLocationUpdates(
+                                locationRequest,
+                                locationCallback,
+                                Looper.getMainLooper()
+                            )
+                            /*val locationResult = fusedLocationProviderClient.lastLocation
+                            locationResult.addOnCompleteListener(activity as AppCompatActivity) { task ->
+                                Log.w("blabla", "Listener ")
+                                if (task.isSuccessful) {
+                                    Log.w("blabla", "Listener isSuccessful true")
+                                    // Set the map's camera position to the current location of the device.
+                                    task.result?.let {
+                                        Log.w("blabla", "Location W ")
+                                        map?.isMyLocationEnabled = true
+                                        map?.uiSettings?.isMyLocationButtonEnabled = true
+                                    }
+                                } else {
+                                    Log.w("blabla", "Listener isSuccessful false")
+                                    map?.isMyLocationEnabled = false
+                                    map?.uiSettings?.isMyLocationButtonEnabled = false
+                                }
+                            }*/
+                        }
+                    } else {
+                        viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
+                        findNavController().navigate(R.id.toLocationPermissionsDialogFragment)
+                    }
+                } else {
+                    fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+                }
+            })
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.map_google_app_bar, menu)
-        viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner){
-            when (it){
+        viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) {
+            when (it) {
                 2 -> menu.findItem(R.id.action_maps_type_hybrid).isChecked = true
                 else -> menu.findItem(R.id.action_maps_type_normal).isChecked = true
             }
@@ -164,13 +257,17 @@ class MapGoogleFragment : Fragment() {
             }
             R.id.action_maps_type_hybrid -> {
                 item.isChecked = !item.isChecked
-                viewModel.setMapType( 2 )
+                viewModel.setMapType(2)
             }
             R.id.action_maps_type_normal -> {
                 item.isChecked = !item.isChecked
-                viewModel.setMapType( 1 )
+                viewModel.setMapType(1)
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+    override fun onPause() {
+        super.onPause()
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 }
