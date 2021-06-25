@@ -1,16 +1,20 @@
 package m.kampukter.travelexpenses.ui.map
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.*
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
@@ -84,14 +88,12 @@ class MapGoogleFragment : Fragment() {
     private val myOnMapReadyCallback = OnMapReadyCallback { googleMap ->
         googleMap ?: return@OnMapReadyCallback
         this.map = googleMap
-        with(googleMap) {
-            viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) {
-                mapType = when (it) {
-                    2 -> GoogleMap.MAP_TYPE_HYBRID
-                    else -> GoogleMap.MAP_TYPE_NORMAL
-                }
-            }
 
+        with(googleMap) {
+            viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) { googleMapType ->
+                googleMapType?.let{ mapType = it }
+                controlMapTypes(googleMap)
+            }
             val builder = LatLngBounds.Builder()
             viewModel.expensesInFolderForMap.observe(viewLifecycleOwner) { (lastExpenses, filter) ->
                 clear()
@@ -141,6 +143,96 @@ class MapGoogleFragment : Fragment() {
                 moveCamera(cu)
             }
         }
+    }
+
+    private fun controlMapTypes(googleMap: GoogleMap) {
+
+        // When map is initially loaded, determine which map type option to 'select'
+        when (googleMap.mapType) {
+            GoogleMap.MAP_TYPE_HYBRID -> {
+                hybridTypeBackgroundView.visibility = View.VISIBLE
+                hybridTypeTextView.setTextColor(Color.BLUE)
+            }
+            else -> {
+                defaultTypeBackgroundView.visibility = View.VISIBLE
+                defaultTypeTextView.setTextColor(Color.BLUE)
+            }
+        }
+
+        // Set click listener on FAB to open the map type selection view
+        mapTypeFAB.setOnClickListener {
+
+            // Start animator to reveal the selection view, starting from the FAB itself
+            val anim = ViewAnimationUtils.createCircularReveal(
+                mapTypeSelectionLayout,
+                mapTypeSelectionLayout.width - (mapTypeFAB.width / 2),
+                mapTypeSelectionLayout.height - (mapTypeFAB.height / 2),
+                mapTypeFAB.width / 2f,
+                mapTypeSelectionLayout.width.toFloat()
+            )
+            anim.duration = 200
+            anim.interpolator = AccelerateDecelerateInterpolator()
+
+            anim.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    mapTypeSelectionLayout.visibility = View.VISIBLE
+                }
+            })
+            anim.start()
+            mapTypeFAB.visibility = View.INVISIBLE
+        }
+        // Set click listener on the map to close the map type selection view
+        googleMap.setOnMapClickListener {
+            // Conduct the animation if the FAB is invisible (window open)
+            if (mapTypeFAB.visibility == View.INVISIBLE) {
+
+                // Start animator close and finish at the FAB position
+                val anim = ViewAnimationUtils.createCircularReveal(
+                    mapTypeSelectionLayout,
+                    mapTypeSelectionLayout.width - (mapTypeFAB.width / 2),
+                    mapTypeSelectionLayout.height - (mapTypeFAB.height / 2),
+                    mapTypeSelectionLayout.width.toFloat(),
+                    mapTypeFAB.width / 2f
+                )
+                anim.duration = 200
+                anim.interpolator = AccelerateDecelerateInterpolator()
+
+                anim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        mapTypeSelectionLayout.visibility = View.INVISIBLE
+                    }
+                })
+
+                // Set a delay to reveal the FAB. Looks better than revealing at end of animation
+                Handler().postDelayed({
+                    kotlin.run {
+                        mapTypeFAB.visibility = View.VISIBLE
+                    }
+                }, 100)
+                anim.start()
+            }
+        }
+
+        // Handle selection of the Default map type
+        defaultTypeImageButton.setOnClickListener {
+            defaultTypeBackgroundView.visibility = View.VISIBLE
+            hybridTypeBackgroundView.visibility = View.INVISIBLE
+            defaultTypeTextView.setTextColor(Color.BLUE)
+            hybridTypeTextView.setTextColor(Color.parseColor("#808080"))
+            viewModel.setMapType(GoogleMap.MAP_TYPE_NORMAL)
+        }
+
+        // Handle selection of the Satellite map type
+        hybridTypeImageButton.setOnClickListener {
+            defaultTypeBackgroundView.visibility = View.INVISIBLE
+            hybridTypeBackgroundView.visibility = View.VISIBLE
+            defaultTypeTextView.setTextColor(Color.parseColor("#808080"))
+            hybridTypeTextView.setTextColor(Color.BLUE)
+            viewModel.setMapType(GoogleMap.MAP_TYPE_HYBRID)
+        }
+
     }
 
     override fun onCreateView(
@@ -222,13 +314,6 @@ class MapGoogleFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.map_google_app_bar, menu)
-        viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                2 -> menu.findItem(R.id.action_maps_type_hybrid).isChecked = true
-                else -> menu.findItem(R.id.action_maps_type_normal).isChecked = true
-            }
-        }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -255,17 +340,10 @@ class MapGoogleFragment : Fragment() {
             R.id.pointsExpenseFilter -> {
                 findNavController().navigate(R.id.toChoiceExpenseForMapFragment)
             }
-            R.id.action_maps_type_hybrid -> {
-                item.isChecked = !item.isChecked
-                viewModel.setMapType(2)
-            }
-            R.id.action_maps_type_normal -> {
-                item.isChecked = !item.isChecked
-                viewModel.setMapType(1)
-            }
         }
         return super.onOptionsItemSelected(item)
     }
+
     override fun onPause() {
         super.onPause()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)

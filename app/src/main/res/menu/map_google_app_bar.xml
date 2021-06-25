@@ -1,33 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group>
-        <item
-                android:id="@+id/pointsDateFilter"
-                android:contentDescription="@string/menu_map_date_filter"
-                android:icon="@drawable/ic_today_24"
-                android:title="@string/menu_map_date_filter_title"
-                app:showAsAction="ifRoom" />
-        <item
-                android:id="@+id/pointsExpenseFilter"
-                android:contentDescription="@string/menu_map_expense_filter"
-                android:icon="@drawable/ic_expenses"
-                android:title="@string/menu_map_expense_filter_title"
-                app:showAsAction="ifRoom" />
-    </group>
-    <group android:checkableBehavior="single"
-            android:id="@+id/maps_type_group"
-            >
-        <item
-                android:id="@+id/action_maps_type_normal"
-                android:orderInCategory="100"
-                android:title="Обычный"
-                app:showAsAction="never" />
-        <item
-                android:id="@+id/action_maps_type_hybrid"
-                android:orderInCategory="200"
-                android:title="Гибрид"
-                app:showAsAction="never" />
+    <item
+            android:id="@+id/pointsDateFilter"
+            android:contentDescription="@string/menu_map_date_filter"
+            android:icon="@drawable/ic_today_24"
+            android:title="@string/menu_map_date_filter_title"
+            app:showAsAction="ifRoom" />
+    <item
+            android:id="@+id/pointsExpenseFilter"
+            android:contentDescription="@string/menu_map_expense_filter"
+            android:icon="@drawable/ic_expenses"
+            android:title="@string/menu_map_expense_filter_title"
+            app:showAsAction="ifRoom" />
 
-    </group>
 </menu>
