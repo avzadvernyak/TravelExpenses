@@ -94,6 +94,7 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.mapGoogleFragment -> {
                     disableLayoutBehaviour()
+                    cardViewToolbarCardView.visibility = View.GONE
                 }
 
                 R.id.cameraXFragment,

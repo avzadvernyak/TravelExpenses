@@ -126,5 +126,43 @@
                 app:layout_constraintTop_toBottomOf="@+id/hybridTypeImageButton" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/filtersLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+                android:id="@+id/dateFilterButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="Фильтр по дате"
+                android:textColor="@color/colorDateTime"
+                app:backgroundTint ="#FFFFFF"
+                app:iconTint = "#000000"
+                app:icon="@drawable/ic_today_24" />
+
+        <Button
+                android:id="@+id/expenseFilterButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@id/dateFilterButton"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="Фильтр по статье"
+                android:textColor="@color/colorDateTime"
+                app:backgroundTint ="#FFFFFF"
+                app:iconTint = "#000000"
+                app:icon="@drawable/ic_expenses" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

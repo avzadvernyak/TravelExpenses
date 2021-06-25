@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
@@ -28,6 +29,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.add_expenses_fragment.*
 import kotlinx.android.synthetic.main.map_google_fragment.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
 import m.kampukter.travelexpenses.ui.STATUS_GPS_OFF
@@ -37,6 +40,7 @@ import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.schedule
 
 
 class MapGoogleFragment : Fragment() {
@@ -90,8 +94,11 @@ class MapGoogleFragment : Fragment() {
         this.map = googleMap
 
         with(googleMap) {
+
+            uiSettings.isCompassEnabled = true
+
             viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) { googleMapType ->
-                googleMapType?.let{ mapType = it }
+                googleMapType?.let { mapType = it }
                 controlMapTypes(googleMap)
             }
             val builder = LatLngBounds.Builder()
@@ -206,11 +213,12 @@ class MapGoogleFragment : Fragment() {
                 })
 
                 // Set a delay to reveal the FAB. Looks better than revealing at end of animation
-                Handler().postDelayed({
-                    kotlin.run {
+                Timer().schedule(100) {
+                    lifecycleScope.launch( Dispatchers.Main ) {
                         mapTypeFAB.visibility = View.VISIBLE
                     }
-                }, 100)
+                }
+
                 anim.start()
             }
         }
@@ -282,23 +290,6 @@ class MapGoogleFragment : Fragment() {
                                 locationCallback,
                                 Looper.getMainLooper()
                             )
-                            /*val locationResult = fusedLocationProviderClient.lastLocation
-                            locationResult.addOnCompleteListener(activity as AppCompatActivity) { task ->
-                                Log.w("blabla", "Listener ")
-                                if (task.isSuccessful) {
-                                    Log.w("blabla", "Listener isSuccessful true")
-                                    // Set the map's camera position to the current location of the device.
-                                    task.result?.let {
-                                        Log.w("blabla", "Location W ")
-                                        map?.isMyLocationEnabled = true
-                                        map?.uiSettings?.isMyLocationButtonEnabled = true
-                                    }
-                                } else {
-                                    Log.w("blabla", "Listener isSuccessful false")
-                                    map?.isMyLocationEnabled = false
-                                    map?.uiSettings?.isMyLocationButtonEnabled = false
-                                }
-                            }*/
                         }
                     } else {
                         viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
