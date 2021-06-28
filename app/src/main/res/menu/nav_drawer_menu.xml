@@ -8,9 +8,13 @@
                 android:title="@string/menu_expenses" />
 
         <item
+                android:id="@id/mapGoogleFragment"
+                android:icon="@drawable/ic_map_24"
+                android:title="@string/menu_map"/>
+        <!-- <item
                 android:id="@id/mapExpensesFragment"
                 android:icon="@drawable/ic_map_24"
-                android:title="@string/menu_map" />
+                android:title="@string/menu_map" />-->
         <item
                 android:id="@id/galleryGridFragment"
                 android:icon="@drawable/ic_baseline_photo_library_24"
@@ -52,9 +56,9 @@
                 android:id="@id/aboutDialogFragment"
                 android:icon="@drawable/ic_info_24"
                 android:title="@string/menu_about" />
-        <item
+      <!--  <item
                 android:id="@id/mapGoogleFragment"
-                android:title="Google Maps" />
+                android:title="Google Maps" />-->
     </group>
 
 </menu>

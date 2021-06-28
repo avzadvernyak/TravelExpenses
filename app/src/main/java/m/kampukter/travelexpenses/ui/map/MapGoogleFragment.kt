@@ -2,6 +2,7 @@ package m.kampukter.travelexpenses.ui.map
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -9,7 +10,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.text.format.DateFormat
@@ -18,6 +18,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -27,7 +28,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.datepicker.MaterialDatePicker
-import kotlinx.android.synthetic.main.add_expenses_fragment.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.map_google_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,6 +60,7 @@ class MapGoogleFragment : Fragment() {
             locationResult.locations.last()?.let {
                 map?.isMyLocationEnabled = true
                 map?.uiSettings?.isMyLocationButtonEnabled = true
+                map?.uiSettings?.isMapToolbarEnabled = false
             }
         }
     }
@@ -72,6 +74,7 @@ class MapGoogleFragment : Fragment() {
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.customView
+            filtersLayout?.visibility = View.INVISIBLE
             return true
         }
 
@@ -85,7 +88,7 @@ class MapGoogleFragment : Fragment() {
 
         override fun onDestroyActionMode(mode: ActionMode?) {
             viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
-
+            filtersLayout?.visibility = View.VISIBLE
         }
     }
 
@@ -133,8 +136,10 @@ class MapGoogleFragment : Fragment() {
                     }
                     else -> lastExpenses.filter { it.location != null }
                 }
+                var isFoundPoint = false
                 expenses.forEach { itemExpenses ->
                     itemExpenses.location?.let { item ->
+                        isFoundPoint = true
                         val latLng = LatLng(item.latitude, item.longitude)
                         addMarker(
                             MarkerOptions()
@@ -145,14 +150,53 @@ class MapGoogleFragment : Fragment() {
                         builder.include(latLng)
                     }
                 }
-                val padding = 128 // offset from edges of the map in pixels
-                val cu = CameraUpdateFactory.newLatLngBounds(builder.build(), padding)
-                moveCamera(cu)
+                if (isFoundPoint) {
+                    val padding = 256 // offset from edges of the map in pixels
+                    val cu = CameraUpdateFactory.newLatLngBounds(builder.build(), padding)
+                    moveCamera(cu)
+                } else {
+                    if (filter !is FilterForExpensesMap.All) {
+                        viewModel.setFilterForExpensesMap(FilterForExpensesMap.All)
+                        Snackbar.make(
+                            googleMapLayout,
+                            getString(R.string.points_is_empty),
+                            Snackbar.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
             }
+        }
+        dateFilterButton.setOnClickListener {
+            val pickerRange = MaterialDatePicker.Builder.dateRangePicker().build()
+            pickerRange.show(parentFragmentManager, "Picker")
+            pickerRange.addOnPositiveButtonClickListener { dateSelected ->
+                val start = DateFormat.format("yyyyMMdd", dateSelected.first).toString()
+                val startLong =
+                    SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(start)?.time
+                val end = DateFormat.format("yyyyMMdd", dateSelected.second).toString()
+                val endLong =
+                    SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(end)?.time
+                if (startLong != null && endLong != null)
+                    viewModel.setFilterForExpensesMap(
+                        FilterForExpensesMap.DateRangeFilter(
+                            startLong,
+                            endLong + (24 * 60 * 60 * 1000) - 1000
+                        )
+                    )
+            }
+        }
+        expenseFilterButton.setOnClickListener {
+            findNavController().navigate(R.id.toChoiceExpenseForMapFragment)
         }
     }
 
     private fun controlMapTypes(googleMap: GoogleMap) {
+        var delta: Float? = null
+        context?.let { context ->
+            delta =
+                context.resources.displayMetrics.density * (filtersLayout.marginTop + filtersLayout.height)
+        }
 
         // When map is initially loaded, determine which map type option to 'select'
         when (googleMap.mapType) {
@@ -192,15 +236,99 @@ class MapGoogleFragment : Fragment() {
         // Set click listener on the map to close the map type selection view
         googleMap.setOnMapClickListener {
             // Conduct the animation if the FAB is invisible (window open)
-            if (mapTypeFAB.visibility == View.INVISIBLE) {
 
-                // Start animator close and finish at the FAB position
-                val anim = ViewAnimationUtils.createCircularReveal(
-                    mapTypeSelectionLayout,
-                    mapTypeSelectionLayout.width - (mapTypeFAB.width / 2),
-                    mapTypeSelectionLayout.height - (mapTypeFAB.height / 2),
-                    mapTypeSelectionLayout.width.toFloat(),
-                    mapTypeFAB.width / 2f
+            when {
+                mapTypeFAB.visibility == View.INVISIBLE -> {
+
+                    // Start animator close and finish at the FAB position
+                    val anim = ViewAnimationUtils.createCircularReveal(
+                        mapTypeSelectionLayout,
+                        mapTypeSelectionLayout.width - (mapTypeFAB.width / 2),
+                        mapTypeSelectionLayout.height - (mapTypeFAB.height / 2),
+                        mapTypeSelectionLayout.width.toFloat(),
+                        mapTypeFAB.width / 2f
+                    )
+                    anim.duration = 200
+                    anim.interpolator = AccelerateDecelerateInterpolator()
+
+                    anim.addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            mapTypeSelectionLayout.visibility = View.INVISIBLE
+                        }
+                    })
+
+                    // Set a delay to reveal the FAB. Looks better than revealing at end of animation
+                    Timer().schedule(100) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            mapTypeFAB.visibility = View.VISIBLE
+                        }
+                    }
+
+                    anim.start()
+                }
+                filtersLayout.visibility == View.INVISIBLE -> {
+                    delta?.let {
+                        ObjectAnimator.ofFloat(filtersLayout, "translationY", 0F).apply {
+                            duration = 200
+                            addListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationStart(animation: Animator?) {
+                                    super.onAnimationEnd(animation)
+                                    filtersLayout.visibility = View.VISIBLE
+
+                                }
+                            })
+                            start()
+
+                        }
+                    }
+
+                    /* val anim = ViewAnimationUtils.createCircularReveal(
+                         filtersLayout,
+                         filtersLayout.width / 2,
+                         filtersLayout.height / 2,
+                         0f,
+                         filtersLayout.width.toFloat()
+                     )
+                     anim.duration = 200
+                     anim.interpolator = AccelerateDecelerateInterpolator()
+
+                     anim.addListener(object : AnimatorListenerAdapter() {
+                         override fun onAnimationStart(animation: Animator?) {
+                             super.onAnimationEnd(animation)
+                             filtersLayout.visibility = View.VISIBLE
+                         }
+                     })
+                     anim.start()*/
+                }
+                else -> {
+                    delta?.let {
+                        ObjectAnimator.ofFloat(filtersLayout, "translationY", -it).apply {
+                            duration = 200
+                            addListener(object : AnimatorListenerAdapter() {
+                                override fun onAnimationEnd(animation: Animator?) {
+                                    super.onAnimationEnd(animation)
+                                    filtersLayout.visibility = View.INVISIBLE
+                                }
+                            })
+                            start()
+                        }
+                    }
+                    /*val path = Path().apply {
+                        arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
+                    }
+                    val pathInterpolator = PathInterpolator(path)
+                    val animation = ObjectAnimator.ofFloat(filtersLayout, "translationX", 100f).apply {
+                        interpolator = pathInterpolator
+                        start()
+                    }*/
+                }
+                /*val anim = ViewAnimationUtils.createCircularReveal(
+                    filtersLayout,
+                    filtersLayout.width / 2 ,
+                    filtersLayout.height / 2 ,
+                    filtersLayout.width.toFloat(),
+                    0F
                 )
                 anim.duration = 200
                 anim.interpolator = AccelerateDecelerateInterpolator()
@@ -208,19 +336,14 @@ class MapGoogleFragment : Fragment() {
                 anim.addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
-                        mapTypeSelectionLayout.visibility = View.INVISIBLE
+
+                        filtersLayout.visibility = View.INVISIBLE
                     }
                 })
-
-                // Set a delay to reveal the FAB. Looks better than revealing at end of animation
-                Timer().schedule(100) {
-                    lifecycleScope.launch( Dispatchers.Main ) {
-                        mapTypeFAB.visibility = View.VISIBLE
-                    }
-                }
-
                 anim.start()
+            }*/
             }
+
         }
 
         // Handle selection of the Default map type
@@ -255,7 +378,8 @@ class MapGoogleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.mapFragmentContainerView) as SupportMapFragment
         mapFragment.getMapAsync(myOnMapReadyCallback)
 
     }

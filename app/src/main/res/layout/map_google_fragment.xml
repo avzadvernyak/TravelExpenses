@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-
+        android:id="@+id/googleMapLayout"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -8,7 +8,7 @@
         android:layout_height="match_parent">
 
     <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map"
+            android:id="@+id/mapFragmentContainerView"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -23,7 +23,7 @@
             android:contentDescription="@null"
             app:backgroundTint="#FFFFFF"
             app:fabSize="mini"
-            app:layout_constraintBottom_toBottomOf="@id/map"
+            app:layout_constraintBottom_toBottomOf="@id/mapFragmentContainerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_layers_24" />
 
@@ -131,7 +131,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
-            android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -141,12 +140,17 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:layout_marginHorizontal="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="Фильтр по дате"
-                android:textColor="@color/colorDateTime"
+                android:elevation="4dp"
+                app:cornerRadius="32dp"
+                app:textAllCaps = "false"
+                android:text="За период"
+                android:textColor="@color/colorIconButton"
                 app:backgroundTint ="#FFFFFF"
-                app:iconTint = "#000000"
+                app:iconTint = "@color/colorIconButton"
                 app:icon="@drawable/ic_today_24" />
 
         <Button
@@ -154,13 +158,17 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginHorizontal="8dp"
                 app:layout_constraintStart_toEndOf="@id/dateFilterButton"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="Фильтр по статье"
-                android:textColor="@color/colorDateTime"
+                android:elevation="4dp"
+                app:cornerRadius="32dp"
+                app:textAllCaps = "false"
+                android:text="Статья"
+                android:textColor="@color/colorIconButton"
                 app:backgroundTint ="#FFFFFF"
-                app:iconTint = "#000000"
+                app:iconTint = "@color/colorIconButton"
                 app:icon="@drawable/ic_expenses" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
