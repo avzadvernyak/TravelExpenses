@@ -282,24 +282,6 @@ class MapGoogleFragment : Fragment() {
 
                         }
                     }
-
-                    /* val anim = ViewAnimationUtils.createCircularReveal(
-                         filtersLayout,
-                         filtersLayout.width / 2,
-                         filtersLayout.height / 2,
-                         0f,
-                         filtersLayout.width.toFloat()
-                     )
-                     anim.duration = 200
-                     anim.interpolator = AccelerateDecelerateInterpolator()
-
-                     anim.addListener(object : AnimatorListenerAdapter() {
-                         override fun onAnimationStart(animation: Animator?) {
-                             super.onAnimationEnd(animation)
-                             filtersLayout.visibility = View.VISIBLE
-                         }
-                     })
-                     anim.start()*/
                 }
                 else -> {
                     delta?.let {
@@ -314,34 +296,7 @@ class MapGoogleFragment : Fragment() {
                             start()
                         }
                     }
-                    /*val path = Path().apply {
-                        arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
-                    }
-                    val pathInterpolator = PathInterpolator(path)
-                    val animation = ObjectAnimator.ofFloat(filtersLayout, "translationX", 100f).apply {
-                        interpolator = pathInterpolator
-                        start()
-                    }*/
                 }
-                /*val anim = ViewAnimationUtils.createCircularReveal(
-                    filtersLayout,
-                    filtersLayout.width / 2 ,
-                    filtersLayout.height / 2 ,
-                    filtersLayout.width.toFloat(),
-                    0F
-                )
-                anim.duration = 200
-                anim.interpolator = AccelerateDecelerateInterpolator()
-
-                anim.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-
-                        filtersLayout.visibility = View.INVISIBLE
-                    }
-                })
-                anim.start()
-            }*/
             }
 
         }
@@ -381,6 +336,8 @@ class MapGoogleFragment : Fragment() {
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.mapFragmentContainerView) as SupportMapFragment
         mapFragment.getMapAsync(myOnMapReadyCallback)
+
+        
 
     }
 

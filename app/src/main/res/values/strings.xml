@@ -10,6 +10,7 @@
     <string name="menu_about">О программе</string>
     <string name="menu_settings">Настройки</string>
     <string name="menu_map">Карта</string>
+    <string name="menu_map_test">Карта TEST</string>
     <string name="menu_map_date_filter">Показать все за дату</string>
     <string name="menu_map_date_filter_title">По дате</string>
     <string name="menu_map_expense_filter">Показать все точки по статье</string>

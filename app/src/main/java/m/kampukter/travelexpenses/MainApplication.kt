@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.facebook.stetho.Stetho
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -145,7 +144,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Stetho.initializeWithDefaults(this)
+        //Stetho.initializeWithDefaults(this)
         mainApplication = this@MainApplication
         NetworkLiveData.init(this)
 

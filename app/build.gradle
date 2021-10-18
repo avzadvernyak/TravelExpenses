@@ -94,7 +94,7 @@ dependencies {
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
-    implementation 'com.facebook.stetho:stetho:1.5.1'
+    //implementation 'com.facebook.stetho:stetho:1.5.1'
     // TikXML
     def tikxml_version = "0.8.13"
     implementation "com.tickaroo.tikxml:annotation:$tikxml_version"
