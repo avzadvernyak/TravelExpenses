@@ -57,8 +57,8 @@
                 android:id="@+id/toAboutDialogFragment"
                 app:destination="@+id/aboutDialogFragment" />
         <action
-                android:id="@+id/toMapTestFragment"
-                app:destination="@+id/mapTestFragment" />
+                android:id="@+id/toMapGooglePlaceFragment"
+                app:destination="@+id/mapGooglePlaceFragment" />
     </fragment>
     <dialog
             android:id="@+id/aboutDialogFragment"

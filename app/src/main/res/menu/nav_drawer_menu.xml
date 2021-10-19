@@ -16,7 +16,7 @@
                 android:icon="@drawable/ic_map_24"
                 android:title="@string/menu_map" />-->
         <item
-                android:id="@id/mapTestFragment"
+                android:id="@id/mapGooglePlaceFragment"
                 android:icon="@drawable/ic_map_24"
                 android:title="@string/menu_map_test" />
         <item

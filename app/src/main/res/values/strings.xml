@@ -114,5 +114,8 @@
     <string name="title_map_type">Тип карты</string>
     <string name="default_map_type"> По\nумолчанию</string>
     <string name="hybrid_map_type">Спутник</string>
+    <string name="nav_map_google_place">Test</string>
+    <string name="map_filter_interval">За период</string>
+    <string name="map_filter_expense">Статья</string>
 
 </resources>

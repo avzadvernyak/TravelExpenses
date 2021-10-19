@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                     cardViewToolbarCardView.visibility = View.GONE
                 }
 
-                R.id.mapGoogleFragment -> {
+                R.id.mapGoogleFragment, R.id.mapGooglePlaceFragment -> {
                     disableLayoutBehaviour()
                     cardViewToolbarCardView.visibility = View.GONE
                 }

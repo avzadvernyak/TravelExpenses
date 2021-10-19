@@ -147,9 +147,9 @@
                 android:elevation="4dp"
                 app:cornerRadius="32dp"
                 app:textAllCaps = "false"
-                android:text="За период"
+                android:text="@string/map_filter_interval"
                 android:textColor="@color/colorIconButton"
-                app:backgroundTint ="#FFFFFF"
+                app:backgroundTint ="#99FFFFFF"
                 app:iconTint = "@color/colorIconButton"
                 app:icon="@drawable/ic_today_24" />
 
@@ -165,9 +165,9 @@
                 android:elevation="4dp"
                 app:cornerRadius="32dp"
                 app:textAllCaps = "false"
-                android:text="Статья"
+                android:text="@string/map_filter_expense"
                 android:textColor="@color/colorIconButton"
-                app:backgroundTint ="#FFFFFF"
+                app:backgroundTint ="#99FFFFFF"
                 app:iconTint = "@color/colorIconButton"
                 app:icon="@drawable/ic_expenses" />
     </androidx.constraintlayout.widget.ConstraintLayout>

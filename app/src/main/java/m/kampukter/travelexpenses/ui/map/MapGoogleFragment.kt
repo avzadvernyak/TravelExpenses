@@ -382,7 +382,7 @@ class MapGoogleFragment : Fragment() {
             })
         }
     }
-
+/*
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.map_google_app_bar, menu)
@@ -415,7 +415,7 @@ class MapGoogleFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
-
+*/
     override fun onPause() {
         super.onPause()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
