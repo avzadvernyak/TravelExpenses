@@ -3,17 +3,15 @@ package m.kampukter.travelexpenses.ui.map
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -23,29 +21,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
-import kotlinx.android.synthetic.main.map_google_fragment.*
-import kotlinx.android.synthetic.main.map_google_fragment.defaultTypeBackgroundView
-import kotlinx.android.synthetic.main.map_google_fragment.defaultTypeImageButton
-import kotlinx.android.synthetic.main.map_google_fragment.defaultTypeTextView
-import kotlinx.android.synthetic.main.map_google_fragment.hybridTypeBackgroundView
-import kotlinx.android.synthetic.main.map_google_fragment.hybridTypeImageButton
-import kotlinx.android.synthetic.main.map_google_fragment.hybridTypeTextView
-import kotlinx.android.synthetic.main.map_google_fragment.mapTypeFAB
-import kotlinx.android.synthetic.main.map_google_fragment.mapTypeSelectionLayout
-import kotlinx.android.synthetic.main.map_google_place_fragment.*
+import kotlinx.android.synthetic.main.google_map_point_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import m.kampukter.travelexpenses.R
@@ -57,23 +40,9 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.*
 import kotlin.concurrent.schedule
 
-@SuppressLint("MissingPermission")
-class MapGooglePlaceFragment : Fragment() {
+class GoogleMapPointFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
-
-    private val onMarkerDragListener = object : GoogleMap.OnMarkerDragListener {
-        override fun onMarkerDragStart(marker: Marker) {
-        }
-
-        override fun onMarkerDrag(p0: Marker) {
-        }
-
-        override fun onMarkerDragEnd(marker: Marker) {
-            Log.d("blabla", "onMarkerDragEnd: ${marker.position}")
-            viewModel.setMapMarker(marker)
-        }
-    }
     private var map: GoogleMap? = null
     private val myOnMapReadyCallback = OnMapReadyCallback { googleMap ->
         googleMap ?: return@OnMapReadyCallback
@@ -81,57 +50,45 @@ class MapGooglePlaceFragment : Fragment() {
 
         with(googleMap) {
             uiSettings.isCompassEnabled = true
+
             viewModel.lastMapTypeLiveData.observe(viewLifecycleOwner) { googleMapType ->
                 googleMapType?.let { mapType = it }
                 controlMapTypes(googleMap)
             }
-            viewModel.lastMarkerLiveData.observe(viewLifecycleOwner) {
-                googleMap.clear()
-                if (it != null) {
-                    googleMap.addMarker(
-                        MarkerOptions().position(it.position).draggable(true)
+            viewModel.expensesEdit.observe(viewLifecycleOwner) { (expenses, _) ->
+                expenses.location?.let {
+                    val position = LatLng(it.latitude, it.longitude)
+                    clear()
+                    val title = "${
+                        DateFormat.format(
+                            "dd/MM/yyyy HH:mm",
+                            expenses.dateTime
+                        )
+                    } ${expenses.sum} ${expenses.currency}"
+
+                    val snippet = "${expenses.expense}(${expenses.note})"
+
+                    addMarker(
+                        MarkerOptions().position(position).title(title).snippet(snippet)
                     )
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(it.position))
-                    deleteMarkerFAB.visibility = View.VISIBLE
-                } else {
-                    deleteMarkerFAB.visibility = View.INVISIBLE
+                    moveCamera(CameraUpdateFactory.newLatLngZoom(position, 14f))
+
+                    markerFAB.setOnClickListener {
+                        moveCamera(CameraUpdateFactory.newLatLng(position))
+                    }
                 }
             }
-            googleMap.setOnMarkerDragListener(onMarkerDragListener)
-
         }
     }
 
     // The entry point to the Fused Location Provider.
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    @SuppressLint("MissingPermission")
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             locationResult ?: return
-            locationResult.locations.last()?.let { location ->
-                viewModel.firstStartLiveData.observe(viewLifecycleOwner) {
-                    /*when {
-                        it && deleteMarkerFAB.visibility == View.INVISIBLE -> {
-                            map?.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(location.latitude, location.longitude), 12f
-                                )
-                            )
-                        }
-                        it && deleteMarkerFAB.visibility == View.VISIBLE -> {
+            locationResult.locations.last()?.let {
 
-                        }
-                    }*/
-                    if (it) map?.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            LatLng(location.latitude, location.longitude), 12f
-                        )
-                    )
-                }
-                viewModel.setMapFirstStart(false)
-
-                map?.isMyLocationEnabled = true
                 map?.uiSettings?.isMyLocationButtonEnabled = true
                 map?.uiSettings?.isMapToolbarEnabled = false
             }
@@ -143,65 +100,23 @@ class MapGooglePlaceFragment : Fragment() {
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.map_google_place_fragment, container, false)
+        return inflater.inflate(R.layout.google_map_point_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize the SDK
-        if (!Places.isInitialized()) {
-            val applicationInfo: ApplicationInfo = view.context.packageManager
-                .getApplicationInfo(view.context.packageName, PackageManager.GET_META_DATA)
-            val apiKey = applicationInfo.metaData["com.google.android.geo.API_KEY"].toString()
-            Places.initialize(view.context, apiKey)
-        }
-
-
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.mapFragmentContainerView) as SupportMapFragment
         mapFragment.getMapAsync(myOnMapReadyCallback)
 
-        // Initialize the AutocompleteSupportFragment.
-        val autocompleteFragment =
-            childFragmentManager.findFragmentById(R.id.autocomplete_fragment)
-                    as AutocompleteSupportFragment
 
-        // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(
-            listOf(
-                Place.Field.LAT_LNG,
-                Place.Field.NAME,
-                Place.Field.VIEWPORT
-            )
-        )
-
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onError(status: Status) {
-                Log.i("blabla", "An error occurred: $status")
-            }
-
-            override fun onPlaceSelected(place: Place) {
-                Log.i("blabla", "Place: ${place.viewport}")
-                place.viewport?.let { latLng ->
-                    val padding = 0 // offset from edges of the map in pixels
-                    map?.animateCamera(
-                        CameraUpdateFactory.newLatLngBounds(latLng, padding)
-                    )
-                }
-            }
-        })
-        deleteMarkerFAB.setOnClickListener {
-            viewModel.setMapMarker(null)
-        }
     }
 
     override fun onResume() {
@@ -234,6 +149,7 @@ class MapGooglePlaceFragment : Fragment() {
                                 locationCallback,
                                 Looper.getMainLooper()
                             )
+                            map?.isMyLocationEnabled = true
                         }
                     } else {
                         viewModel.setSettingStatusGPS(STATUS_GPS_OFF)
@@ -271,8 +187,8 @@ class MapGooglePlaceFragment : Fragment() {
             // Start animator to reveal the selection view, starting from the FAB itself
 
             // 8 is android:layout_marginBottom="8dp"
-            val delMarkerFabY = mapTypeSelectionLayout.height - mapTypeFAB.height - 8
-            ObjectAnimator.ofFloat(deleteMarkerFAB, View.TRANSLATION_Y, -delMarkerFabY.toFloat())
+            val markerFabY = mapTypeSelectionLayout.height - mapTypeFAB.height - 8
+            ObjectAnimator.ofFloat(markerFAB, View.TRANSLATION_Y, -markerFabY.toFloat())
                 .apply {
                     duration = 200
                     start()
@@ -297,18 +213,13 @@ class MapGooglePlaceFragment : Fragment() {
             mapTypeFAB.visibility = View.INVISIBLE
         }
         // Set click listener on the map to close the map type selection view
-        googleMap.setOnMapClickListener { latLng ->
-
-
-            // Turn off all map movements
-            viewModel.setMapFirstStart(false)
+        googleMap.setOnMapClickListener {
 
             // Conduct the animation if the FAB is invisible (window open)
-
             if (mapTypeFAB.visibility == View.INVISIBLE) {
 
                 // Start animator close and finish at the FAB position
-                ObjectAnimator.ofFloat(deleteMarkerFAB, View.TRANSLATION_Y, 0f).apply {
+                ObjectAnimator.ofFloat(markerFAB, View.TRANSLATION_Y, 0f).apply {
                     duration = 200
                     start()
                 }
@@ -337,15 +248,7 @@ class MapGooglePlaceFragment : Fragment() {
                 }
 
                 anim.start()
-            } else {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-                googleMap.clear()
-                val marker = googleMap.addMarker(
-                    MarkerOptions().position(latLng).draggable(true)
-                )
-                viewModel.setMapMarker(marker)
             }
-
         }
 
         // Handle selection of the Default map type

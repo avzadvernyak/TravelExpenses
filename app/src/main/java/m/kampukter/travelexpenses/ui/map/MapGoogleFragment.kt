@@ -382,40 +382,6 @@ class MapGoogleFragment : Fragment() {
             })
         }
     }
-/*
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.map_google_app_bar, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.pointsDateFilter -> {
-                val pickerRange = MaterialDatePicker.Builder.dateRangePicker().build()
-                pickerRange.show(parentFragmentManager, "Picker")
-                pickerRange.addOnPositiveButtonClickListener { dateSelected ->
-                    val start = DateFormat.format("yyyyMMdd", dateSelected.first).toString()
-                    val startLong =
-                        SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(start)?.time
-                    val end = DateFormat.format("yyyyMMdd", dateSelected.second).toString()
-                    val endLong =
-                        SimpleDateFormat("yyyyMMdd", Locale.getDefault()).parse(end)?.time
-                    if (startLong != null && endLong != null)
-                        viewModel.setFilterForExpensesMap(
-                            FilterForExpensesMap.DateRangeFilter(
-                                startLong,
-                                endLong + (24 * 60 * 60 * 1000) - 1000
-                            )
-                        )
-                }
-            }
-            R.id.pointsExpenseFilter -> {
-                findNavController().navigate(R.id.toChoiceExpenseForMapFragment)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-*/
     override fun onPause() {
         super.onPause()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)

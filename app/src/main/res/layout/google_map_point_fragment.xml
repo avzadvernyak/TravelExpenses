@@ -10,29 +10,20 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="m.kampukter.travelexpenses.ui.map.MapGoogleTestFragment" />
-
-    <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewToolbarCardView"
-            android:layout_width="match_parent"
+            tools:context="m.kampukter.travelexpenses.ui.map.GoogleMapPointFragment" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/markerFAB"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:elevation="4dp"
-            app:cardBackgroundColor="#99F3EFEF"
-            app:cardCornerRadius="12dp"
-            app:cardUseCompatPadding="true"
-            android:layout_marginTop="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@null"
+            app:backgroundTint="#FFFFFF"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@id/mapTypeFAB"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:srcCompat="@drawable/ic_where_to_vote" />
 
-        <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/autocomplete_fragment"
-                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                 />
-    </androidx.cardview.widget.CardView>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/mapTypeFAB"
             android:layout_width="wrap_content"
@@ -45,19 +36,7 @@
             app:layout_constraintBottom_toBottomOf="@id/mapFragmentContainerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_layers_24" />
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/deleteMarkerFAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:contentDescription="@null"
-            app:backgroundTint="#FFFFFF"
-            app:fabSize="mini"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@id/mapTypeFAB"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_delete_forever_black" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mapTypeSelectionLayout"
             android:layout_width="wrap_content"

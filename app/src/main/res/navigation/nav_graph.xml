@@ -166,9 +166,10 @@
 
     </fragment>
 
+    <!--android:name="m.kampukter.travelexpenses.ui.map.MapPointFragment"-->
     <fragment
             android:id="@+id/mapPointFragment"
-            android:name="m.kampukter.travelexpenses.ui.map.MapPointFragment"
+            android:name="m.kampukter.travelexpenses.ui.map.GoogleMapPointFragment"
             android:label="@string/nav_label_view_map"
             tools:layout="@layout/map_point_fragment">
         <action
