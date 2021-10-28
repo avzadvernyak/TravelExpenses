@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.viewmodel
 
 import androidx.lifecycle.*
-import com.google.android.gms.maps.model.Marker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -615,12 +614,13 @@ Search in Expenses
         firstStartMutableLiveData.postValue(firstStart)
     }
 
-    private val lastMarkerMutableLiveData = MutableLiveData<Marker?>().apply { postValue(null ) }
+    //Google maps marker support
+    /*private val lastMarkerMutableLiveData = MutableLiveData<Marker?>().apply { postValue(null ) }
     val lastMarkerLiveData: LiveData<Marker?>
         get() = lastMarkerMutableLiveData
 
     fun setMapMarker( marker: Marker?) {
         lastMarkerMutableLiveData.postValue(marker)
-    }
+    }*/
 }
 

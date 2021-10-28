@@ -15,10 +15,7 @@
                 android:id="@id/mapExpensesFragment"
                 android:icon="@drawable/ic_map_24"
                 android:title="@string/menu_map" />-->
-        <item
-                android:id="@id/mapGooglePlaceFragment"
-                android:icon="@drawable/ic_map_24"
-                android:title="@string/menu_map_test" />
+
         <item
                 android:id="@id/galleryGridFragment"
                 android:icon="@drawable/ic_baseline_photo_library_24"
@@ -44,6 +41,10 @@
     </group>
     <group android:checkableBehavior="single">
         <item
+                android:id="@id/mapGooglePlaceFragment"
+                android:icon="@drawable/ic_map_24"
+                android:title="@string/menu_map_test" />
+        <item
                 android:id="@id/settingsFragment"
                 android:icon="@drawable/ic_settings_black"
                 android:title="@string/menu_settings" />
@@ -60,9 +61,6 @@
                 android:id="@id/aboutDialogFragment"
                 android:icon="@drawable/ic_info_24"
                 android:title="@string/menu_about" />
-      <!--  <item
-                android:id="@id/mapGoogleFragment"
-                android:title="Google Maps" />-->
     </group>
 
 </menu>
