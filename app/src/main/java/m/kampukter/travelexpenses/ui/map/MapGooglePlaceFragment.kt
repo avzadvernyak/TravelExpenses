@@ -61,19 +61,6 @@ class MapGooglePlaceFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
 
-    //Google maps marker support
-    /* private val onMarkerDragListener = object : GoogleMap.OnMarkerDragListener {
-         override fun onMarkerDragStart(marker: Marker) {
-         }
-
-         override fun onMarkerDrag(p0: Marker) {
-         }
-
-         override fun onMarkerDragEnd(marker: Marker) {
-             Log.d("blabla", "onMarkerDragEnd: ${marker.position}")
-             viewModel.setMapMarker(marker)
-         }
-     }*/
     private var map: GoogleMap? = null
     private val myOnMapReadyCallback = OnMapReadyCallback { googleMap ->
         googleMap ?: return@OnMapReadyCallback
@@ -85,33 +72,14 @@ class MapGooglePlaceFragment : Fragment() {
                 googleMapType?.let { mapType = it }
                 controlMapTypes(googleMap)
             }
-            // Перемещение компаса по экрану
+            // Перемещение компаса и моя локация по экрану
             /*val compassButton: View? =
                 view?.findViewWithTag("GoogleMapCompass") //to access the compass button
-            (compassButton?.layoutParams as RelativeLayout.LayoutParams).leftMargin = navMenuFAB.width + 8*/
+            (compassButton?.layoutParams as RelativeLayout.LayoutParams).topMargin = 50
 
-        /*val rlp = compassButton?.layoutParams as RelativeLayout.LayoutParams?
-        rlp?.addRule(RelativeLayout.ALIGN_PARENT_END)
-        rlp?.addRule(RelativeLayout.ALIGN_PARENT_TOP)
-        rlp?.addRule(RelativeLayout.ALIGN_PARENT_START, 0)
-        rlp?.topMargin = 50*/
-
-
-            //Google maps marker support
-            /* viewModel.lastMarkerLiveData.observe(viewLifecycleOwner) {
-                 googleMap.clear()
-                 if (it != null) {
-                     googleMap.addMarker(
-                         MarkerOptions().position(it.position).draggable(true)
-                     )
-                     googleMap.animateCamera(CameraUpdateFactory.newLatLng(it.position))
-                     deleteMarkerFAB.visibility = View.VISIBLE
-                 } else {
-                     deleteMarkerFAB.visibility = View.INVISIBLE
-                 }
-             }
-             googleMap.setOnMarkerDragListener(onMarkerDragListener)*/
-
+            val myLocationButton: View? =
+                view?.findViewById(0x2)
+            (myLocationButton?.layoutParams as RelativeLayout.LayoutParams).topMargin = 50*/
         }
     }
 
@@ -124,18 +92,6 @@ class MapGooglePlaceFragment : Fragment() {
             locationResult ?: return
             locationResult.locations.last()?.let { location ->
                 viewModel.firstStartLiveData.observe(viewLifecycleOwner) {
-                    /*when {
-                        it && deleteMarkerFAB.visibility == View.INVISIBLE -> {
-                            map?.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(location.latitude, location.longitude), 12f
-                                )
-                            )
-                        }
-                        it && deleteMarkerFAB.visibility == View.VISIBLE -> {
-
-                        }
-                    }*/
                     if (it) map?.moveCamera(
                         CameraUpdateFactory.newLatLngZoom(
                             LatLng(location.latitude, location.longitude), 12f
@@ -211,10 +167,6 @@ class MapGooglePlaceFragment : Fragment() {
                 }
             }
         })
-        //Google maps marker support
-        /*deleteMarkerFAB.setOnClickListener {
-            viewModel.setMapMarker(null)
-        }*/
     }
 
     override fun onResume() {
@@ -282,15 +234,6 @@ class MapGooglePlaceFragment : Fragment() {
         mapTypeFAB.setOnClickListener {
 
             // Start animator to reveal the selection view, starting from the FAB itself
-
-            //Google maps marker support
-            // 8 is android:layout_marginBottom="8dp"
-            /*val delMarkerFabY = mapTypeSelectionLayout.height - mapTypeFAB.height - 8
-            ObjectAnimator.ofFloat(deleteMarkerFAB, View.TRANSLATION_Y, -delMarkerFabY.toFloat())
-                .apply {
-                    duration = 200
-                    start()
-                }*/
             val anim = ViewAnimationUtils.createCircularReveal(
                 mapTypeSelectionLayout,
                 mapTypeSelectionLayout.width - (mapTypeFAB.width / 2),
@@ -320,13 +263,6 @@ class MapGooglePlaceFragment : Fragment() {
             // Conduct the animation if the FAB is invisible (window open)
 
             if (mapTypeFAB.visibility == View.INVISIBLE) {
-
-                //Google maps marker support
-                // Start animator close and finish at the FAB position
-                /*ObjectAnimator.ofFloat(deleteMarkerFAB, View.TRANSLATION_Y, 0f).apply {
-                    duration = 200
-                    start()
-                }*/
                 val anim = ViewAnimationUtils.createCircularReveal(
                     mapTypeSelectionLayout,
                     mapTypeSelectionLayout.width - (mapTypeFAB.width / 2),
@@ -352,18 +288,7 @@ class MapGooglePlaceFragment : Fragment() {
                 }
 
                 anim.start()
-            } /*else {
-
-                //Google maps marker support
-
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-                googleMap.clear()
-                val marker = googleMap.addMarker(
-                    MarkerOptions().position(latLng).draggable(true)
-                )
-                viewModel.setMapMarker(marker)
-            }*/
-
+            }
         }
 
         // Handle selection of the Default map type

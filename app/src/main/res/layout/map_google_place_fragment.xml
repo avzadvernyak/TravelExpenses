@@ -33,19 +33,6 @@
                 android:layout_height="wrap_content"
                  />
     </androidx.cardview.widget.CardView>
-    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/navMenuFAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:contentDescription="@null"
-            app:backgroundTint="#FFFFFF"
-            app:fabSize="mini"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_dehaze_24" />-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/mapTypeFAB"
             android:layout_width="wrap_content"
