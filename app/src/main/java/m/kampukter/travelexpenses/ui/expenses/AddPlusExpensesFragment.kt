@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.add_additional_data_expenses.*
-import kotlinx.android.synthetic.main.main_activity.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -34,27 +33,27 @@ class AddPlusExpensesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
-            val tempExpenses = value.first
-            if (tempExpenses?.imageUri == null) imageToggleButton.visibility = View.INVISIBLE
+        viewModel.addExpensesLiveData.observe(viewLifecycleOwner){ (expense,_,_) ->
+            if (expense.imageUri == null) imageToggleButton.visibility = View.INVISIBLE
             else {
                 imageToggleButton.visibility = View.VISIBLE
                 delButton.setOnClickListener {
-                    viewModel.setBufferExpensesPhoto(null)
-                    viewModel.deleteFile(File(URI(tempExpenses.imageUri)))
+                    viewModel.setLastUriPhoto(null)
+                    viewModel.deleteFile(File(URI(expense.imageUri)))
                 }
             }
 
             photoImageView.setOnClickListener {
-                if (tempExpenses?.imageUri == null) {
+                if (expense.imageUri == null) {
                     findNavController().navigate(R.id.toCameraXFragment)
                 }
             }
 
-            Glide.with(view).load(tempExpenses?.imageUri).placeholder(R.drawable.ic_photo_24)
+            Log.w("blabla","2 **** -> ${expense.imageUri}")
+            Glide.with(view).load(expense.imageUri).placeholder(R.drawable.ic_photo_24)
                 .into(photoImageView)
-        })
 
+        }
     }
 
     override fun onResume() {

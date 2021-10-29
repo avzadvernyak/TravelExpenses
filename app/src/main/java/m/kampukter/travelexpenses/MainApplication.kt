@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.facebook.stetho.Stetho
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -43,7 +42,7 @@ class MainApplication : Application() {
     private val module = module {
         single {
             Room.databaseBuilder(androidContext(), MyDatabase::class.java, "expenses.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(supportDb: SupportSQLiteDatabase) {
                         GlobalScope.launch(context = Dispatchers.IO) {
@@ -80,7 +79,17 @@ class MainApplication : Application() {
                         GlobalScope.launch(context = Dispatchers.IO) {
                             get<MyDatabase>().foldersDao().insertAll(
                                 listOf(
-                                    Folders(shortName = "Расходы", description = "Папка расходов по умолчанию")
+                                    Folders( id = 1L ,shortName = "Расходы", description = "Папка расходов по умолчанию")
+                                )
+                            )
+                        }
+                        GlobalScope.launch(context = Dispatchers.IO) {
+                            get<MyDatabase>().settingsDao().insert(
+                                Settings(
+                                    userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
+                                    defCurrency = 0,
+                                    backupPeriod = 0,
+                                    folder_id  = 1L
                                 )
                             )
                         }
@@ -113,7 +122,7 @@ class MainApplication : Application() {
                 RateCurrencyAPIRepository(
                     get<MyDatabase>().expensesDao(),
                     get<MyDatabase>().rateCurrencyDao(),
-                    get(),get()
+                    get()
                 )
             }
         }
@@ -122,9 +131,6 @@ class MainApplication : Application() {
     }
 
     private fun retrofitBuild(apiUrl: String): Retrofit {
-       /* val client = OkHttpClient.Builder()
-            .addInterceptor(ResponseInterceptor())
-            .build()*/
         return Retrofit.Builder()
             .baseUrl(apiUrl)
             .addConverterFactory(
@@ -138,7 +144,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Stetho.initializeWithDefaults(this)
+        //Stetho.initializeWithDefaults(this)
         mainApplication = this@MainApplication
         NetworkLiveData.init(this)
 
@@ -162,16 +168,16 @@ class MainApplication : Application() {
                     3 -> getKoin().get<MyViewModel>().startBackup(Periodic.WeekBackup)
                     else -> getKoin().get<MyViewModel>().stopBackup()
                 }
-            } else {
+            } /*else {
                 getKoin().get<ExpensesRepository>().insertSettings(
                     Settings(
                         userName = "${Build.BRAND}-${Build.MODEL}-${UUID.randomUUID()}",
                         defCurrency = 0,
                         backupPeriod = 0,
-                        folder ="Расходы"
+                        folder_id  = 0L
                     )
                 )
-            }
+            }*/
         }
     }
 

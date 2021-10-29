@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.settings_fragment.*
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_BYN
 import m.kampukter.travelexpenses.DEFAULT_CURRENCY_CONST_RUB
@@ -29,7 +28,7 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         controlBackupRadioGroup.visibility = View.INVISIBLE
-        viewModel.savedSettings.observe(viewLifecycleOwner, Observer { settings ->
+        viewModel.savedSettings.observe(viewLifecycleOwner, { settings ->
             if (settings != null) {
                 gpsSwitch.isChecked = (settings.statusGPS == STATUS_GPS_ON)
 

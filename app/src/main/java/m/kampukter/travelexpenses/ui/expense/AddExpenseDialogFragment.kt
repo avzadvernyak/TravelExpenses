@@ -25,8 +25,8 @@ class AddExpenseDialogFragment : DialogFragment() {
                 val editField =
                     (dialog as? AlertDialog)?.findViewById<TextInputEditText>(R.id.newExpenseTextInputEdit)
                 if (editField != null) {
-                    if (!editField.text.isNullOrBlank()) viewModel.addExpense(
-                        Expense(editField.text.toString())
+                    if (!editField.text.isNullOrBlank()) viewModel.addNewExpense(
+                        Expense(name = editField.text.toString())
                     )
                 }
                 dialog.dismiss()

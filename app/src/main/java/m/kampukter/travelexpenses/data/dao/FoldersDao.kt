@@ -1,10 +1,7 @@
 package m.kampukter.travelexpenses.data.dao
 
-import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import m.kampukter.travelexpenses.data.Folders
 import m.kampukter.travelexpenses.data.FoldersExtendedView
 
@@ -15,24 +12,29 @@ interface FoldersDao {
     suspend fun insertAll(expensesProfiles: List<Folders>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addFolder( folders: Folders)
-
-    @Query("select * from folders")
-    fun getAllLiveData(): LiveData<List<Folders>>
-
-    @Query("select * from folders where shortName = :query limit 1")
-    fun search(query: String): LiveData<FoldersExtendedView>
+    suspend fun addFolder(folders: Folders)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add( expensesProfiles: Folders)
+    suspend fun add(expensesProfiles: Folders)
 
-    @Query("delete from folders WHERE folders.shortName = :selectedFolder")
-    suspend fun deleteFolderByName(selectedFolder: String)
+    @Query("select * from folders")
+    fun getAllFoldersFlow(): Flow<List<Folders>>
 
-    @Query("update folders set shortName = :newFolderName where shortName = :oldFolderName ")
-    suspend fun updateRecord(newFolderName: String, oldFolderName: String): Int
+    @Query("select * from folders where id = :idFolder")
+    fun searchById(idFolder: Long): Flow<Folders>
 
-    @Query("select shortName, description, (select count(*) from expenses where expenses.folder = folders.shortName) as countRecords from folders")
-    fun getAllExtendedView(): LiveData<List<FoldersExtendedView>>
+    @Query("select id, shortName, description, (select count(*) from expenses where expenses.folder_id = folders.id) as countRecords from folders")
+    fun getAllExtendedViewFlow(): Flow<List<FoldersExtendedView>>
 
+    @Query("delete from folders WHERE folders.id = :folderId")
+    suspend fun deleteFolderByName( folderId: Long)
+
+    @Query("update folders set shortName = :newFolderName where id = :id ")
+    suspend fun updateShortName(id: Long, newFolderName: String): Int
+
+    @Query("update folders set description = :description where id = :id ")
+    suspend fun updateDescription(id: Long, description: String): Int
+
+    @Update
+    suspend fun update( folder: Folders)
 }

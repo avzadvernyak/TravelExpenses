@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,32 +35,42 @@ class FoldersEditFragment : Fragment() {
         folderShortNameTextInputEdit.filters = filterArray
         folderShortNameTextInputEdit.filterTouchesWhenObscured
 
-        folderDescriptionTextInputEdit.onFocusChangeListener =
-            View.OnFocusChangeListener { _, p1 ->
-                if (!p1) viewModel.setEditFolderDescription(folderDescriptionTextInputEdit.text.toString())
+        viewModel.currentFolder.observe(viewLifecycleOwner) {
+            if (folderShortNameTextInputEdit.text.toString() != it.shortName) {
+                folderShortNameTextInputEdit.setText(it.shortName)
             }
-        folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
+            if (folderDescriptionTextInputEdit.text.toString() != it.description) {
+                folderDescriptionTextInputEdit.setText(it.description)
+            }
+        }
+        viewModel.editFolderLiveData.observe(viewLifecycleOwner) { (currentFolder, candidate, folders) ->
+            folderShortNameTextInputEdit.error = when {
+                folders.map { it.shortName }
+                    .contains(candidate.shortName) -> getString(R.string.folder_name_validate_msg_duplicate)
+                candidate.shortName.isBlank() -> getString(R.string.folder_name_validate_msg_empty)
+                else -> {
+                    if (currentFolder != candidate) viewModel.updateFolder(candidate)
+
+                    null
+                }
+            }
+        }
+        folderDescriptionTextInputEdit.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.setEditFolderName(p0.toString())
+                viewModel.setFolderDescriptionForUpd(p0.toString())
+
             }
+
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {}
         })
-        folderShortNameTextInputEdit.onFocusChangeListener =
-            View.OnFocusChangeListener { _, p1 ->
-                if (!p1) viewModel.setUpdateFolderTrigger()
+        folderShortNameTextInputEdit.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.setFolderNameForUpd(p0.toString())
             }
 
-        viewModel.editFolderErrorMsg.observe(viewLifecycleOwner, {
-            folderShortNameTextInputEdit.error = it
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
         })
-        viewModel.currentFolder.observe(viewLifecycleOwner, { folder ->
-            folder?.let {
-                folderShortNameTextInputEdit.setText(it.shortName)
-                folderDescriptionTextInputEdit.setText(it.description)
-            }
-        })
-
-
     }
 }

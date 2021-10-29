@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.ExpensesWithRate
+import m.kampukter.travelexpenses.data.ExpensesExtendedView
 
 class GalleryPageAdapter : RecyclerView.Adapter<GalleryViewHolder>() {
 
-    private var mediaList = emptyList<ExpensesWithRate>()
+    private var mediaList = emptyList<ExpensesExtendedView>()
 
     var onClickCallback: ((Int) -> Unit)? = null
 
@@ -29,7 +29,7 @@ class GalleryPageAdapter : RecyclerView.Adapter<GalleryViewHolder>() {
             .inflate(R.layout.gallery_item, parent, false)
     )
 
-    fun setList(newMediaList: List<ExpensesWithRate>) {
+    fun setList(newMediaList: List<ExpensesExtendedView>) {
 
         val diff = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =

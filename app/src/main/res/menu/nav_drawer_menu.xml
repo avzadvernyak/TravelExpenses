@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <group>
         <item
                 android:id="@id/homeExpensesFragment"
@@ -9,11 +8,16 @@
                 android:title="@string/menu_expenses" />
 
         <item
+                android:id="@id/mapGoogleFragment"
+                android:icon="@drawable/ic_map_24"
+                android:title="@string/menu_map"/>
+        <!-- <item
                 android:id="@id/mapExpensesFragment"
                 android:icon="@drawable/ic_map_24"
-                android:title="@string/menu_map" />
+                android:title="@string/menu_map" />-->
+
         <item
-                android:id="@id/galleryFragment"
+                android:id="@id/galleryGridFragment"
                 android:icon="@drawable/ic_baseline_photo_library_24"
                 android:title="@string/menu_gallery" />
         <item
@@ -23,9 +27,9 @@
         <item
                 android:id="@id/foldersFragment"
                 android:icon="@drawable/ic_archive_black"
-                android:title="Папки расходов" />
+                android:title="@string/menu_folders" />
     </group>
-    <group android:checkableBehavior="single" android:id="@+id/grp0">
+    <group android:checkableBehavior="single">
         <item
                 android:id="@id/exchangeFragment"
                 android:icon="@drawable/ic_expenses"
@@ -35,7 +39,11 @@
                 android:icon="@drawable/ic_format_list_bulleted_24"
                 android:title="@string/menu_expense" />
     </group>
-    <group android:checkableBehavior="single" android:id="@+id/grp1">
+    <group android:checkableBehavior="single">
+        <item
+                android:id="@id/mapGooglePlaceFragment"
+                android:icon="@drawable/ic_map_24"
+                android:title="@string/menu_map_test" />
         <item
                 android:id="@id/settingsFragment"
                 android:icon="@drawable/ic_settings_black"

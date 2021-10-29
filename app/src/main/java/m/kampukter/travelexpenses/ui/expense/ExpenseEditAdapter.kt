@@ -12,7 +12,6 @@ class ExpenseEditAdapter : RecyclerView.Adapter<ExpenseEditViewHolder>() {
     private var items = emptyList<Expense>()
 
     var onClickCallback: ((Expense) -> Unit)? = null
-    var onLongClickCallback: ((Expense) -> Boolean)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExpenseEditViewHolder =
         ExpenseEditViewHolder(
@@ -26,7 +25,7 @@ class ExpenseEditAdapter : RecyclerView.Adapter<ExpenseEditViewHolder>() {
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ExpenseEditViewHolder, position: Int) {
-        holder.bind(items[position], onClickCallback, onLongClickCallback)
+        holder.bind(items[position], onClickCallback )
     }
 
     fun setItems(newItems: List<Expense>) {

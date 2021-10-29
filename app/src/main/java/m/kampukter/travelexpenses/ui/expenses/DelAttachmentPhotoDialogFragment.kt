@@ -6,6 +6,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import m.kampukter.travelexpenses.R
+import m.kampukter.travelexpenses.data.EditedExpensesField
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -16,13 +17,10 @@ class DelAttachmentPhotoDialogFragment : DialogFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dialog_title_del_photo))
             .setPositiveButton(resources.getString(R.string.dialog_yes)) { _, _ ->
-                viewModel.expenseMediatorLiveData.observe(this,{
-                    it.first?.let { expenses ->
-                        viewModel.addExpenses(expenses.copy(imageUri = null))
-                        findNavController().navigate(R.id.next_action)
-                    }
-                })
-
+                viewModel.expensesIdEditLiveData.observe(this) { expensesId ->
+                    viewModel.updateExpenses( EditedExpensesField.ImageUriField(expensesId,null))
+                    findNavController().navigate(R.id.next_action)
+                }
             }
             .create()
 

@@ -7,14 +7,14 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-            <ImageView
-                    android:id="@+id/folderOpenImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_folder_open_24"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="@null" />
+    <ImageView
+            android:id="@+id/folderOpenImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_folder_open_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
             android:id="@+id/shortNameFolderTextView"
@@ -29,45 +29,28 @@
             app:layout_constraintStart_toEndOf="@id/folderOpenImageView"
             app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                    android:id="@+id/descriptionFolderTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-
-                    android:layout_marginTop="8dp"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    android:textColor="?android:attr/textColorSecondary"
-
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/shortNameFolderTextView"
-                    app:layout_constraintEnd_toStartOf="@id/iconEditCheckBox"/>
-
-            <CheckBox
-                    android:id="@+id/iconEditCheckBox"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:button="@drawable/ic_edit_24"
-                    app:layout_constraintBottom_toBottomOf="@id/descriptionFolderTextView"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/shortNameFolderTextView" />
-<!--
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
     <TextView
-            android:id="@+id/changeTextView"
-            android:layout_width="wrap_content"
+            android:id="@+id/descriptionFolderTextView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Папки"
-            android:textStyle="bold"
+
+            android:layout_marginTop="8dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?android:attr/textColorSecondary"
+
+            app:layout_constraintEnd_toStartOf="@id/iconEditCheckBox"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/currentFolderMaterialCardView"
-            android:visibility="invisible"/>
--->
+            app:layout_constraintTop_toBottomOf="@id/shortNameFolderTextView" />
+
+    <CheckBox
+            android:id="@+id/iconEditCheckBox"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:button="@drawable/ic_edit_24"
+            app:layout_constraintBottom_toBottomOf="@id/descriptionFolderTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/shortNameFolderTextView" />
+
     <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
@@ -81,11 +64,10 @@
             android:id="@+id/foldersRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginTop="16dp"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

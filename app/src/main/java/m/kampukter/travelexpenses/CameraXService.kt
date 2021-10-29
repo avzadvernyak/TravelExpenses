@@ -44,8 +44,6 @@ class CameraXService(private val cameraExecutor: ExecutorService) {
 
             // Attach the viewfinder's surface provider to preview use case
             preview.setSurfaceProvider(viewFinder.surfaceProvider)
-
-
         }, ContextCompat.getMainExecutor(context))
     }
 
@@ -63,13 +61,9 @@ class CameraXService(private val cameraExecutor: ExecutorService) {
                     }
 
                     override fun onError(exception: ImageCaptureException) {
-                        Log.e(
-                            "blabla",
-                            "Error (OnImageSavedCallback): ${exception.message}"
-                        )
+                        Log.e("blabla", "Error (OnImageSavedCallback): ${exception.message}")
                     }
                 })
-
         }
     }
 }

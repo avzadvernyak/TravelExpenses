@@ -1,11 +1,8 @@
 package m.kampukter.travelexpenses.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import m.kampukter.travelexpenses.data.Expenses
-import m.kampukter.travelexpenses.data.ExpensesWithRate
-import m.kampukter.travelexpenses.data.InfoForRate
-import m.kampukter.travelexpenses.data.ReportSumView
+import kotlinx.coroutines.flow.Flow
+import m.kampukter.travelexpenses.data.*
 
 @Dao
 interface ExpensesDao {
@@ -15,69 +12,58 @@ interface ExpensesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(expanses: Expenses): Long
 
-    @Query("select * from expenses where expenses.folder = :folder")
-    fun getAll(folder:String): LiveData<List<Expenses>>
+    @Query("select * from expenses where expenses.folder_id = :folderId")
+    fun getAll( folderId: Long ): Flow<List<Expenses>>
 
-    @Query("select * from expenses")
-    suspend fun getAllExpenses(): List<Expenses>
-
+    //@Query("select * from expenses")
     @Query(
-        """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
-                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
+    """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
+                            expenses.expense_id as expense_id, expenses.note as note, expenses.sum as sum, 
+                            expenses.imageUri as imageUri, expenses.location as location , expenses.folder_id as folderId,
+                            expense.name as expense , folders.shortName as folderName  
             from expenses
-            LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder = :folder 
-            group by expenses.dateTime
-            order by expenses.dateTime desc  
-           """
+            LEFT JOIN expense ON expenses.expense_id = expense.id
+            LEFT JOIN folders ON expenses.folder_id = folders.id 
+            """
+
     )
-    fun getAllExpensesWithRate(folder: String): LiveData<List<ExpensesWithRate>>
+    suspend fun getAllExpenses(): List<ExpensesExtendedView>
 
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
-                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
+                         expenses.expense_id as expense_id, expense.name as expense, expenses.note as note, expenses.sum as sum, 
+                         rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri,
+                         expenses.folder_id as folderId, folders.shortName as folderName
             from expenses
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder = :folder 
+            LEFT JOIN expense ON expenses.expense_id = expense.id
+            LEFT JOIN folders ON expenses.folder_id = folders.id 
+            where ((date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.note LIKE :searchString) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
            
            """
     )
-    fun getSearchExpensesWithRate( searchString: String, folder: String): LiveData<List<ExpensesWithRate>>
-
-
-    @Query("delete from expenses WHERE expenses.id = :selectedId")
-    suspend fun deleteExpensesById(selectedId: Long)
-
-    @Query("select * from expenses where id = :id")
-    fun getExpensesById(id: Long): LiveData<Expenses>
-
-    @Query("select count(expense) from expenses where expense = :name")
-    suspend fun getExpensesCount(name: String): Long
-
-    @Query("select count(folder) from expenses where folder = :name")
-    suspend fun getFoldersCount(name: String): Long
+    fun getSearchExpenses(searchString: String, folderId: Long): Flow<List<ExpensesExtendedView>>
 
     @Query(
-        """ select sum(sum) AS sum, expense AS name, currency_field AS note 
+        """ select sum(sum) AS sum, expense.name AS name, currency_field AS note 
             from expenses 
-            where expenses.folder = :folder
-            group by  expense,currency_field    
+            LEFT JOIN expense ON expenses.expense_id = expense.id 
+            where expenses.folder_id = :folder_id
+            group by  expense_id,currency_field    
             """
     )
-    fun getSumExpenses(folder: String): LiveData<List<ReportSumView>>
+    fun getSumExpenses(folder_id: Long): Flow<List<ReportSumView>>
 
     @Query(
         """ select sum(sum) AS sum, currency_field AS name, null AS note 
             from expenses
-            where expenses.folder = :folder
+            where expenses.folder_id = :folder_id
             group by  currency_field 
             """
     )
-    fun getSumCurrency(folder: String): LiveData<List<ReportSumView>>
+    fun getSumCurrency(folder_id: Long): Flow<List<ReportSumView>>
 
     @Query(
         """select currency_field, Date(dateTime) as dateRate 
@@ -86,23 +72,59 @@ interface ExpensesDao {
     )
     suspend fun getInfoForRate(): List<InfoForRate>
 
+    @Query("delete from expenses WHERE expenses.id IN (:selected)")
+    suspend fun deleteIdList(selected: Set<Long>)
+
+    @Query("update expenses set folder_id = :newFolderId WHERE expenses.id IN (:selected)")
+    suspend fun moveIdList(selected: Set<Long>, newFolderId: Long)
+
     @Query(
         """ select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
-                            expenses.expense as expense, expenses.note as note, expenses.sum as sum, 
-                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri  
+                            expenses.expense_id as expense_id, expense.name as expense, expenses.note as note, expenses.sum as sum, 
+                              rateCurrency.rate as rate, date(rateCurrency.exchangeDate) as exchangeDate , expenses.imageUri as imageUri,
+                              expenses.location as location, expenses.folder_id as folderId
             from expenses
+            LEFT JOIN expense ON expenses.expense_id = expense.id 
             LEFT JOIN rateCurrency ON expenses.currency_field = rateCurrency.name 
-            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder = :folder 
+            where (date(expenses.dateTime) >= date(rateCurrency.exchangeDate) or rateCurrency.exchangeDate is null) and expenses.folder_id = :folderId 
             group by expenses.dateTime
             order by expenses.dateTime desc  
             
            """
     )
-    fun getExpenses(folder: String): LiveData<List<ExpensesWithRate>>
+    fun getExpensesView(folderId: Long): Flow<List<ExpensesExtendedView>>
 
-    @Query("delete from expenses WHERE expenses.id IN (:selected)")
-    suspend fun deleteIdList(selected: Set<Long>)
+    @Query(""" select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
+                            expenses.expense_id as expense_id, expense.name as expense, expenses.note as note, expenses.sum as sum, 
+                            expenses.imageUri as imageUri, expenses.location as location , expenses.folder_id as folderId   
+            from expenses
+            LEFT JOIN expense ON expenses.expense_id = expense.id 
+            where expenses.id = :id"""
+        )
+    fun getExpensesById(id: Long): Flow<ExpensesExtendedView>
 
-    @Query("update expenses set folder = :newFolder WHERE expenses.id IN (:selected)")
-    suspend fun moveIdList(selected: Set<Long>, newFolder: String)
+    @Query("update expenses set expense_id = :expenseId where id = :id")
+    suspend fun updateExpense(id: Long, expenseId: Long)
+
+    @Query("update expenses set currency_field = :name where id = :id")
+    suspend fun updateCurrency(id: Long, name: String)
+
+    @Query("update expenses set note = :note where id = :id")
+    suspend fun updateNote(id: Long, note: String)
+
+    @Query("update expenses set sum = :sum where id = :id")
+    suspend fun updateSum(id: Long, sum: Double)
+
+    @Query("update expenses set imageUri = :imageUri where id = :id")
+    suspend fun updateImageUri(id: Long, imageUri: String?)
+
+    @Query(""" select expenses.id as id, expenses.dateTime as dateTime, expenses.currency_field as currency,
+                            expenses.expense_id as expense_id, expenses.note as note, expenses.sum as sum, 
+                            expenses.imageUri as imageUri, expenses.location as location , expenses.folder_id as folderId,
+                            expense.name as expense   
+            from expenses
+             LEFT JOIN expense ON expenses.expense_id = expense.id 
+            where expenses.expense_id = :id"""
+    )
+    fun getExpensesByExpense(id: Long): Flow<List<ExpensesExtendedView>>
 }

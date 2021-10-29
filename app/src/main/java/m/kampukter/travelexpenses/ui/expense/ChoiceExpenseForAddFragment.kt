@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.choice_expense_fragment.*
 import m.kampukter.travelexpenses.R
@@ -39,17 +38,13 @@ class ChoiceExpenseForAddFragment : Fragment() {
             )
             adapter = expenseAdapter
         }
-        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, Observer { value ->
-            value.first?.let { expenses ->
-                expenseAdapter?.setCallback {
-                    viewModel.setBufferExpenses(expenses.copy(expense = it.name))
-                    findNavController().navigate(R.id.next_action)
-                }
-            }
-        })
-
-        viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
+        expenseAdapter?.setCallback { item ->
+            viewModel.setLastExpense(item.id)
+            findNavController().navigate(R.id.next_action)
+        }
+        viewModel.expenseList.observe(viewLifecycleOwner) { expenseList ->
             expenseAdapter?.setList(expenseList)
-        })
+        }
+
     }
 }

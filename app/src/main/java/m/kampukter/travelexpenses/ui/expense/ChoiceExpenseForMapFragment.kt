@@ -1,4 +1,4 @@
-package m.kampukter.travelexpenses.ui.map
+package m.kampukter.travelexpenses.ui.expense
 
 import android.content.Context
 import android.os.Bundle
@@ -7,12 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.choice_expense_fragment.*
 import m.kampukter.travelexpenses.R
 import m.kampukter.travelexpenses.data.FilterForExpensesMap
-import m.kampukter.travelexpenses.ui.expense.ExpenseChoiceAdapter
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -32,9 +30,10 @@ class ChoiceExpenseForMapFragment: Fragment() {
 
         val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+
         expenseAdapter = ExpenseChoiceAdapter{ item->
-            viewModel.setFilterForExpensesMap(FilterForExpensesMap.ExpenseFilter(item.name))
-            findNavController().navigate(R.id.next_action)
+            viewModel.setFilterForExpensesMap(FilterForExpensesMap.ExpenseFilter( item ))
+            findNavController().navigateUp()
         }
         with(recyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -45,7 +44,7 @@ class ChoiceExpenseForMapFragment: Fragment() {
             adapter = expenseAdapter
         }
 
-        viewModel.expenseList.observe(viewLifecycleOwner, Observer { expenseList ->
+        viewModel.expenseList.observe(viewLifecycleOwner, { expenseList ->
             expenseAdapter?.setList(expenseList)
         })
     }

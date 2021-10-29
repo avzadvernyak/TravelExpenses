@@ -3,48 +3,56 @@ package m.kampukter.travelexpenses.ui.expenses
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.search_result_expenses_fragment.*
 import m.kampukter.travelexpenses.R
-import m.kampukter.travelexpenses.data.ExpensesWithRate
-import m.kampukter.travelexpenses.ui.ClickEventDelegate
+import m.kampukter.travelexpenses.data.ExpensesExtendedView
+import m.kampukter.travelexpenses.data.ExpensesMainCollection
 import m.kampukter.travelexpenses.viewmodel.MyViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import android.text.format.DateFormat
-import android.util.Log
-import androidx.appcompat.view.ActionMode
-import androidx.navigation.NavController
-import m.kampukter.travelexpenses.data.ExpensesMainCollection
 
 
 class SearchResultExpensesFragment : Fragment() {
 
     private val viewModel by sharedViewModel<MyViewModel>()
 
-    private lateinit var expensesAdapter: ExpensesAdapter
+    private var expensesAdapter: ExpensesAdapter? = null
 
     private lateinit var navController: NavController
     private var actionMode: ActionMode? = null
 
+    private var isInSelection = false
+
+    val countSelectedItem = MutableLiveData<Int>()
+
+
     private val actionModeCallback: ActionMode.Callback = object : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            viewModel.setSelectedExpenses(expensesAdapter.getSelectedItems())
-            when (item?.itemId) {
-                R.id.action_move -> {
-                    navController.navigate(R.id.toExpensesMoveFragment)
-                    mode?.finish()
-                }
-                R.id.action_share -> {
-                    viewModel.expensesShareTrigger(true)
-                }
-                R.id.action_delete -> {
-                    navController.navigate(R.id.toDelExpensesDialogFragment)
+            expensesAdapter?.let { adapter ->
+                val list = adapter.getSelectedItems()
+                val bundle = bundleOf("Ids" to list.map { (it as ExpensesMainCollection.Row).id }
+                    .toLongArray())
+                when (item?.itemId) {
+                    R.id.action_move -> {
+                        navController.navigate(R.id.toExpensesMoveFragment, bundle)
+                    }
+                    R.id.action_share -> {
+                        sharedExpenses(list.map { (it as ExpensesMainCollection.Row).expenses })
+                    }
+                    R.id.action_delete -> {
+                        navController.navigate(R.id.toExpensesDelDialogFragment, bundle)
+                    }
                 }
             }
             mode?.finish()
@@ -63,7 +71,7 @@ class SearchResultExpensesFragment : Fragment() {
 
         override fun onDestroyActionMode(mode: ActionMode?) {
             actionMode = null
-            expensesAdapter.endSelection()
+            expensesAdapter?.endSelection()
         }
     }
 
@@ -87,22 +95,51 @@ class SearchResultExpensesFragment : Fragment() {
 
         navController = findNavController()
 
-        expensesAdapter =
-            ExpensesAdapter(view.context) { item ->
-                viewModel.setQueryExpensesId(item.id)
-                navController.navigate(R.id.toEditExpensesFragment)
-            }.apply {
-                enableActionMode(actionModeCallback) { count ->
-                    actionMode?.title = getString(R.string.expenses_am_title_count, count)
-                    if (count == 0) {
-                        actionMode?.finish()
-                        expensesAdapter.endSelection()
-                    }
+        expensesAdapter = ExpensesAdapter().apply {
+            onClick = { item ->
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    navController.navigate(
+                        R.id.toEditExpensesFragment,
+                        bundleOf("expensesId" to item.id)
+                    )
                 }
-                viewModel.selectedExpensesLiveData.observe(viewLifecycleOwner, {
-                    expensesAdapter.setSelection(it)
-                })
             }
+            onLongClick = { item ->
+                if (!isInSelection) {
+                    (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                    isInSelection = true
+                    countSelectedItem.postValue(toggleItemSelection(item))
+                }
+            }
+            onLocationClick = { item ->
+                if (isInSelection) {
+                    countSelectedItem.postValue(toggleItemSelection(item))
+                } else {
+                    viewModel.expensesIdEdit(item.id)
+                    navController.navigate(R.id.toMapPointFragment)
+                }
+            }
+            onPhotoClick = { item ->
+                if (isInSelection) {
+                    countSelectedItem.postValue(expensesAdapter?.toggleItemSelection(item))
+                } else {
+                    navController.navigate(
+                        R.id.toGalleryFragment,
+                        bundleOf("galleryItemId" to item.id)
+                    )
+                }
+            }
+            viewModel.savedStateSearchFragmentLiveData.observe(viewLifecycleOwner, {
+                if (it.isNotEmpty()) {
+                    (context as AppCompatActivity).startSupportActionMode(actionModeCallback)
+                    isInSelection = true
+                    this.setSelection(it)
+                    actionMode?.title = getString(R.string.expenses_am_title_count, it.size)
+                }
+            })
+        }
 
         with(resultRecyclerView) {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -112,32 +149,27 @@ class SearchResultExpensesFragment : Fragment() {
             )
             adapter = expensesAdapter
         }
+
+        countSelectedItem.observe(viewLifecycleOwner,
+            {
+                actionMode?.title = getString(R.string.expenses_am_title_count, it)
+                if (it == 0) {
+                    actionMode?.finish()
+                    expensesAdapter?.endSelection()
+                    isInSelection = false
+                }
+            })
+
         viewModel.expensesSearchResult.observe(viewLifecycleOwner, {
             val expenses = mutableListOf<ExpensesMainCollection>()
             expenses.add(ExpensesMainCollection.Header(resources.getString(R.string.nav_label_search_result_expenses)))
             it.forEach { item -> expenses.add(ExpensesMainCollection.Row(item)) }
-            expensesAdapter.setList(expenses)
-        })
-        viewModel.expensesDeleteStatusMediatorLiveData.observe(viewLifecycleOwner, {
-            actionMode?.finish()
-            expensesAdapter.endSelection()
-        })
-        viewModel.expensesMoveStatusMediatorLiveData.observe(viewLifecycleOwner, {
-            actionMode?.finish()
-            expensesAdapter.endSelection()
-        })
-
-        viewModel.expensesShareResultMediatorLiveData.observe(viewLifecycleOwner, {
-            if (it.second.isNotEmpty() && it.first) {
-                actionMode?.finish()
-                expensesAdapter.endSelection()
-                sharedExpenses(it.second)
-            }
+            expensesAdapter?.setList(expenses)
         })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        expensesAdapter.let { viewModel.setSelectedExpenses(it.getSelectedItems()) }
+        expensesAdapter?.let { viewModel.setSavedStateSearchFragment(it.getSelectedItems()) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -173,9 +205,7 @@ class SearchResultExpensesFragment : Fragment() {
             })
     }
 
-    private fun sharedExpenses(expensesList: List<ExpensesWithRate>) {
-
-
+    private fun sharedExpenses(expensesList: List<ExpensesExtendedView>) {
         if (expensesList.size == 1) {
             if (expensesList[0].imageUri != null) sharedExpensesImageIntent(expensesList[0])
             else {
@@ -185,7 +215,8 @@ class SearchResultExpensesFragment : Fragment() {
                     expensesList[0].note,
                     expensesList[0].sum,
                     expensesList[0].currency,
-                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString()
+                    DateFormat.format("dd/MM/yyyy HH:mm", expensesList[0].dateTime).toString(),
+                    expensesList[0].folderName
                 )
                 sharedExpensesTextIntent(messageText)
             }
@@ -198,14 +229,15 @@ class SearchResultExpensesFragment : Fragment() {
                     it.note,
                     it.sum,
                     it.currency,
-                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString()
+                    DateFormat.format("dd/MM/yyyy HH:mm", it.dateTime).toString(),
+                    it.folderName
                 )
             }
             sharedExpensesTextIntent(messageText)
         }
     }
 
-    private fun sharedExpensesImageIntent(expenses: ExpensesWithRate) {
+    private fun sharedExpensesImageIntent(expenses: ExpensesExtendedView) {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             val date =
@@ -217,7 +249,8 @@ class SearchResultExpensesFragment : Fragment() {
                     expenses.note,
                     expenses.sum,
                     expenses.currency,
-                    date
+                    date,
+                    expenses.folderName
                 )
             )
             putExtra(Intent.EXTRA_STREAM, Uri.parse(expenses.imageUri))

@@ -21,11 +21,17 @@
                 android:id="@+id/toAddExpensesFragment"
                 app:destination="@+id/addExpensesFragment" />
         <action
+                android:id="@+id/toMapPointFragment"
+                app:destination="@+id/mapPointFragment" />
+        <action
+                android:id="@+id/toGalleryFragment"
+                app:destination="@+id/galleryFragment" />
+        <action
                 android:id="@+id/toEditExpensesFragment"
                 app:destination="@+id/editExpensesFragment" />
         <action
-                android:id="@+id/toDelExpensesDialogFragment"
-                app:destination="@+id/delExpensesDialogFragment" />
+                android:id="@+id/toExpensesDelDialogFragment"
+                app:destination="@+id/expensesDelDialogFragment" />
         <action
                 android:id="@+id/toExpensesMoveFragment"
                 app:destination="@+id/expensesMoveFragment" />
@@ -50,6 +56,9 @@
         <action
                 android:id="@+id/toAboutDialogFragment"
                 app:destination="@+id/aboutDialogFragment" />
+        <action
+                android:id="@+id/toMapGooglePlaceFragment"
+                app:destination="@+id/mapGooglePlaceFragment" />
     </fragment>
     <dialog
             android:id="@+id/aboutDialogFragment"
@@ -98,8 +107,8 @@
                 android:id="@+id/toEditExpensesFragment"
                 app:destination="@+id/editExpensesFragment" />
         <action
-                android:id="@+id/toDelExpensesDialogFragment"
-                app:destination="@+id/delExpensesDialogFragment" />
+                android:id="@+id/toExpensesDelDialogFragment"
+                app:destination="@+id/expensesDelDialogFragment" />
         <action
                 android:id="@+id/toExpensesMoveDialogFragment"
                 app:destination="@+id/expensesMoveDialogFragment" />
@@ -119,13 +128,10 @@
     </fragment>
     <fragment
             android:id="@+id/takePhotoForEditFragment"
-            android:name="m.kampukter.travelexpenses.ui.TakePhotoForEditFragment">
+            android:name="m.kampukter.travelexpenses.ui.expenses.TakePhotoForEditFragment">
         <action
                 android:id="@+id/toCameraPermissionsDialogFragment"
                 app:destination="@id/cameraPermissionsDialogFragment" />
-        <action
-                android:id="@+id/toDelAttachmentPhotoDialogFragment"
-                app:destination="@id/delAttachmentPhotoDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/editExpensesFragment" />
@@ -142,6 +148,9 @@
                 android:id="@+id/toAttachmentPhotoViewFragment"
                 app:destination="@id/attachmentPhotoViewFragment" />
         <action
+                android:id="@+id/toMapPointFragment"
+                app:destination="@id/mapPointFragment" />
+        <action
                 android:id="@+id/toTakePhotoForEditFragment"
                 app:destination="@id/takePhotoForEditFragment" />
 
@@ -151,6 +160,21 @@
             android:name="m.kampukter.travelexpenses.ui.expenses.AttachmentPhotoViewFragment"
             android:label="@string/nav_label_edit_expenses"
             tools:layout="@layout/edit_expenses_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/editExpensesFragment" />
+
+    </fragment>
+
+    <!--android:name="m.kampukter.travelexpenses.ui.map.MapPointFragment"-->
+    <fragment
+            android:id="@+id/mapPointFragment"
+            android:name="m.kampukter.travelexpenses.ui.map.GoogleMapPointFragment"
+            android:label="@string/nav_label_view_map"
+            tools:layout="@layout/map_point_fragment">
+        <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/editExpensesFragment" />
@@ -167,21 +191,14 @@
     </dialog>
 
     <dialog
-            android:id="@+id/delExpensesDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expenses.DelExpensesDialogFragment">
+            android:id="@+id/expensesDelDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesDelDialogFragment">
 
         <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </dialog>
-   <!-- <dialog
-            android:id="@+id/expensesMoveDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesMoveDialogFragment">
 
-        <action
-                android:id="@+id/next_action"
-                app:popUpTo="@id/homeExpensesFragment" />
-    </dialog>-->
     <fragment
             android:id="@+id/expensesMoveFragment"
             android:name="m.kampukter.travelexpenses.ui.expenses.ExpensesMoveFragment"
@@ -222,33 +239,13 @@
             android:label="@string/nav_label_expense"
             tools:layout="@layout/expense_fragment">
         <action
-                android:id="@+id/toDelExpensePhaseOneDialogFragment"
-                app:destination="@id/delExpensePhaseOneDialogFragment" />
-        <action
-                android:id="@+id/toDelExpensePhaseSecondDialogFragment"
-                app:destination="@id/delExpensePhaseSecondDialogFragment" />
-        <action
-                android:id="@+id/toEditExpenseDialogFragment"
-                app:destination="@id/editExpenseDialogFragment" />
+                android:id="@+id/toExpenseEditFragment"
+                app:destination="@id/expenseEditFragment" />
         <action
                 android:id="@+id/toAddExpenseDialogFragment"
                 app:destination="@id/addExpenseDialogFragment" />
 
     </fragment>
-    <dialog
-            android:id="@+id/delExpensePhaseOneDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expense.DelExpensePhaseOneDialogFragment">
-        <action
-                android:id="@+id/toExpenseFragment"
-                app:popUpTo="@id/expenseFragment" />
-    </dialog>
-    <dialog
-            android:id="@+id/delExpensePhaseSecondDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expense.DelExpensePhaseSecondDialogFragment">
-        <action
-                android:id="@+id/toExpenseFragment"
-                app:popUpTo="@id/expenseFragment" />
-    </dialog>
     <dialog
             android:id="@+id/addExpenseDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.expense.AddExpenseDialogFragment">
@@ -256,9 +253,9 @@
                 android:id="@+id/toExpenseFragment"
                 app:popUpTo="@id/expenseFragment" />
     </dialog>
-    <dialog
-            android:id="@+id/editExpenseDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.expenses.EditExpenseDialogFragment"
+    <fragment
+            android:id="@+id/expenseEditFragment"
+            android:name="m.kampukter.travelexpenses.ui.expense.ExpenseEditFragment"
             android:label="@string/nav_label_edit_expense">
         <argument
                 android:name="expenseArg"
@@ -267,7 +264,7 @@
         <action
                 android:id="@+id/toExpenseFragment"
                 app:popUpTo="@id/expenseFragment" />
-    </dialog>
+    </fragment>
     <dialog
             android:id="@+id/datePickerDialogFragment"
             android:name="m.kampukter.travelexpenses.ui.DatePickerDialogFragment">
@@ -336,12 +333,15 @@
                 android:id="@+id/toChoiceExpenseForMapFragment"
                 app:destination="@id/choiceExpenseForMapFragment" />
         <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
+        <action
                 android:id="@+id/next_action"
                 app:popUpTo="@id/homeExpensesFragment" />
     </fragment>
     <fragment
             android:id="@+id/choiceExpenseForMapFragment"
-            android:name="m.kampukter.travelexpenses.ui.map.ChoiceExpenseForMapFragment"
+            android:name="m.kampukter.travelexpenses.ui.expense.ChoiceExpenseForMapFragment"
             android:label="@string/nav_label_expense_choice"
             tools:layout="@layout/choice_expense_fragment">
         <action
@@ -371,6 +371,23 @@
                 android:id="@+id/next_action"
                 app:popUpTo="@id/galleryFragment" />
     </dialog>
+
+    <!--   Gallery Grid   -->
+    <fragment
+            android:id="@+id/galleryGridFragment"
+            android:name="m.kampukter.travelexpenses.ui.gallery.GalleryGridFragment"
+            android:label="@string/nav_label_gallery"
+            tools:layout="@layout/gallery_fragment">
+
+        <action
+                android:id="@+id/toGalleryFragment"
+                app:destination="@+id/galleryFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+
+    </fragment>
+
     <!--   Folders Expenses    -->
     <fragment
             android:id="@+id/foldersFragment"
@@ -387,11 +404,9 @@
                 android:id="@+id/toFoldersEditFragment"
                 app:destination="@+id/foldersEditFragment" />
         <action
-                android:id="@+id/toDelFolderPhaseOneDialogFragment"
-                app:destination="@id/delFolderPhaseOneDialogFragment" />
-        <action
-                android:id="@+id/toDelFolderPhaseSecondDialogFragment"
-                app:destination="@id/delFolderPhaseSecondDialogFragment" />
+                android:id="@+id/toDelFolderDialogFragment"
+                app:destination="@id/delFolderDialogFragment" />
+
     </fragment>
     <fragment
             android:id="@+id/foldersAddFragment"
@@ -403,19 +418,13 @@
                 app:popUpTo="@id/foldersFragment" />
     </fragment>
     <dialog
-            android:id="@+id/delFolderPhaseOneDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.folders.FolderDeletePhaseOneDialogFragment">
+            android:id="@+id/delFolderDialogFragment"
+            android:name="m.kampukter.travelexpenses.ui.folders.FolderDeleteDialogFragment">
         <action
                 android:id="@+id/toFoldersFragment"
                 app:popUpTo="@id/foldersFragment" />
     </dialog>
-    <dialog
-            android:id="@+id/delFolderPhaseSecondDialogFragment"
-            android:name="m.kampukter.travelexpenses.ui.folders.FolderDeletePhaseSecondDialogFragment">
-        <action
-                android:id="@+id/toFoldersFragment"
-                app:popUpTo="@id/foldersFragment" />
-    </dialog>
+
     <fragment
             android:id="@+id/foldersEditFragment"
             android:name="m.kampukter.travelexpenses.ui.folders.FoldersEditFragment"
@@ -424,5 +433,32 @@
         <action
                 android:id="@+id/toFoldersFragment"
                 app:popUpTo="@id/foldersFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/mapGoogleFragment"
+            android:name="m.kampukter.travelexpenses.ui.map.MapGoogleFragment"
+            android:label="@string/nav_map_google"
+            tools:layout="@layout/map_google_fragment">
+
+        <action
+                android:id="@+id/toChoiceExpenseForMapFragment"
+                app:destination="@id/choiceExpenseForMapFragment" />
+        <action
+                android:id="@+id/toLocationPermissionsDialogFragment"
+                app:destination="@id/locationPermissionsDialogFragment" />
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+
+    </fragment>
+    <fragment
+            android:id="@+id/mapGooglePlaceFragment"
+            android:name="m.kampukter.travelexpenses.ui.map.MapGooglePlaceFragment"
+            android:label="@string/nav_map_google_place"
+            tools:layout="@layout/map_google_place_fragment">
+        <action
+                android:id="@+id/next_action"
+                app:popUpTo="@id/homeExpensesFragment" />
+
     </fragment>
 </navigation>

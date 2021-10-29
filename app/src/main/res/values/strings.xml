@@ -9,14 +9,12 @@
     <string name="menu_clear_expenses">Очистить</string>
     <string name="menu_about">О программе</string>
     <string name="menu_settings">Настройки</string>
-    <string name="menu_sum_expense">По статьям</string>
-    <string name="menu_sum_currency">По валютам</string>
     <string name="menu_map">Карта</string>
+    <string name="menu_map_test">Google maps</string>
     <string name="menu_map_date_filter">Показать все за дату</string>
     <string name="menu_map_date_filter_title">По дате</string>
     <string name="menu_map_expense_filter">Показать все точки по статье</string>
     <string name="menu_map_expense_filter_title">По статье</string>
-    <string name="menu_save">Сохранить запись</string>
     <string name="menu_save_title">Сохранить</string>
 
     <string name="menu_add_photo">Add photo</string>
@@ -43,33 +41,28 @@
     " прораммы в процессе написания\n\n Для тех, кто хочет поддержать проект "
     "WMZ Z463710705149\n"</string>
 
-    <string name="last_backup">Last backup in %1$s</string>
-    <string name="expense_update_message">Все записи изменены</string>
     <string name="expense_del_warning">"%1$s\nЕсть связанные с этой статьей записи в количестве %2$d шт."
-    "Данные будут безвозвратно потеряны! "</string>
+    "Данные будут безвозвратно потеряны!"</string>
+    <string name="expense_info_warning">"По статье найдено %1$d записей в %2$d папках"
+     "</string>
 
-    <string name="edit_record_title">Редактирование записи</string>
     <string name="dialog_expenses_del_all_title">Удалить?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_cancel">Нет</string>
-    <string name="dialog_save">Сохранить</string>
     <string name="dialog_title_del_photo">Удалить прикрепленное фото?</string>
     <string name="dialog_title_del_photo_gallery">Удалить фото из галереи и записи?</string>
     <string name="dialog_location_access_required">"Получить разрешения на определение ваших координат? В случае отказа опция будет отключена"</string>
     <string name="dialog_camera_access_required">"Получить разрешения для работы с камерой? "</string>
     <string name="dialog_permission_required">"Получение разрешений"</string>
-    <string name="dialog_expenses_del_supporting_text">От %1$s \nна сумму %2$8.2f  %3$s</string>
+    <string name="dialog_expenses_del_supporting_text">%1$d записей</string>
     <string name="dialog_expenses_del_all_message">Все записи с расходами будут безвозвратно потеряны.Для их сохранения в другом месте воспользуйтесь Экспортом.
     </string>
     <string name="dialog_del_title">Удалить?</string>
-    <string name="dialog_expenses_del_record">Удалено</string>
-    <string name="dialog_expenses_move_record">Перенесено</string>
     <string name="dialog_exchange_is_empty">Ничего не найдено</string>
     <string name="hint_datetime_created">Запись создана</string>
     <string name="hint_sum">Сумма</string>
     <string name="hint_note">Примечание</string>
     <string name="add_record_title">Добавить запись</string>
-    <string name="fields_add_title">Создать папку расходов</string>
     <string name="oneUah">за 1 UAH на</string>
     <string name="oneRub">за 1 RUB на</string>
     <string name="oneByn">за 1 BYN на</string>
@@ -81,7 +74,6 @@
 
     <string name="reload">Повторить</string>
     <string name="errorAPI">Ошибка связи с банком. \nПопробуйте позже.</string>
-    <string name="map_expenses_button_all">Все</string>
 
 
     <string name="settings_currency_title">Автоматическая конвертация</string>
@@ -98,7 +90,7 @@
     <string name="accuracy_value">%1$d m.</string>
     <string name="menu_gallery">Gallery</string>
     <string name="new_record">Новая запись</string>
-    <string name="menu_search">Search</string>
+    <string name="menu_search">Поиск</string>
     <string name="nav_label_gallery">Галерея</string>
     <string name="nav_label_folders">Выбор текущей папки</string>
     <string name="nav_label_add_new_folder">Новая папка</string>
@@ -107,6 +99,23 @@
     <string name="expenses_am_action_move">Перенести</string>
     <string name="expenses_am_action_del">Удалить</string>
     <string name="expenses_am_title_count">Выбрано: %1$d</string>
-    <string name="msg_sent_to">%1$s \n%2$s \n%3$8.2f %4$s \n%5$s;\n"</string>
+    <string name="msg_sent_to">%1$s \n%2$s \n%3$8.2f %4$s \n%5$s ;\n%6$s"</string>
+    <string name="folder_name_validate_msg_duplicate">Такое имя уже есть</string>
+    <string name="folder_name_validate_msg_empty">Заполните поле</string>
+    <string name="expenses">Расходы %1$s</string>
+    <string name="expense_del_warning_1">В случае удаления статьи все связанные записи будут удалены.</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="menu_folders">Папки расходов</string>
+    <string name="points_is_empty">Записей с локацией нет</string>
+    <string name="map">Карта</string>
+    <string name="photo">Фото</string>
+    <string name="nav_label_view_map">View Point on Map</string>
+    <string name="nav_map_google">Google Maps</string>
+    <string name="title_map_type">Тип карты</string>
+    <string name="default_map_type"> По\nумолчанию</string>
+    <string name="hybrid_map_type">Спутник</string>
+    <string name="nav_map_google_place">Test</string>
+    <string name="map_filter_interval">За период</string>
+    <string name="map_filter_expense">Статья</string>
 
 </resources>

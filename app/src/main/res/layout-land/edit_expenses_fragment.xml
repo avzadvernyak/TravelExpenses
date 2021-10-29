@@ -12,25 +12,36 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="2dp"
             android:hint="@string/hint_datetime_created"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/attachmentImageView"/>
+            app:layout_constraintEnd_toEndOf="@id/expenseTextInputLayout"/>
+    <com.google.android.material.chip.Chip
+            android:id="@+id/locationChip"
+            style="@style/AppTheme.AdvancedChipText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/map"
+            app:chipIcon="@drawable/ic_gps_fixed_24"
+            app:layout_constraintEnd_toEndOf="@id/expenseTextInputLayout"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/expenseTextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-
+            android:layout_marginTop="2dp"
             android:hint="@string/hint_expense"
             android:inputType="none"
             app:endIconDrawable="@drawable/ic_drop_down_24"
             app:endIconMode="custom"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateTimeTextView"
+            app:layout_constraintTop_toBottomOf="@+id/locationChip"
             app:layout_constraintEnd_toStartOf="@id/attachmentImageView">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -46,7 +57,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:hint="@string/hint_sum"
             app:layout_constraintEnd_toStartOf="@+id/currencyTextInputLayout"
@@ -86,13 +97,12 @@
 
     <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/noteTextInputLayout"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
             android:hint="@string/hint_note"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/expenseTextInputLayout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sumTextInputLayout">
 
@@ -103,17 +113,17 @@
 
     </com.google.android.material.textfield.TextInputLayout>
     <ImageView
-            android:layout_width="175dp"
-            android:layout_height="175dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:id="@+id/attachmentImageView"
             android:src="@drawable/ic_photo_24"
             android:visibility="invisible"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginVertical="16dp"
             app:layout_constraintStart_toEndOf="@id/expenseTextInputLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:contentDescription="@null" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

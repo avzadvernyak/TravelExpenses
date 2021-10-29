@@ -8,9 +8,8 @@ import androidx.room.PrimaryKey
     tableName = "settings",
     foreignKeys = [ForeignKey(
         entity = Folders::class,
-        parentColumns = arrayOf("shortName"),
-        childColumns = arrayOf("folder"),
-        onUpdate = ForeignKey.CASCADE
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("folder_id"),
     )]
 )
 data class Settings(
@@ -18,5 +17,5 @@ data class Settings(
     val defCurrency: Int = 0,
     val backupPeriod: Int = 0,
     val statusGPS: Int = 0,
-    val folder: String = ""
+    val folder_id: Long = 1L
 )

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/mapFragmentContainerView"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="m.kampukter.travelexpenses.ui.map.MapGoogleTestFragment" />
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewToolbarCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:elevation="4dp"
+            app:cardBackgroundColor="#99F3EFEF"
+            app:cardCornerRadius="12dp"
+            app:cardUseCompatPadding="true"
+            android:layout_marginTop="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/autocomplete_fragment"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                 />
+    </androidx.cardview.widget.CardView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/mapTypeFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@null"
+            app:backgroundTint="#FFFFFF"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toBottomOf="@id/mapFragmentContainerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_layers_24" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/deleteMarkerFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="@null"
+            app:backgroundTint="#FFFFFF"
+            app:fabSize="mini"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@id/mapTypeFAB"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_delete_forever_black" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mapTypeSelectionLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/map_type_background"
+            android:elevation="6dp"
+            android:padding="8dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/mapTypeFAB"
+            app:layout_constraintEnd_toEndOf="@+id/mapTypeFAB">
+
+        <View
+                android:id="@+id/defaultTypeBackgroundView"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/rounded_rectangle"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/defaultTypeImageButton"
+                app:layout_constraintEnd_toEndOf="@+id/defaultTypeImageButton"
+                app:layout_constraintStart_toStartOf="@+id/defaultTypeImageButton"
+                app:layout_constraintTop_toTopOf="@+id/defaultTypeImageButton" />
+
+        <ImageButton
+                android:id="@+id/defaultTypeImageButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/type_default"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/titleTypeTextView" />
+
+        <View
+                android:id="@+id/hybridTypeBackgroundView"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@drawable/rounded_rectangle"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/hybridTypeImageButton"
+                app:layout_constraintEnd_toEndOf="@+id/hybridTypeImageButton"
+                app:layout_constraintStart_toStartOf="@+id/hybridTypeImageButton"
+                app:layout_constraintTop_toTopOf="@+id/hybridTypeImageButton" />
+
+        <ImageButton
+                android:id="@+id/hybridTypeImageButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/type_satellite"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/defaultTypeImageButton"
+                app:layout_constraintTop_toBottomOf="@+id/titleTypeTextView" />
+
+        <TextView
+                android:id="@+id/titleTypeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/title_map_type"
+                android:textAllCaps="true"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/defaultTypeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/default_map_type"
+                android:textColor="#808080"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/defaultTypeImageButton"
+                app:layout_constraintStart_toStartOf="@+id/defaultTypeImageButton"
+                app:layout_constraintTop_toBottomOf="@+id/defaultTypeImageButton" />
+
+        <TextView
+                android:id="@+id/hybridTypeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/hybrid_map_type"
+                android:textColor="#808080"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/hybridTypeImageButton"
+                app:layout_constraintStart_toStartOf="@+id/hybridTypeImageButton"
+                app:layout_constraintTop_toBottomOf="@+id/hybridTypeImageButton" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

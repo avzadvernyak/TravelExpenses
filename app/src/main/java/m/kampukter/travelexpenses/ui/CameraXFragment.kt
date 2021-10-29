@@ -66,12 +66,18 @@ class CameraXFragment : Fragment() {
         viewFinder.post {
             cameraService.setUpCamera(this, view.context, viewFinder)
         }
-        viewModel.bufferExpensesMediatorLiveData.observe(viewLifecycleOwner, { value ->
-            if (!value.first?.imageUri.isNullOrEmpty()) findNavController().navigate(R.id.next_action)
-        })
+        viewModel.addExpensesLiveData.observe(viewLifecycleOwner) { (expenses, _, _) ->
+            expenses.imageUri?.let {
+                if (it.isNotBlank()) findNavController().navigate(R.id.next_action)
+            }
+
+        }
+
         camera_capture_button.setOnClickListener {
             viewModel.createJPGFile()?.let {
-                cameraService.takePhoto(it) { uriPhoto -> viewModel.setBufferExpensesPhoto(uriPhoto) }
+                cameraService.takePhoto(it) { uriPhoto ->
+                    viewModel.setLastUriPhoto(uriPhoto)
+                }
             }
         }
     }

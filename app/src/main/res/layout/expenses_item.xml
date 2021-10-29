@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
 
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="2dp"
 
         android:checkable="true"
         android:clickable="true"
@@ -14,44 +14,54 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
     <!--android:background="#EBEDED"-->
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:background="@drawable/expenses_item_bg"
-            >
+            android:paddingVertical="4dp">
 
         <TextView
                 android:id="@+id/dateTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
                 android:textColor="@color/colorDateTime"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-        <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:id="@+id/attachmentImageView"
-                android:src="@drawable/ic_photo_24"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintStart_toEndOf="@id/dateTimeTextView"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="@null" />
 
+        <!-- <ImageView
+                 android:id="@+id/attachmentImageView"
+                 android:layout_width="24dp"
+                 android:layout_height="24dp"
+                 android:layout_marginStart="2dp"
+                 android:layout_marginTop="8dp"
+                 android:alpha=".75"
+                 android:contentDescription="@null"
+                 android:src="@drawable/ic_photo_24"
+                 app:layout_constraintStart_toEndOf="@id/dateTimeTextView"
+                 app:layout_constraintTop_toTopOf="parent" />
+
+         <ImageView
+                 android:id="@+id/locationImageView"
+                 android:layout_width="24dp"
+                 android:layout_height="24dp"
+                 android:layout_marginStart="1dp"
+                 android:layout_marginTop="8dp"
+                 android:alpha=".5"
+                 android:contentDescription="@null"
+                 android:src="@drawable/ic_where_to_vote"
+                 app:layout_constraintStart_toEndOf="@id/attachmentImageView"
+                 app:layout_constraintTop_toTopOf="parent" />
+ -->
         <TextView
                 android:id="@+id/sumTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="2dp"
                 android:textAlignment="textEnd"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/currencyTextView"
@@ -63,7 +73,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
+
                 android:layout_marginEnd="8dp"
                 android:textAlignment="textEnd"
                 android:textSize="14sp"
@@ -74,7 +84,6 @@
                 android:id="@+id/currencyTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@+id/sumTextView"
@@ -87,7 +96,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
                 android:textColor="@color/colorExp"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -102,10 +110,38 @@
                 android:layout_marginBottom="8dp"
                 android:textAlignment="textStart"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/photoChip"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/expenseTextView" />
 
+        <com.google.android.material.chip.Chip
+                android:id="@+id/photoChip"
+                style="@style/AppTheme.AdvancedChipText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/photo"
+
+                app:chipIcon="@drawable/ic_photo_24"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/noteTextView"
+
+                />
+        <com.google.android.material.chip.Chip
+                android:id="@+id/locationChip"
+                style="@style/AppTheme.AdvancedChipText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/map"
+
+                app:chipIcon="@drawable/ic_gps_fixed_24"
+
+                app:layout_constraintStart_toEndOf="@id/photoChip"
+                app:layout_constraintTop_toBottomOf="@+id/noteTextView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

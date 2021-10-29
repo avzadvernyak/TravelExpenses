@@ -1,7 +1,6 @@
 package m.kampukter.travelexpenses.data
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -9,6 +8,8 @@ import androidx.room.PrimaryKey
 )
 
 data class Folders(
-    @PrimaryKey val shortName: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
+    val shortName: String,
     val description: String?
 )
